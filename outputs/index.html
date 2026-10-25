@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -474,9 +474,10 @@
       left: 14px
     }
 
-    @media(pointer:coarse){#title{padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}.home-layout{grid-template-columns:1fr;gap:18px;align-content:start;height:auto;min-height:0}.home-hero{padding:8px 0;gap:14px}.home-hero h1{font-size:clamp(42px,12vw,72px)!important}.home-hero .how{grid-template-columns:1fr 1fr}.home-sessions{max-height:none;padding:18px}.home-footer{font-size:9px}#joystick{display:block}#keys{left:auto;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:158px;display:grid;grid-template-columns:repeat(2,74px);gap:8px;justify-content:end}.k{width:74px;height:74px;border-radius:50%;touch-action:manipulation}.k b{font-size:23px}.k span{font-size:9px}.k small{position:absolute;z-index:3;right:5px;top:4px;font:700 10px Arial;color:white}#combos{bottom:calc(env(safe-area-inset-bottom,0px) + 190px);font-size:8px;gap:3px}#combos span{padding:2px 5px}#hud{left:8px;right:8px;font-size:10px;gap:6px}.bars{max-width:45%}.ib{top:calc(env(safe-area-inset-top,0px) + 48px)}}
+    @media(pointer:coarse){canvas{cursor:none}#keys,.k,#joystick{ -webkit-tap-highlight-color:transparent}#keys{padding-bottom:env(safe-area-inset-bottom,0px)}#title{padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}.home-layout{grid-template-columns:1fr;gap:18px;align-content:start;height:auto;min-height:0}.home-hero{padding:8px 0;gap:14px}.home-hero h1{font-size:clamp(42px,12vw,72px)!important}.home-hero .how{grid-template-columns:1fr 1fr}.home-sessions{max-height:none;padding:18px}.home-footer{font-size:9px}#joystick{display:block}#keys{left:auto;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:158px;display:grid;grid-template-columns:repeat(2,74px);gap:8px;justify-content:end}.k{width:74px;height:74px;border-radius:50%;touch-action:manipulation}.k b{font-size:23px}.k span{font-size:9px}.k small{position:absolute;z-index:3;right:5px;top:4px;font:700 10px Arial;color:white}#combos{bottom:calc(env(safe-area-inset-bottom,0px) + 190px);font-size:8px;gap:3px}#combos span{padding:2px 5px}#hud{left:8px;right:8px;font-size:10px;gap:6px}.bars{max-width:45%}.ib{top:calc(env(safe-area-inset-top,0px) + 48px)}}
     @media(max-width:430px){.home-header{align-items:flex-start;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.12em}#installApp{padding:9px 12px!important;font-size:11px!important}.home-hero .how{grid-template-columns:1fr}.home-hero .how div{align-items:flex-start}.home-hero .how b{min-width:88px}.home-hero h1{font-size:clamp(38px,11vw,54px)!important;letter-spacing:.05em!important}.home-layout{height:auto}.home-sessions{overflow:visible}.session-card{padding:10px}.session-info small{font-size:9px}}
     @media(pointer:coarse){#upg{overflow-y:auto;justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px calc(env(safe-area-inset-bottom,0px) + 18px);gap:12px}#upg h2{font-size:18px;line-height:1.25}#cards{width:min(100%,440px);display:grid;grid-template-columns:1fr;gap:9px;margin:auto}#cards button{width:100%;min-height:86px;padding:10px 14px;display:grid;grid-template-columns:36px 1fr;grid-template-rows:auto auto;text-align:left;gap:4px 10px}#cards i{grid-row:1/3;align-self:center}#cards b{font-size:14px}#cards span{font-size:11px}#over{overflow-y:auto}}
+    @media(pointer:coarse) and (max-height:520px){#joystick{width:100px;height:100px;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}#joyknob{width:44px;height:44px}#keys{right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);grid-template-columns:repeat(2,64px);width:136px;gap:5px}.k{width:64px;height:64px}.k b{font-size:20px}.k span{font-size:8px}#combos{display:none}#hud{top:calc(env(safe-area-inset-top,0px) + 8px)}.ib{top:calc(env(safe-area-inset-top,0px) + 42px)}}
     @media (max-height:520px) {
       #title {
         gap: 8px
@@ -507,7 +508,7 @@
     <div id="lv"></div>
   </div>
   <div id="ban"></div>
-  <div id="keys"><button class="k" data-k="a"><b>⚡</b><span>Embestida</span><small></small></button><button class="k" data-k="s"><b>🔥</b><span>Aliento</span><small></small></button><button class="k" data-k="d"><b>👁️</b><span>Sombras</span><small></small></button><button class="k" data-k="f"><b>✦</b><span>Nova</span><small></small></button></div><div id="joystick"><div id="joyknob"></div></div>
+  <div id="keys"><button class="k" data-k="a" aria-label="Embestida" title="Embestida"><b aria-hidden="true">⚡</b><span>Embestida</span><small></small></button><button class="k" data-k="s" aria-label="Aliento" title="Aliento"><b aria-hidden="true">🔥</b><span>Aliento</span><small></small></button><button class="k" data-k="d" aria-label="Sombras" title="Sombras"><b aria-hidden="true">👁</b><span>Sombras</span><small></small></button><button class="k" data-k="f" aria-label="Nova" title="Nova"><b aria-hidden="true">✦</b><span>Nova</span><small></small></button></div><div id="joystick"><div id="joyknob"></div></div>
   <div id="combos"><span>A+S Cometa</span><span>S+D Infierno</span><span>D+F Singularidad</span></div>
   <div id="toast"></div>
   <button id="mute" class="ib">🔊</button><button id="pbtn" class="ib">❚❚</button>
@@ -530,9 +531,10 @@
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-    let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0,mobile=matchMedia('(pointer: coarse)').matches;
-    function resize() { dpr = Math.min(devicePixelRatio || 1, 2); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*3;WORLD_H=H*3;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
-    addEventListener('resize', resize); resize();
+    const mobileMQ=matchMedia('(pointer: coarse)');
+    let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0,mobile=mobileMQ.matches;
+    function resize() { dpr = Math.min(devicePixelRatio || 1, 2); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
+    addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0};
     const CF = {
       basic: { hp: 60, v: 120, col: '#e8e8f2', n: 20 }, spitter: { hp: 50, v: 100, col: '#7dffa0', n: 20 }, dasher: { hp: 70, v: 110, col: '#ffd36b', n: 22 },
@@ -876,7 +878,7 @@
         ctx.save(); ctx.translate(bh.x, bh.y); const r = (40 + Math.sin(t / 80) * 3) * sc * (1 + bh.t * .3), g2 = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 2.2); g2.addColorStop(0, 'rgba(0,0,0,1)'); g2.addColorStop(.45, 'rgba(10,0,20,.95)'); g2.addColorStop(1, 'rgba(120,40,200,0)'); ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(0, 0, r * 2.2, 0, TAU); ctx.fill();
         ctx.shadowColor = '#a04bff'; ctx.shadowBlur = 18; ctx.strokeStyle = 'rgba(190,120,255,.8)'; ctx.lineWidth = 2; for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(0, 0, r * (1.1 + i * .35), t / 300 + i * 2, t / 300 + i * 2 + 2.2); ctx.stroke() } ctx.restore()
       }
-      drawTents(t);en.forEach(e=>e.drawBone());drawShots();drawDemon(t);if(mobile&&joy.active){const q=pl.P[0],r=18*sc;ctx.save();ctx.globalAlpha=.9;ctx.strokeStyle='#f4cd78';ctx.fillStyle='#fff0bd';ctx.lineWidth=2;ctx.shadowColor='#ffb840';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(ptr.x,ptr.y,r,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(ptr.x,ptr.y,3*sc,0,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(ptr.x-r*1.45,ptr.y);ctx.lineTo(ptr.x-r*.65,ptr.y);ctx.moveTo(ptr.x+r*.65,ptr.y);ctx.lineTo(ptr.x+r*1.45,ptr.y);ctx.moveTo(ptr.x,ptr.y-r*1.45);ctx.lineTo(ptr.x,ptr.y-r*.65);ctx.moveTo(ptr.x,ptr.y+r*.65);ctx.lineTo(ptr.x,ptr.y+r*1.45);ctx.stroke();ctx.globalAlpha=.2;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(ptr.x,ptr.y);ctx.stroke();ctx.restore()}
+      drawTents(t);en.forEach(e=>e.drawBone());drawShots();drawDemon(t);if(mobile){const q=pl.P[0],a=joy.active?Math.atan2(ptr.y-q.y,ptr.x-q.x):pl.A[0],dist=joy.active?Math.min(Math.hypot(ptr.x-q.x,ptr.y-q.y),Math.min(W,H)*.75):Math.min(W,H)*.32,ax=q.x+Math.cos(a)*dist,ay=q.y+Math.sin(a)*dist,r=16*sc;ctx.save();ctx.globalAlpha=.88;ctx.strokeStyle='#f4cd78';ctx.fillStyle='#fff0bd';ctx.lineWidth=2;ctx.shadowColor='#ffb840';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(ax,ay,r,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(ax,ay,3*sc,0,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(ax-r*1.5,ay);ctx.lineTo(ax-r*.65,ay);ctx.moveTo(ax+r*.65,ay);ctx.lineTo(ax+r*1.5,ay);ctx.moveTo(ax,ay-r*1.5);ctx.lineTo(ax,ay-r*.65);ctx.moveTo(ax,ay+r*.65);ctx.lineTo(ax,ay+r*1.5);ctx.stroke();if(joy.active){ctx.globalAlpha=.22;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(ax,ay);ctx.stroke()}ctx.restore()}
       if (nova) { ctx.save(); ctx.shadowColor = '#ff7a2a'; ctx.shadowBlur = 30; ctx.strokeStyle = 'rgba(255,170,90,.85)'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, nova.r, 0, TAU); ctx.stroke(); ctx.strokeStyle = 'rgba(160,75,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, Math.max(0, nova.r - 14), 0, TAU); ctx.stroke(); ctx.restore() }
       drawParts();drawPops();ctx.restore();ctx.globalAlpha=1; ctx.globalCompositeOperation = 'source-over';
       const bs = en.find(e => e.boss); if (bs) { const w = Math.min(W * .5, 420), x = (W - w) / 2; ctx.fillStyle = '#200'; ctx.fillRect(x, 50, w, 8); ctx.fillStyle = '#ff6a5a'; ctx.fillRect(x, 50, w * Math.max(0, bs.hp / bs.max), 8); ctx.strokeStyle = '#ff6a5a'; ctx.strokeRect(x, 50, w, 8); ctx.fillStyle = '#ffb0a5'; ctx.font = '700 11px Cinzel,Georgia,serif'; ctx.textAlign = 'center'; ctx.fillText('EL REY SERPIENTE', W / 2, 44); ctx.textAlign = 'left' }
