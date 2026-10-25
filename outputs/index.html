@@ -1084,7 +1084,7 @@
     function banner(t, s) { const b = $('ban'); b.innerHTML = t + '<small>' + s + '</small>'; b.style.opacity = 1; clearTimeout(banner.h); banner.h = setTimeout(() => b.style.opacity = 0, 2900) }
     function compose(n){
       const a=[],add=(k,c)=>{for(let i=0;i<c;i++)a.push(k)};
-      const base=Math.min(100,18+Math.floor(n*4));
+      const base=Math.min(lowEndDevice?58:100,18+Math.floor(n*(lowEndDevice?2.8:4)));
       if(n%5===0)add('boss',1);
       add('basic',Math.max(7,Math.ceil(base*(n<2?.88:n<3?.72:.58))));
       if(n>=2)add('spitter',Math.min(14,Math.ceil(base*.24)));
@@ -1236,7 +1236,7 @@
       const h = pl.P[0], a = pl.A[0], s = pl.sc, mx = h.x + Math.cos(a) * 16 * s, my = h.y + Math.sin(a) * 16 * s;
       for (let i = 0; i < 8; i++) { const b = a + rnd(-.28, .28), v = rnd(520, 760); part(mx, my, Math.cos(b) * v, Math.sin(b) * v, rnd(.3, .55), rnd(3, 6), 'fire', true) }
       en.forEach(e => {
-        if (e.dead) return; let hit = false; for (let i = 0; i < e.n; i += 3) { const q = e.P[i]; if (Math.hypot(q.x - mx, q.y - my) < 330 * sc && Math.abs(wrap(Math.atan2(q.y - my, q.x - mx) - a)) < .32) { hit = true; break } }
+        if (e.dead) return; let hit = false; for (let i = 0; i < e.n; i += 3) { const q = e.P[i]; if (Math.hypot(q.x - mx, q.y - my) < 380 * sc * (U.area||1) && Math.abs(wrap(Math.atan2(q.y - my, q.x - mx) - a)) < .32) { hit = true; break } }
         if (hit) { hurt(e, 75 * U.dS * dt, 0, 0, true); e.burn = 2.5 }
       });
       shake = Math.max(shake, 2);
@@ -1282,7 +1282,7 @@
       }
       pl.move(ptr.x,ptr.y,spd,turn,dt);updateCamera();
       if (nova) {
-        nova.r += 1000 * dt; en.forEach(e => { if (!e.dead && !nova.hit.has(e) && dst(h, e.P[0]) < nova.r) { nova.hit.add(e); const a = Math.atan2(e.P[0].y - h.y, e.P[0].x - h.x); hurt(e, e.boss ? 160 : 200, Math.cos(a) * 800, Math.sin(a) * 800); e.stun = 1 } });
+        nova.r += 1000 * (U.area||1) * dt; en.forEach(e => { if (!e.dead && !nova.hit.has(e) && dst(h, e.P[0]) < nova.r) { nova.hit.add(e); const a = Math.atan2(e.P[0].y - h.y, e.P[0].x - h.x); hurt(e, (e.boss ? 160 : 200) * U.dA, Math.cos(a) * 800, Math.sin(a) * 800); e.stun = 1 } });
         shots = shots.filter(s => Math.hypot(s.x - h.x, s.y - h.y) > nova.r);
         for (let i = 0; i < 10; i++) { const a = rnd(0, TAU); part(h.x + Math.cos(a) * nova.r, h.y + Math.sin(a) * nova.r, Math.cos(a) * 60, Math.sin(a) * 60, .5, rnd(2, 5), 'fire', true) }
         if (nova.r > Math.hypot(W, H)) nova = null
@@ -1331,7 +1331,7 @@
       });
     }
     const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const emb = Array.from({ length: 46 }, () => ({ x: Math.random(), y: Math.random(), v: rnd(8, 26), r: rnd(.8, 2.2), ph: rnd(0, TAU) }));
+    const emb = Array.from({ length: lowEndDevice?18:46 }, () => ({ x: Math.random(), y: Math.random(), v: rnd(8, 26), r: rnd(.8, 2.2), ph: rnd(0, TAU) }));
     const glowSpr = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(190,255,215,1)'); r.addColorStop(.25, 'rgba(125,255,160,.55)'); r.addColorStop(1, 'rgba(125,255,160,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return c })();
     function lsGet() { try { return +localStorage.getItem('arena_serpientes_best') || 0 } catch (e) { return 0 } }
     function buildBG() {
