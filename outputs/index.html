@@ -855,17 +855,17 @@
     .shop-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1px solid rgba(255,185,100,.24);border-radius:12px;background:rgba(17,9,14,.76)}
     .shop-card[data-tier="ÉPICA"]{border-color:rgba(174,91,255,.5);box-shadow:inset 0 0 18px rgba(125,50,190,.08)}
     .shop-card[data-tier="LEGENDARIA"]{border-color:rgba(255,193,76,.55);box-shadow:inset 0 0 18px rgba(230,150,35,.09)}
-    .shop-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.06);font-size:22px}
-    .shop-copy{min-width:0;display:grid;gap:3px}
-    .shop-copy b{color:#ffe8c5;font-size:13px}
-    .shop-copy small{color:#b8a69b;font-size:11px;line-height:1.35}
-    .shop-copy em{color:#dbb5ff;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.12em}
+    .shop-skill-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.06);font-size:22px}
+    .shop-skill-info{min-width:0;display:grid;gap:3px}
+    .shop-skill-title b{color:#ffe8c5;font-size:13px}
+    .shop-skill-info p{margin:0;color:#b8a69b;font-size:11px;line-height:1.35}.shop-skill-info small{color:#b8a69b;font-size:11px;line-height:1.35}
+    .shop-skill-title span{color:#dbb5ff;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.12em}
     .shop-price{color:#ffe18c;font-size:11px;font-weight:900}
     .shop-card button{min-height:40px;min-width:82px;padding:8px 10px;border:1px solid #9b51d1;border-radius:9px;background:#291238;color:#fff0ff;font-size:11px;font-weight:900;touch-action:manipulation}
     .shop-card button:disabled{border-color:rgba(255,255,255,.15);background:#21191c;color:#9f938d}
     .coin-readout{color:#ffe18c;font-size:.86em}
     .k.empty{opacity:.56;filter:saturate(.55)}
-    @media(max-width:600px){.loadout-grid{grid-template-columns:1fr}.shop-card{grid-template-columns:36px minmax(0,1fr);gap:8px}.shop-card .shop-icon{width:34px;height:34px;font-size:19px}.shop-card button{grid-column:2;justify-self:stretch}.shop-copy small{font-size:10px}}
+    @media(max-width:600px){.loadout-grid{grid-template-columns:1fr}.shop-card{grid-template-columns:36px minmax(0,1fr);gap:8px}.shop-card .shop-skill-icon{width:34px;height:34px;font-size:19px}.shop-card button{grid-column:2;justify-self:stretch}.shop-skill-info small{font-size:10px}}
     @media(orientation:landscape) and (max-height:480px){.loadout-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shop-card{grid-template-columns:34px minmax(0,1fr) auto}.shop-card button{grid-column:auto}}
   </style>
 </head>
