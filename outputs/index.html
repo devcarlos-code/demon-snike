@@ -1437,9 +1437,46 @@
       });
       shake = Math.max(shake, 2);
     }
-    function headHitsBody(headSnake,bodySnake){const h=headSnake.P[0];for(let i=5;i<bodySnake.n-2;i+=2){const p=bodySnake.P[i],r=(headSnake.R[0]*headSnake.sc+bodySnake.R[i]*bodySnake.sc)*.78;if((h.x-p.x)*(h.x-p.x)+(h.y-p.y)*(h.y-p.y)<r*r)return true}return false}
-     function resolveSnakeCollisions(){if(state!=='play')return;for(const e of en){if(e.dead)continue;if(headHitsBody(pl,e)){gameOver();return}if(headHitsBody(e,pl)){kill(e);continue}}for(let i=0;i<en.length;i++){const a=en[i];if(a.dead)continue;for(let j=i+1;j<en.length;j++){const b=en[j];if(b.dead)continue;if(headHitsBody(a,b)){kill(a);break}if(headHitsBody(b,a)){kill(b)}}}}
-     function updateCamera(){if(!pl)return;const target=Math.max(.76,Math.min(1.08,1.08-Math.max(0,pl.n-30)*.0019));camTargetZoom=target;camZoom+=(camTargetZoom-camZoom)*.095;const vw=W/camZoom,vh=H/camZoom,tx=Math.max(0,Math.min(WORLD_W-vw,pl.P[0].x-vw/2)),ty=Math.max(0,Math.min(WORLD_H-vh,pl.P[0].y-vh/2));camX+=(tx-camX)*.22;camY+=(ty-camY)*.22;camX=Math.max(0,Math.min(WORLD_W-vw,camX));camY=Math.max(0,Math.min(WORLD_H-vh,camY))}
+    // Broad phase: calcula una caja por serpiente una sola vez antes de revisar segmentos.
+    function bodyBounds(s){
+      const box={minX:Infinity,minY:Infinity,maxX:-Infinity,maxY:-Infinity,maxR:0};
+      for(let i=5;i<s.n-2;i+=2){const p=s.P[i],r=(s.R[i]||0)*s.sc;box.minX=Math.min(box.minX,p.x-r);box.minY=Math.min(box.minY,p.y-r);box.maxX=Math.max(box.maxX,p.x+r);box.maxY=Math.max(box.maxY,p.y+r);box.maxR=Math.max(box.maxR,r)}
+      return box;
+    }
+    function headNearBody(headSnake,box){
+      const h=headSnake.P[0],r=(headSnake.R[0]*headSnake.sc+box.maxR)*.78;
+      return h.x>=box.minX-r&&h.x<=box.maxX+r&&h.y>=box.minY-r&&h.y<=box.maxY+r;
+    }
+    function headHitsBody(headSnake,bodySnake){
+      const h=headSnake.P[0];
+      for(let i=5;i<bodySnake.n-2;i+=2){
+        const p=bodySnake.P[i],r=(headSnake.R[0]*headSnake.sc+bodySnake.R[i]*bodySnake.sc)*.78;
+        if((h.x-p.x)*(h.x-p.x)+(h.y-p.y)*(h.y-p.y)<r*r)return true;
+      }
+      return false;
+    }
+    function resolveSnakeCollisions(){
+      if(state!=='play')return;
+      const bodies=new Map();
+      if(pl)bodies.set(pl,bodyBounds(pl));
+      for(const e of en)if(!e.dead)bodies.set(e,bodyBounds(e));
+      const playerBounds=bodies.get(pl);
+      for(const e of en){
+        if(e.dead)continue;
+        const eb=bodies.get(e);
+        if(headNearBody(pl,eb)&&headHitsBody(pl,e)){gameOver();return}
+        if(headNearBody(e,playerBounds)&&headHitsBody(e,pl)){kill(e);continue}
+      }
+      for(let i=0;i<en.length;i++){
+        const a=en[i];if(a.dead)continue;
+        for(let j=i+1;j<en.length;j++){
+          const b=en[j];if(b.dead)continue;
+          if(headNearBody(a,bodies.get(b))&&headHitsBody(a,b)){kill(a);break}
+          if(headNearBody(b,bodies.get(a))&&headHitsBody(b,a)){kill(b)}
+        }
+      }
+    }
+    function updateCamera(){if(!pl)return;const target=Math.max(.76,Math.min(1.08,1.08-Math.max(0,pl.n-30)*.0019));camTargetZoom=target;camZoom+=(camTargetZoom-camZoom)*.095;const vw=W/camZoom,vh=H/camZoom,tx=Math.max(0,Math.min(WORLD_W-vw,pl.P[0].x-vw/2)),ty=Math.max(0,Math.min(WORLD_H-vh,pl.P[0].y-vh/2));camX+=(tx-camX)*.22;camY+=(ty-camY)*.22;camX=Math.max(0,Math.min(WORLD_W-vw,camX));camY=Math.max(0,Math.min(WORLD_H-vh,camY))}
      function step(dt) {
       if (state === 'pause') return;
       shake = Math.max(0, shake - dt * 30); wf = Math.max(0, wf - dt * 1.5); rf = Math.max(0, rf - dt * 1.5); guard=Math.max(0,guard-dt);guardFlash=Math.max(0,guardFlash-dt);
