@@ -867,6 +867,14 @@
     .k.empty{opacity:.56;filter:saturate(.55)}
     @media(max-width:600px){.loadout-grid{grid-template-columns:1fr}.shop-card{grid-template-columns:36px minmax(0,1fr);gap:8px}.shop-card .shop-skill-icon{width:34px;height:34px;font-size:19px}.shop-card button{grid-column:2;justify-self:stretch}.shop-skill-info small{font-size:10px}}
     @media(orientation:landscape) and (max-height:480px){.loadout-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shop-card{grid-template-columns:34px minmax(0,1fr) auto}.shop-card button{grid-column:auto}}
+  
+    .home-actions .home-drawer-link{min-height:48px;padding:10px 18px!important;border-color:#75488f!important;background:linear-gradient(145deg,#261630,#100c14)!important;color:#eddbff!important;font:700 12px Arial,sans-serif!important;letter-spacing:.1em!important;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 14px #9b55c322}
+    .home-actions .home-drawer-link:hover{border-color:#d8a7ff!important;box-shadow:0 0 20px #ad5ee466}
+    .home-actions .shop-entry{border-color:#9a7439!important;background:linear-gradient(145deg,#352519,#130d0d)!important;color:#ffe4ad!important}
+    .home-coin-pill{padding:5px 8px;border-radius:999px;background:#0b090b88;color:#ffe18c}
+    .home-coin-pill b{font-size:11px}
+    .home-disclosure{scroll-margin-top:24px}
+    @media(max-width:600px){.home-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.home-actions #go{grid-column:1/-1}.home-actions .home-drawer-link{min-width:0;padding:10px 8px!important;font-size:10px!important}.home-layout{align-content:start}}
   </style>
 </head>
 
@@ -907,9 +915,9 @@
         <div class="home-kicker"><i></i> SOBREVIVE A LA HORDA</div>
         <h1 id="home-title">ARENA DE<br><span>SERPIENTES</span></h1>
         <p class="sub">Eres un demonio hambriento. <strong>Devora las hordas, evoluciona tus poderes</strong> y enfréntate al Rey Serpiente.</p>
-        <div class="home-actions"><button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button></div>
+        <div class="home-actions"><button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button><button class="home-drawer-link" type="button" data-open-drawer="skillsDrawer">✦ HABILIDADES</button><button class="home-drawer-link shop-entry" type="button" data-open-drawer="shopDrawer">TIENDA <span class="home-coin-pill">◈ <b id="homeCoins">0</b></span></button></div>
         <div class="home-drawers">
-          <details class="home-disclosure skills-disclosure">
+          <details id="skillsDrawer" class="home-disclosure skills-disclosure">
             <summary><span class="disclosure-copy"><b>HABILIDADES</b><small>Edita tus cuatro espacios activos</small></span><span id="equippedCount" class="disclosure-count">04/04</span><span class="disclosure-mark" aria-hidden="true"></span></summary>
             <div class="home-disclosure-body">
               <p class="armory-note">Elige una habilidad por tecla. Puedes dejar espacios vacíos; las habilidades compradas se pueden intercambiar cuando quieras.</p>
@@ -917,7 +925,7 @@
               <div id="ownedSkillList" class="owned-skill-list"></div>
             </div>
           </details>
-          <details class="home-disclosure shop-disclosure">
+          <details id="shopDrawer" class="home-disclosure shop-disclosure">
             <summary><span class="disclosure-copy"><b>TIENDA</b><small>Habilidades nuevas para tu arsenal</small></span><span class="shop-wallet">◈ <b id="shopBalance">0</b></span><span class="disclosure-mark" aria-hidden="true"></span></summary>
             <div class="home-disclosure-body">
               <div class="shop-heading"><b>ARTEFACTOS DE COMBATE</b><small>Gana monedas al derrotar enemigos y limpiar hordas.</small></div>
@@ -1033,7 +1041,7 @@
     function runSnapshot(){return {level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
     function persist(checkpoint=true){try{const cp=checkpoint&&['play','pause','upg'].includes(state)?runSnapshot():null;if(cp&&activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=cp;session.level=cp.level;session.score=cp.score;session.updatedAt=Date.now()}}saveData={version:2,best,coins,ownedSkills:[...ownedSkills],skillLoadout:[...skillLoadout],metaU:{...permanentU},metaMaxHp:permanentMaxHp,stats:{...stats},sessions,activeSessionId,checkpoint:cp,savedAt:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));localStorage.setItem('arena_serpientes_best',String(best));refreshHome()}catch(e){}}
     function refreshHome(){
-      const statsNode=$('homeStats'),list=$('sessionList'),count=$('homeSessionCount');
+      const statsNode=$('homeStats'),list=$('sessionList'),count=$('homeSessionCount');const wallet=$('homeCoins');if(wallet)wallet.textContent=coins.toLocaleString('es');
       if(statsNode)statsNode.innerHTML='<span class="home-stat"><b>'+best+'</b><small>RÉCORD</small></span><span class="home-stat"><b>'+stats.bestLevel+'</b><small>NIVEL MÁX.</small></span><span class="home-stat"><b>'+stats.kills+'</b><small>DERROTADAS</small></span><span class="home-stat"><b>'+stats.upgrades+'</b><small>MEJORAS</small></span>';
       const ordered=[...sessions].sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
       if(count)count.textContent=String(ordered.length).padStart(2,'0');
@@ -1408,7 +1416,7 @@
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});document.querySelectorAll('[data-open-drawer]').forEach(b=>b.addEventListener('click',()=>{const panel=$(b.dataset.openDrawer);if(panel){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'center'})}}));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { if (state === 'play') togglePause() });
     document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') togglePause() });
