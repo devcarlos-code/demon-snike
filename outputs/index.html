@@ -819,6 +819,25 @@
     .home-disclosure #homeStats,.home-disclosure .how { margin:0; }
     @media(max-width:600px) { .home-disclosure summary { min-height:54px;padding:9px 11px; }.home-disclosure-body { gap:9px;padding:0 9px 9px; } }
     @media(prefers-reduced-motion:reduce) { .home-disclosure-body,.disclosure-mark,.disclosure-mark::after { animation:none;transition:none; } }
+      /* Portada centrada con dos paneles bajo demanda */
+    .home-layout { width:min(1180px,100%);grid-template-columns:minmax(0,1fr);align-items:center; }
+    .home-hero { width:100%;align-items:center;text-align:center; }
+    .home-kicker { justify-content:center; }
+    .home-hero .sub { margin-left:auto;margin-right:auto; }
+    .home-actions { justify-content:center; }
+    .home-drawers { width:min(100%,940px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin-top:8px;text-align:left; }
+    .home-drawers .home-disclosure { width:100%;margin:0; }
+    .disclosure-count { min-width:32px;height:26px;padding:0 7px;display:grid;place-items:center;border:1px solid #58313b;border-radius:6px;color:#d5ad8a;font:700 10px Arial,sans-serif;letter-spacing:.1em; }
+    .session-disclosure .sessions-heading { padding:3px 2px 4px; }
+    .session-disclosure .sessions-heading .eyebrow { margin-bottom:8px; }
+    .session-disclosure .sessions-heading h2 { margin:0;color:#f0d8ce;font-size:22px;line-height:1.1;letter-spacing:.1em; }
+    .session-disclosure .sessions-heading p { margin:8px 0 12px;font-size:11px; }
+    .session-disclosure .session-card { align-items:flex-start;flex-direction:column; }
+    .session-disclosure .session-resume { width:100%;min-height:38px; }
+    .session-disclosure .sessions-empty { min-height:116px;padding:12px; }
+    .session-disclosure .save-note { margin-top:10px;padding-top:10px; }
+    @media(max-width:760px) { .home-drawers { grid-template-columns:minmax(0,1fr);gap:9px; } }
+    @media(max-width:600px) { .home-layout { padding:14px 0; }.home-hero { gap:12px; }.home-drawers { margin-top:4px; }.session-disclosure .sessions-heading h2 { font-size:20px; } }
   </style>
 </head>
 
@@ -859,31 +878,29 @@
         <div class="home-kicker"><i></i> SOBREVIVE A LA HORDA</div>
         <h1 id="home-title">ARENA DE<br><span>SERPIENTES</span></h1>
         <p class="sub">Eres un demonio hambriento. <strong>Devora las hordas, evoluciona tus poderes</strong> y enfréntate al Rey Serpiente.</p>
-        <div class="home-actions">
-          <button id="homeContinue" class="home-continue" type="button" hidden><span>CONTINUAR CAZA</span><small></small></button>
-          <button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button>
-        </div>
-        <details class="home-disclosure">
-          <summary><span class="disclosure-copy"><b>INFORMACIÓN DE SUPERVIVENCIA</b><small>Estadísticas · controles · combos</small></span><span class="disclosure-mark" aria-hidden="true"></span></summary>
-          <div class="home-disclosure-body">
-            <div id="homeStats" aria-live="polite"></div>
-            <div class="how" aria-label="Controles del juego">
-              <div><b>01 · MOVER</b><span>Ratón o flechas en PC · joystick táctil en móvil</span></div>
-              <div><b>02 · HABILIDADES</b><span>Embestida · Aliento · Sombras · Nova</span></div>
-              <div><b>03 · COMBOS</b><span>A+S · S+D · D+F</span></div>
+        <div class="home-actions"><button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button></div>
+        <div class="home-drawers">
+          <details class="home-disclosure">
+            <summary><span class="disclosure-copy"><b>INFORMACIÓN DE SUPERVIVENCIA</b><small>Estadísticas · controles · combos</small></span><span class="disclosure-mark" aria-hidden="true"></span></summary>
+            <div class="home-disclosure-body">
+              <div id="homeStats" aria-live="polite"></div>
+              <div class="how" aria-label="Controles del juego">
+                <div><b>01 · MOVER</b><span>Ratón o flechas en PC · joystick táctil en móvil</span></div>
+                <div><b>02 · HABILIDADES</b><span>Embestida · Aliento · Sombras · Nova</span></div>
+                <div><b>03 · COMBOS</b><span>A+S · S+D · D+F</span></div>
+              </div>
             </div>
-          </div>
-        </details>
-      </section>
-      <aside class="home-sessions" aria-labelledby="sessions-title">
-        <div class="sessions-heading">
-          <div class="sessions-heading-top"><div class="eyebrow">TU PROGRESO</div><span id="homeSessionCount">0</span></div>
-          <h2 id="sessions-title">TU CAZA<br><span>CONTINÚA</span></h2>
-          <p>Retoma una partida guardada o vuelve a la arena.</p>
+          </details>
+          <details class="home-disclosure session-disclosure">
+            <summary><span class="disclosure-copy"><b>PARTIDAS GUARDADAS</b><small>Retoma o repite una cacería</small></span><span id="homeSessionCount" class="disclosure-count">00</span><span class="disclosure-mark" aria-hidden="true"></span></summary>
+            <div class="home-disclosure-body">
+              <div class="sessions-heading"><div class="eyebrow">TU PROGRESO</div><h2 id="sessions-title">TUS PARTIDAS</h2><p>Elige una sesión para volver a la arena.</p></div>
+              <div id="sessionList"></div>
+              <div class="save-note"><span aria-hidden="true">✦</span> Guardado automático en este dispositivo</div>
+            </div>
+          </details>
         </div>
-        <div id="sessionList"></div>
-        <div class="save-note"><span aria-hidden="true">✦</span> Guardado automático en este dispositivo</div>
-      </aside>
+      </section>
     </main>
   </div>
   <script>
@@ -962,8 +979,6 @@
       if(statsNode)statsNode.innerHTML='<span class="home-stat"><b>'+best+'</b><small>RÉCORD</small></span><span class="home-stat"><b>'+stats.bestLevel+'</b><small>NIVEL MÁX.</small></span><span class="home-stat"><b>'+stats.kills+'</b><small>DERROTADAS</small></span><span class="home-stat"><b>'+stats.upgrades+'</b><small>MEJORAS</small></span>';
       const ordered=[...sessions].sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
       if(count)count.textContent=String(ordered.length).padStart(2,'0');
-      const resumable=ordered.find(x=>x.checkpoint),resume=$('homeContinue');
-      if(resume){resume.hidden=!resumable;if(resumable){resume.dataset.sessionId=resumable.id;resume.querySelector('small').textContent='HORDA '+resumable.checkpoint.level+' · '+resumable.checkpoint.score+' PTS'}}
       if(list)list.innerHTML=ordered.length?ordered.map(x=>{const c=x.checkpoint;return '<article class="session-card"><div class="session-info"><b>'+x.name+'</b><small>'+(c?'HORDA '+c.level+' · '+c.score+' PTS · GUARDADA '+new Date(x.updatedAt||x.createdAt).toLocaleString():'PARTIDA CERRADA · NIVEL '+(x.level||1)+' · '+(x.score||0)+' PTS')+'</small></div><button class="session-resume" data-session-id="'+x.id+'">'+(c?'CONTINUAR':'REPETIR CAZA')+'</button></article>'}).join(''):'<div class="sessions-empty"><span aria-hidden="true">☠</span><b>Tu historia empieza aquí</b><small>Juega tu primera partida y tus sesiones aparecerán en esta lista.</small></div>';
       const t=$('tbest');if(t)t.textContent=best?'MEJOR PUNTUACIÓN · '+best:'';
     }
@@ -1291,7 +1306,7 @@
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('homeContinue').addEventListener('click',e=>continueSavedGame(e.currentTarget.dataset.sessionId));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { if (state === 'play') togglePause() });
     document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') togglePause() });
