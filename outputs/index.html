@@ -579,6 +579,227 @@
         width: clamp(76px, 16vh, 96px);
       }
     }
+  
+    /* Pantalla principal: refugio de la arena */
+    #title {
+      isolation:isolate;
+      overflow-x:hidden;
+      padding:calc(env(safe-area-inset-top,0px) + clamp(42px,3vw,48px)) clamp(18px,5vw,72px) calc(env(safe-area-inset-bottom,0px) + 18px);
+      background:
+        radial-gradient(ellipse at 18% 50%,rgba(145,25,32,.22),transparent 42%),
+        radial-gradient(ellipse at 78% 42%,rgba(105,39,133,.12),transparent 36%),
+        linear-gradient(125deg,#10080e 0%,#09060b 54%,#07050a 100%);
+    }
+    #title::before {
+      content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.6;
+      background:
+        radial-gradient(circle at 18% 28%,#e8473b 0 1px,transparent 2px),
+        radial-gradient(circle at 74% 72%,#d18754 0 1px,transparent 2px),
+        radial-gradient(circle at 87% 24%,#8e3c59 0 1px,transparent 2px),
+        radial-gradient(ellipse at 50% 50%,transparent 0 24%,rgba(213,70,46,.12) 24.2% 24.35%,transparent 24.6% 38%,rgba(213,70,46,.08) 38.2% 38.35%,transparent 38.6%);
+      background-size:180px 180px,240px 240px,210px 210px,100% 100%;
+      mask-image:linear-gradient(90deg,#000,transparent 58%);
+    }
+    .home-header {
+      width:min(1480px,100%);margin:0 auto;position:relative;
+      min-height:58px;padding:8px 0 16px;border-color:#6c3031;
+    }
+    .brand { gap:13px;font-size:12px;letter-spacing:.15em; }
+    .home-mark {
+      display:grid;place-items:center;width:42px;height:42px;margin:0;
+      border:1px solid #a74d3d;border-radius:50%;
+      background:radial-gradient(circle at 35% 25%,#54251f,#180c11 72%);
+      font-size:23px;box-shadow:0 0 22px #b22c272b,inset 0 1px #ffb79c33;
+    }
+    .brand-copy { display:grid;gap:4px; }
+    .brand-copy small { color:#bd8177;font:700 9px Arial,sans-serif;letter-spacing:.3em; }
+    .brand-copy b { color:#f1e3d8;font-size:11px;letter-spacing:.19em; }
+    .home-topline { display:flex;align-items:center;gap:18px;color:#997b78;font:700 9px Arial,sans-serif;letter-spacing:.18em; }
+    #installApp {
+      display:inline-flex!important;align-items:center;justify-content:center;min-height:38px;
+      padding:0 15px!important;border:1px solid #68402f;border-radius:8px;
+      color:#e5cda2;background:rgba(29,18,18,.74);font:700 10px Arial,sans-serif!important;
+      letter-spacing:.12em!important;transition:background .2s,border-color .2s,transform .2s;
+    }
+    #installApp:hover { border-color:#d8a254;background:#3a231a;transform:translateY(-2px); }
+    body[data-s=title] #mute {
+      top:calc(env(safe-area-inset-top,0px) + 8px);left:auto;right:16px;
+      width:36px;height:32px;padding:0;display:grid;place-items:center;
+      border-color:#48252c;background:#100a10;z-index:10;
+    }
+    .home-layout {
+      width:min(1480px,100%);height:auto;min-height:0;flex:1;
+      grid-template-columns:minmax(0,1.18fr) minmax(340px,.82fr);
+      gap:clamp(38px,7vw,112px);align-items:center;padding:clamp(22px,4vh,52px) 0;
+    }
+    .home-hero { position:relative;gap:clamp(13px,2.1vh,22px);padding:28px 0; }
+    .home-kicker { display:flex;align-items:center;gap:10px;color:#f09a73;font:700 10px Arial,sans-serif;letter-spacing:.25em; }
+    .home-kicker i { width:7px;height:7px;border-radius:50%;background:#ff6248;box-shadow:0 0 13px #ff6248; }
+    .home-hero h1 {
+      max-width:900px;font-size:clamp(54px,7.4vw,102px)!important;
+      line-height:.97!important;letter-spacing:.065em!important;
+      text-shadow:0 5px 30px #000a,0 0 32px #d52c251f;
+    }
+    .home-hero h1 span {
+      color:#eedbd0;background:linear-gradient(100deg,#f3e7d8 10%,#c9a28d 65%,#9c736d);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .home-hero .sub {
+      max-width:590px;color:#d2bfbb;font-size:clamp(15px,1.5vw,19px);
+      line-height:1.7;letter-spacing:.035em;
+    }
+    .home-hero .sub strong { color:#fff0dc;font-weight:700; }
+    .home-actions { width:min(100%,540px);align-items:stretch;justify-content:flex-start;gap:12px;flex-wrap:wrap; }
+    .home-actions button {
+      min-height:54px;padding:10px 18px!important;border:1px solid #6b342b;border-radius:9px;
+      display:inline-flex;align-items:center;justify-content:center;gap:14px;
+      font:700 12px Arial,sans-serif!important;letter-spacing:.12em!important;
+      transition:transform .18s,border-color .18s,box-shadow .18s,background .18s;
+    }
+    #go {
+      min-width:220px;color:#fff0dc!important;border-color:#d59149!important;
+      background:linear-gradient(135deg,#9d3825,#6e1d1c 55%,#39151a)!important;
+      box-shadow:0 8px 28px #a82d2538,inset 0 1px #ffe5b955!important;
+    }
+    #go small,.home-continue small { font:700 9px Arial,sans-serif;letter-spacing:.12em;opacity:.76; }
+    #go:hover,.home-continue:hover { transform:translateY(-3px);box-shadow:0 12px 34px #c14a354a,inset 0 1px #fff5!important; }
+    .home-continue {
+      min-width:220px;color:#ffe9bf!important;border-color:#9d7843!important;
+      background:linear-gradient(135deg,#49351d,#211812)!important;
+      box-shadow:0 7px 24px #0005,inset 0 1px #ffe7b433!important;
+    }
+    .home-continue[hidden] { display:none!important; }
+    .home-actions button:focus-visible,#installApp:focus-visible,.session-resume:focus-visible {
+      outline:2px solid #ffe1a0;outline-offset:4px;
+    }
+    #homeStats {
+      display:grid;grid-template-columns:repeat(4,minmax(80px,1fr));gap:8px;
+      width:min(100%,590px);margin-top:4px;letter-spacing:normal;
+    }
+    .home-stat {
+      min-height:54px;padding:9px 11px;display:flex;flex-direction:column;justify-content:center;gap:3px;
+      border:1px solid #40232a;border-radius:8px;background:linear-gradient(145deg,#160d13c9,#0e090dc9);
+    }
+    .home-stat b { color:#f4d7b0;font:700 17px Arial,sans-serif; }
+    .home-stat small { color:#9e8585;font:700 8px Arial,sans-serif;letter-spacing:.16em; }
+    .home-hero .how {
+      max-width:630px;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+      margin-top:3px;font:11px Arial,sans-serif;
+    }
+    .home-hero .how div {
+      min-height:70px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+      border:1px solid #3e242a;border-radius:8px;
+      background:linear-gradient(145deg,rgba(28,14,19,.9),rgba(13,9,13,.75));
+      transition:transform .18s,border-color .18s,background .18s;
+    }
+    .home-hero .how div:hover { transform:translateY(-3px);border-color:#98513d;background:#24141a; }
+    .home-hero .how b { min-width:0;color:#e7ad8a;font-size:9px;letter-spacing:.12em; }
+    .home-hero .how span { color:#b9a6a2;font-size:10px;line-height:1.5;opacity:1; }
+    #tbest { min-height:1em;color:#9f8580;font:700 9px Arial,sans-serif;letter-spacing:.15em; }
+    .home-sessions {
+      align-self:center;max-height:min(72vh,720px);padding:clamp(22px,3vw,38px);
+      border-color:#65403a;border-radius:16px;
+      background:linear-gradient(155deg,rgba(30,15,22,.96),rgba(12,9,14,.97));
+      box-shadow:0 28px 80px #0008,inset 0 1px #ffffff0d;
+    }
+    .sessions-heading-top { display:flex;align-items:center;justify-content:space-between; }
+    .sessions-heading-top #homeSessionCount {
+      min-width:34px;padding:6px 8px;border:1px solid #58313b;border-radius:6px;
+      color:#d5ad8a;text-align:center;font:700 10px Arial,sans-serif;letter-spacing:.1em;
+    }
+    .sessions-heading h2 { margin:12px 0;color:#f0d8ce;font-size:clamp(28px,3.6vw,42px);line-height:1.05; }
+    .sessions-heading h2 span { color:#c28e83; }
+    .sessions-heading p { max-width:320px;margin:12px 0 22px;color:#bba9a4;font:13px Arial,sans-serif;line-height:1.6; }
+    .session-card {
+      margin-top:10px;padding:14px;align-items:center;
+      border-color:#4b2b32;border-radius:10px;
+      background:linear-gradient(130deg,#1a1017,#110c11);
+      transition:transform .18s,border-color .18s,background .18s;
+    }
+    .session-card:hover { transform:translateY(-2px);border-color:#87503f;background:#20131a; }
+    .session-info b { color:#f0ddd0;font-size:12px; }
+    .session-info small { color:#a99592;font:10px Arial,sans-serif;line-height:1.5; }
+    .session-resume {
+      min-height:36px;padding:8px 10px!important;border:1px solid #80543e!important;
+      border-radius:6px!important;color:#f2d5a7!important;background:#291b19!important;
+      font:700 9px Arial,sans-serif!important;letter-spacing:.08em!important;
+      transition:background .18s,border-color .18s;
+    }
+    .session-resume:hover:not(:disabled) { background:#543021!important;border-color:#d39b58!important; }
+    .session-resume:disabled { cursor:default;opacity:.45; }
+    .sessions-empty {
+      min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+      border:1px dashed #52333b;border-radius:10px;background:#100b10;
+      text-align:center;color:#d4b39c;
+    }
+    .sessions-empty>span { color:#c55b46;font-size:24px;text-shadow:0 0 18px #d1473a; }
+    .sessions-empty b { font-size:13px;letter-spacing:.06em; }
+    .sessions-empty small { max-width:240px;color:#a99491;font:11px Arial,sans-serif;line-height:1.55; }
+    .save-note {
+      display:flex;align-items:center;gap:8px;margin-top:18px;padding-top:14px;
+      border-top:1px solid #442a30;color:#967f7e;font:10px Arial,sans-serif;letter-spacing:.04em;
+    }
+    .save-note span { color:#d5a862; }
+    .home-footer {
+      width:min(1480px,100%);margin:0 auto;padding-top:12px;border-top:1px solid #372129;
+      display:flex;justify-content:center;align-items:center;gap:12px;color:#806d72;
+      font:700 8px Arial,sans-serif;letter-spacing:.18em;
+    }
+    .home-footer i { width:3px;height:3px;border-radius:50%;background:#a25745; }
+    @media(pointer:coarse) {
+      #title {
+        padding:calc(env(safe-area-inset-top,0px) + 52px) 18px calc(env(safe-area-inset-bottom,0px) + 18px);
+      }
+      body[data-s=title] #mute { top:calc(env(safe-area-inset-top,0px) + 8px);right:16px;left:auto; }
+      .home-header { min-height:50px;padding-bottom:12px; }
+      .home-topline { gap:0; }
+      .home-topline>span { display:none; }
+      .home-layout { grid-template-columns:minmax(0,1fr);gap:20px;padding:22px 0; }
+      .home-hero { gap:14px;padding:8px 0; }
+      .home-hero h1 { font-size:clamp(48px,11vw,76px)!important; }
+      .home-hero .sub { font-size:15px; }
+      .home-sessions { max-height:none;padding:20px; }
+      .sessions-heading h2 { font-size:28px; }
+      .home-footer { flex-wrap:wrap;text-align:center;font-size:7px; }
+    }
+    @media(max-width:600px) {
+      #title { padding-left:15px;padding-right:15px;gap:14px; }
+      .home-header { align-items:center; }
+      .home-mark { width:36px;height:36px;font-size:20px; }
+      .brand-copy small { font-size:8px; }
+      .brand-copy b { font-size:9px;letter-spacing:.12em; }
+      #installApp { min-height:34px;padding:0 10px!important;font-size:9px!important; }
+      .home-hero h1 { font-size:clamp(42px,11.5vw,64px)!important; }
+      .home-hero .sub { font-size:14px;line-height:1.6; }
+      .home-actions { display:grid;grid-template-columns:1fr;gap:9px; }
+      .home-actions button { width:100%;min-height:50px; }
+      #homeStats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .home-stat { min-height:48px; }
+      .home-hero .how { grid-template-columns:1fr;gap:6px; }
+      .home-hero .how div { min-height:0;flex-direction:row;align-items:center;gap:10px;padding:9px 11px; }
+      .home-hero .how b { flex:0 0 112px; }
+      .home-hero .how span { font-size:10px; }
+      .session-card { flex-wrap:wrap; }
+      .session-info { flex:1 1 100%; }
+      .session-resume { width:100%;min-height:40px; }
+      .home-footer { gap:7px;letter-spacing:.12em; }
+    }
+    @media(max-height:720px) and (min-width:601px) {
+      #title { padding-top:calc(env(safe-area-inset-top,0px) + 42px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);gap:10px; }
+      .home-header { min-height:42px;padding-bottom:9px; }
+      .home-layout { gap:28px;padding:10px 0; }
+      .home-hero { gap:10px;padding:6px 0; }
+      .home-hero h1 { font-size:clamp(46px,6vw,72px)!important; }
+      .home-hero .how div { min-height:58px;padding:8px; }
+      #homeStats { gap:5px; }
+      .home-stat { min-height:44px;padding:6px 8px; }
+      .home-sessions { max-height:66vh;padding:20px; }
+      .home-footer { padding-top:7px; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      .home-hero .how div,.session-card,#go,.home-continue,#installApp { transition:none; }
+      .home-hero .how div:hover,.session-card:hover,#go:hover,.home-continue:hover,#installApp:hover { transform:none; }
+    }
   </style>
 </head>
 
@@ -596,7 +817,7 @@
   <div id="keys"><button class="k" data-k="a" data-hotkey="A" aria-keyshortcuts="A" aria-label="Embestida, tecla A" title="Embestida (A)"><b aria-hidden="true">⚡</b><span>Embestida</span><small></small></button><button class="k" data-k="s" data-hotkey="S" aria-keyshortcuts="S" aria-label="Aliento, tecla S" title="Aliento (S)"><b aria-hidden="true">🔥</b><span>Aliento</span><small></small></button><button class="k" data-k="d" data-hotkey="D" aria-keyshortcuts="D" aria-label="Sombras, tecla D" title="Sombras (D)"><b aria-hidden="true">👁</b><span>Sombras</span><small></small></button><button class="k" data-k="f" data-hotkey="F" aria-keyshortcuts="F" aria-label="Nova, tecla F" title="Nova (F)"><b aria-hidden="true">✦</b><span>Nova</span><small></small></button></div><div id="joystick"><div id="joyknob"></div></div>
   <div id="combos"><span>A+S Cometa</span><span>S+D Infierno</span><span>D+F Singularidad</span></div>
   <div id="toast"></div>
-  <button id="mute" class="ib">🔊</button><button id="pbtn" class="ib">❚❚</button>
+  <button id="mute" class="ib" aria-label="Silenciar sonido" title="Silenciar sonido">🔊</button><button id="pbtn" class="ib">❚❚</button>
   <div id="upg">
     <h2>ELIGE UNA MEJORA</h2>
     <div id="cards"></div>
@@ -610,8 +831,38 @@
     <p class="sub">Pulsa P o Esc para continuar</p><button id="rs">CONTINUAR</button><button id="pauseHome" class="secondary">MENÚ PRINCIPAL</button>
   </div>
   <div id="title" class="home-page">
-    <header class="home-header"><div class="brand"><span class="home-mark">☠</span><span>ARENA <b>DE SERPIENTES</b></span></div><button id="installApp" class="secondary">INSTALAR APP</button></header>
-    <main class="home-layout"><section class="home-hero"><div class="eyebrow">SUPERVIVE. EVOLUCIONA. DOMINA.</div><h1>ARENA DE<br>SERPIENTES</h1><p class="sub">Eres un demonio hambriento. Devora las hordas, fortalece tus habilidades y derriba al Rey Serpiente.</p><div class="how"><div><b>MOVER</b><span>Ratón, flechas o joystick táctil</span></div><div><b>HABILIDADES</b><span>Embestida · Aliento · Sombras · Nova</span></div><div><b>COMBOS</b><span>A+S · S+D · D+F</span></div></div><div id="homeStats"></div><div class="home-actions"><button id="go">NUEVA PARTIDA</button></div><small id="tbest"></small></section><aside class="home-sessions"><div class="sessions-heading"><div class="eyebrow">TU PROGRESO</div><h2>MIS SESIONES</h2><p>Continúa una partida guardada cuando quieras.</p></div><div id="sessionList"></div><div class="save-note">Guardado automático en este dispositivo</div></aside></main><footer class="home-footer">Progreso permanente · Guardado local · Disponible sin conexión después de cargar</footer>
+    <header class="home-header">
+      <div class="brand"><span class="home-mark" aria-hidden="true">☠</span><span class="brand-copy"><small>DEMON-SNIKE</small><b>ARENA DE SERPIENTES</b></span></div>
+      <div class="home-topline"><span>SUPERVIVENCIA · ACCIÓN · EVOLUCIÓN</span><button id="installApp" class="secondary">↓ INSTALAR</button></div>
+    </header>
+    <main class="home-layout">
+      <section class="home-hero" aria-labelledby="home-title">
+        <div class="home-kicker"><i></i> SOBREVIVE A LA HORDA</div>
+        <h1 id="home-title">ARENA DE<br><span>SERPIENTES</span></h1>
+        <p class="sub">Eres un demonio hambriento. <strong>Devora las hordas, evoluciona tus poderes</strong> y enfréntate al Rey Serpiente.</p>
+        <div class="home-actions">
+          <button id="homeContinue" class="home-continue" type="button" hidden><span>CONTINUAR CAZA</span><small></small></button>
+          <button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button>
+        </div>
+        <div id="homeStats" aria-live="polite"></div>
+        <div class="how" aria-label="Controles del juego">
+          <div><b>01 · MOVER</b><span>Ratón o flechas en PC · joystick táctil en móvil</span></div>
+          <div><b>02 · HABILIDADES</b><span>Embestida · Aliento · Sombras · Nova</span></div>
+          <div><b>03 · COMBOS</b><span>A+S · S+D · D+F</span></div>
+        </div>
+        <small id="tbest"></small>
+      </section>
+      <aside class="home-sessions" aria-labelledby="sessions-title">
+        <div class="sessions-heading">
+          <div class="sessions-heading-top"><div class="eyebrow">TU PROGRESO</div><span id="homeSessionCount">0</span></div>
+          <h2 id="sessions-title">TU CAZA<br><span>CONTINÚA</span></h2>
+          <p>Retoma una partida guardada o vuelve a la arena.</p>
+        </div>
+        <div id="sessionList"></div>
+        <div class="save-note"><span aria-hidden="true">✦</span> Guardado automático en este dispositivo</div>
+      </aside>
+    </main>
+    <footer class="home-footer"><span>PROGRESO PERMANENTE</span><i></i><span>LISTO PARA JUGAR SIN CONEXIÓN</span></footer>
   </div>
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
@@ -684,7 +935,16 @@
     if(saveData.checkpoint&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Partida guardada',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
     function runSnapshot(){return {level:Math.max(1,lvl),score,hp,fury,enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
     function persist(checkpoint=true){try{const cp=checkpoint&&['play','pause','upg'].includes(state)?runSnapshot():null;if(cp&&activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=cp;session.level=cp.level;session.score=cp.score;session.updatedAt=Date.now()}}saveData={version:2,best,metaU:{...permanentU},metaMaxHp:permanentMaxHp,stats:{...stats},sessions,activeSessionId,checkpoint:cp,savedAt:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));localStorage.setItem('arena_serpientes_best',String(best));refreshHome()}catch(e){}}
-    function refreshHome(){const n=$('homeStats'),list=$('sessionList');if(n)n.innerHTML='<b>'+best+'</b> RÉCORD &nbsp; · &nbsp; <b>'+stats.bestLevel+'</b> HORDAS &nbsp; · &nbsp; <b>'+stats.kills+'</b> SERPIENTES &nbsp; · &nbsp; <b>'+stats.upgrades+'</b> MEJORAS PERMANENTES';const ordered=[...sessions].sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));if(list)list.innerHTML=ordered.length?ordered.map(x=>{const c=x.checkpoint;return '<article class="session-card"><div class="session-info"><b>'+x.name+'</b><small>'+(c?'Horda '+c.level+' · '+c.score+' pts · Guardada '+new Date(x.updatedAt||x.createdAt).toLocaleString():'Finalizada · Horda '+(x.level||1)+' · '+(x.score||0)+' pts')+'</small></div>'+'<button class="session-resume" data-session-id="'+x.id+'">CONTINUAR SESIÓN</button>'+'</article>'}).join(''):'<div class="sessions-empty">Aún no hay sesiones. Inicia una partida y aparecerá aquí.</div>';const t=$('tbest');if(t)t.textContent=best?'RÉCORD ACTUAL: '+best:''}
+    function refreshHome(){
+      const statsNode=$('homeStats'),list=$('sessionList'),count=$('homeSessionCount');
+      if(statsNode)statsNode.innerHTML='<span class="home-stat"><b>'+best+'</b><small>RÉCORD</small></span><span class="home-stat"><b>'+stats.bestLevel+'</b><small>NIVEL MÁX.</small></span><span class="home-stat"><b>'+stats.kills+'</b><small>DERROTADAS</small></span><span class="home-stat"><b>'+stats.upgrades+'</b><small>MEJORAS</small></span>';
+      const ordered=[...sessions].sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
+      if(count)count.textContent=String(ordered.length).padStart(2,'0');
+      const resumable=ordered.find(x=>x.checkpoint),resume=$('homeContinue');
+      if(resume){resume.hidden=!resumable;if(resumable){resume.dataset.sessionId=resumable.id;resume.querySelector('small').textContent='HORDA '+resumable.checkpoint.level+' · '+resumable.checkpoint.score+' PTS'}}
+      if(list)list.innerHTML=ordered.length?ordered.map(x=>{const c=x.checkpoint;return '<article class="session-card"><div class="session-info"><b>'+x.name+'</b><small>'+(c?'HORDA '+c.level+' · '+c.score+' PTS · GUARDADA '+new Date(x.updatedAt||x.createdAt).toLocaleString():'PARTIDA CERRADA · NIVEL '+(x.level||1)+' · '+(x.score||0)+' PTS')+'</small></div><button class="session-resume" data-session-id="'+x.id+'">'+(c?'CONTINUAR':'REPETIR CAZA')+'</button></article>'}).join(''):'<div class="sessions-empty"><span aria-hidden="true">☠</span><b>Tu historia empieza aquí</b><small>Juega tu primera partida y tus sesiones aparecerán en esta lista.</small></div>';
+      const t=$('tbest');if(t)t.textContent=best?'MEJOR PUNTUACIÓN · '+best:'';
+    }
     let U={...permanentU},maxHp=permanentMaxHp, saveTick=0, comet = 0, poolT = 0, bh = null, pools = [], lastK = null, lastT = 0, upgCur = [];
     const cdset = (k, m = 1) => { cd[k] = MAXCD[k] * U.cd * m };
     const mk = (k, x, y) => { const c = CF[k]; return new Snake(x, y, { ...c, hp: c.hp * (1 + .16 * (Math.max(1, lvl) - 1)) }, k) };
@@ -1009,7 +1269,7 @@
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('sessionList').addEventListener('click',e=>{const b=e.target.closest('[data-session-id]');if(b)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('homeContinue').addEventListener('click',e=>continueSavedGame(e.currentTarget.dataset.sessionId));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { if (state === 'play') togglePause() });
     document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') togglePause() });
@@ -1070,7 +1330,7 @@
     };
     function ping(k) { const f = { a: 523, s: 659, d: 440, f: 880 }[k]; tone(f, f * 1.5, .2, 'sine', .09) }
     const installButton=$('installApp');let installPrompt=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;installButton.style.display='inline-block'});installButton.addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null}else toast('En el menú del navegador: “Añadir a pantalla de inicio” o “Instalar app”')});addEventListener('appinstalled',()=>{installButton.style.display='none';toast('APP INSTALADA')});if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./service-worker.js').catch(()=>{});installButton.style.display='inline-block';
-    $('mute').addEventListener('click', () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; if (master) master.gain.value = muted ? 0 : .6; initAudio() });
+    $('mute').addEventListener('click', () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; $('mute').setAttribute('aria-label',muted?'Activar sonido':'Silenciar sonido'); $('mute').title=muted?'Activar sonido':'Silenciar sonido'; if (master) master.gain.value = muted ? 0 : .6; initAudio() });
     let prev = performance.now();
     function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now); requestAnimationFrame(loop) }
     makePlayer();refreshHome();requestAnimationFrame(loop);
