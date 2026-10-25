@@ -1,0 +1,17 @@
+{
+  "id": "./index.html",
+  "name": "Arena de Serpientes",
+  "short_name": "Serpientes",
+  "description": "Arena de acción y supervivencia por oleadas.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#07050a",
+  "theme_color": "#07050a",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

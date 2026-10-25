@@ -1,0 +1,6 @@
+ARENA DE SERPIENTES — INSTALACIÓN
+
+Para jugar como página: abre index.html o Arena de Serpientes.html.
+Para instalarla como app sin conexión, publica la carpeta outputs en un sitio con HTTPS y abre la dirección en el navegador. Después elige “Instalar app” desde el menú del navegador. La instalación local desde file:// no permite activar el service worker ni la instalación PWA.
+
+Las partidas y mejoras se guardan en el almacenamiento local del navegador. Usa el mismo navegador y perfil para continuar las sesiones guardadas.
