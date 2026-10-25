@@ -1049,7 +1049,7 @@
       const used=skillLoadout.filter(Boolean).length;if(count)count.textContent=String(used).padStart(2,'0')+'/04';
       grid.innerHTML=SLOT_KEYS.map((key,i)=>{
         const selected=skillLoadout[i]||'',options='<option value="">— ESPACIO VACÍO —</option>'+ownedSkills.map(id=>{const skill=skillById(id);return skill?'<option value="'+skill.id+'"'+(selected===id?' selected':'')+'>'+skill.icon+' '+skill.name+' · '+skill.tier+'</option>':''}).join('');
-        return '<label class="loadout-slot"><span><b>ESPACIO '+key.toUpperCase()+'</b><small>TECLA '+key.toUpperCase()+'</small></span><select data-skill-slot="'+i+'" aria-label="Habilidad del espacio '+key.toUpperCase()+'">'+options+'</select></label>
+        return '<label class="loadout-slot"><span><b>ESPACIO '+key.toUpperCase()+'</b><small>TECLA '+key.toUpperCase()+'</small></span><select data-skill-slot="'+i+'" aria-label="Habilidad del espacio '+key.toUpperCase()+'">'+options+'</select></label>'
       }).join('')+'<div class="loadout-actions"><button id="resetLoadout" type="button">RESTABLECER HABILIDADES INICIALES</button><small>'+used+' de 4 espacios ocupados</small></div>';
       const owned=$('ownedSkillList');if(owned)owned.innerHTML='<span>DESBLOQUEADAS</span> '+ownedSkills.map(id=>{const skill=skillById(id);return skill?'<b>'+skill.icon+' '+skill.name+'</b>':''}).join('');
     }
@@ -1058,7 +1058,7 @@
       list.innerHTML=SKILL_CATALOG.filter(x=>x.price>0).map(skill=>{
         const owned=ownedSkills.includes(skill.id),equipped=skillLoadout.includes(skill.id),short=coins<skill.price?skill.price-coins:0;
         const label=owned?(equipped?'EN TU ARSENAL':'ADQUIRIDA'):(short?'FALTAN '+short+' ◈':'COMPRAR · '+skill.price+' ◈');
-        return '<article class="shop-card" data-tier="'+skill.tier+'"><div class="shop-skill-icon">'+skill.icon+'</div><div class="shop-skill-info"><div class="shop-skill-title"><b>'+skill.name+'</b><span>'+skill.tier+'</span></div><p>'+skill.description+'</p><small>RECARGA · '+skill.cooldown.toFixed(1)+' S</small></div><button type="button" data-buy-skill="'+skill.id+'"'+(owned||short?' disabled':'')+'>'+label+'</button></article>
+        return '<article class="shop-card" data-tier="'+skill.tier+'"><div class="shop-skill-icon">'+skill.icon+'</div><div class="shop-skill-info"><div class="shop-skill-title"><b>'+skill.name+'</b><span>'+skill.tier+'</span></div><p>'+skill.description+'</p><small>RECARGA · '+skill.cooldown.toFixed(1)+' S</small></div><button type="button" data-buy-skill="'+skill.id+'"'+(owned||short?' disabled':'')+'>'+label+'</button></article>'
       }).join('');
     }
     function buySkill(id){const skill=skillById(id);if(!skill||skill.price<=0||ownedSkills.includes(id))return;if(coins<skill.price){toast('TE FALTAN '+(skill.price-coins)+' MONEDAS');return}coins-=skill.price;ownedSkills.push(id);persist(true);toast(skill.name.toUpperCase()+' · ADQUIRIDA');SFX.up()}
