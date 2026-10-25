@@ -1302,7 +1302,7 @@
     }
     function continueSavedGame(id){const session=sessions.find(x=>x.id===id);if(!session)return;activeSessionId=session.id;saveData.checkpoint=session.checkpoint||null;$('title').style.display='none';initAudio();if(session.checkpoint)newGame(true);else newGame(false,session.id);tryFullscreen()}
     function goHome(){if(state==='play'||state==='pause'||state==='upg')persist(true);state='title';$('title').style.display='grid';$('over').style.display='none';$('pz').style.display='none';$('upg').style.display='none';refreshHome()}
-    function restart() { if (state === 'over' && performance.now() - overAt > 700) { $('over').querySelector('h1').textContent='FIN DE PARTIDA';gameMode='survival';newGame(false)} }
+    function restart() { if (state === 'over' && performance.now() - overAt > 700) { $('over').querySelector('h1').textContent='FIN DE PARTIDA';newGame(false)} }
     function togglePause(){
       if(state==='play'){persist(true);state='pause'; $('pz').style.display = 'flex'; if (AC && AC.suspend) AC.suspend() }
       else if (state === 'pause') { state = 'play'; $('pz').style.display = 'none'; if (AC && AC.resume) AC.resume() }
