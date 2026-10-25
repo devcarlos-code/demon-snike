@@ -286,10 +286,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(5, 0, 3, .88);
-      gap: 18px;
-      padding: 16px;
-      text-align: center
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background: rgba(5, 0, 3, .94);
+      gap: 16px;
+      padding: 22px 16px;
+      text-align: center;
+      z-index: 30
     }
 
     #upg h2 {
@@ -301,14 +304,17 @@
     }
 
     #cards {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: center
+      width: min(100%, 900px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      justify-content: center;
+      margin: auto
     }
 
     #cards button {
-      width: 200px;
+      width: 100%;
+      min-width: 0;
       padding: 16px 12px;
       background:linear-gradient(145deg,#211811,#0d090b);
       border:1px solid #a57a38;
@@ -515,8 +521,8 @@
     }
 
     @media(pointer:coarse){canvas{cursor:none}#keys,.k,#joystick{ -webkit-tap-highlight-color:transparent}#keys{padding-bottom:env(safe-area-inset-bottom,0px)}#title{padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}.home-layout{grid-template-columns:1fr;gap:18px;align-content:start;height:auto;min-height:0}.home-hero{padding:8px 0;gap:14px}.home-hero h1{font-size:clamp(42px,12vw,72px)!important}.home-hero .how{grid-template-columns:1fr 1fr}.home-sessions{max-height:none;padding:18px}.home-footer{font-size:9px}#joystick{display:block}#keys{left:auto;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:158px;display:grid;grid-template-columns:repeat(2,74px);gap:8px;justify-content:end}.k{width:74px;height:74px;border-radius:50%;touch-action:manipulation}.k b{font-size:23px}.k span{font-size:9px}.k small{position:absolute;z-index:3;right:5px;top:4px;font:700 10px Arial;color:white}#combos{bottom:calc(env(safe-area-inset-bottom,0px) + 190px);font-size:8px;gap:3px}#combos span{padding:2px 5px}#hud{left:8px;right:8px;font-size:10px;gap:6px}.bars{max-width:45%}.ib{top:calc(env(safe-area-inset-top,0px) + 48px)}}
-    @media(max-width:430px){#cards{grid-template-columns:1fr;max-width:420px}#cards button{min-height:78px}.home-header{align-items:flex-start;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.12em}#installApp{padding:9px 12px!important;font-size:11px!important}.home-hero .how{grid-template-columns:1fr}.home-hero .how div{align-items:flex-start}.home-hero .how b{min-width:88px}.home-hero h1{font-size:clamp(38px,11vw,54px)!important;letter-spacing:.05em!important}.home-layout{height:auto}.home-sessions{overflow:visible}.session-card{padding:10px}.session-info small{font-size:9px}}
-    @media(pointer:coarse){#upg{overflow-y:auto;justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px calc(env(safe-area-inset-bottom,0px) + 18px);gap:12px}#upg h2{font-size:18px;line-height:1.25}#cards{width:min(100%,520px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:auto}#cards button{width:100%;min-height:112px;padding:10px;display:flex;flex-direction:column;justify-content:center;text-align:left;gap:5px}#cards button b{font-size:12px}#cards button span{font-size:10px;line-height:1.3}#cards button i{font-size:9px}#cards i{grid-row:1/3;align-self:center}#cards b{font-size:14px}#cards span{font-size:11px}#over{overflow-y:auto}}
+    @media(max-width:700px){#cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#cards button{min-height:104px;padding:11px}}@media(max-width:430px){#cards{grid-template-columns:1fr;max-width:420px}#cards button{min-height:78px}.home-header{align-items:flex-start;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.12em}#installApp{padding:9px 12px!important;font-size:11px!important}.home-hero .how{grid-template-columns:1fr}.home-hero .how div{align-items:flex-start}.home-hero .how b{min-width:88px}.home-hero h1{font-size:clamp(38px,11vw,54px)!important;letter-spacing:.05em!important}.home-layout{height:auto}.home-sessions{overflow:visible}.session-card{padding:10px}.session-info small{font-size:9px}}
+    @media(pointer:coarse){#upg{justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px calc(env(safe-area-inset-bottom,0px) + 18px);gap:12px}#upg h2{font-size:18px;line-height:1.25}#cards{width:min(100%,520px);grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:auto}#cards button{width:100%;min-height:112px;padding:10px;display:flex;flex-direction:column;justify-content:center;text-align:left;gap:5px}#cards button b{font-size:12px}#cards button span{font-size:10px;line-height:1.3}#cards button i{font-size:9px}#cards i{grid-row:1/3;align-self:center}#cards b{font-size:14px}#cards span{font-size:11px}#over{overflow-y:auto}}
     @media(pointer:coarse) and (max-height:520px){#joystick{width:100px;height:100px;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}#joyknob{width:44px;height:44px}#keys{right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);grid-template-columns:repeat(2,64px);width:136px;gap:5px}.k{width:64px;height:64px}.k b{font-size:20px}.k span{font-size:8px}#combos{display:none}#hud{top:calc(env(safe-area-inset-top,0px) + 8px)}.ib{top:calc(env(safe-area-inset-top,0px) + 42px)}}
     @media (max-height:520px) {
       #title {
@@ -1421,7 +1427,7 @@
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       initAudio(); const k = e.key.toLowerCase();
       if (k === 'p' || k === 'escape') { if (!e.repeat) togglePause(); return }
-      if (state === 'upg' && k.length === 1 && '123'.includes(k)) { pickUpg(+k - 1); return }
+      if (state === 'upg' && k.length === 1 && '1234567'.includes(k)) { pickUpg(+k - 1); return }
       if (k.length === 1 && 'asdf'.includes(k) && !e.repeat) { atk(k); e.preventDefault() }
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
@@ -1448,8 +1454,8 @@
       {id:'shadows',name:'🕷 Legión de sombras',desc:'Sombras: +22% de daño y un tentáculo adicional.',skill:'shadows',apply:()=>{U.dD*=1.22;U.tn=Math.min(10,U.tn+1)}},
       {id:'nova',name:'✦ Supernova eterna',desc:'Nova: +25% de daño y expansión más rápida.',skill:'nova',apply:()=>{U.dA*=1.25;U.area=(U.area||1)*1.14}}
     ];
-    function showUpgrades(){state='upg';const head=$('upg').querySelector('h2');if(head)head.textContent='ELIGE TU EVOLUCIÓN · NIVEL '+lvl;persist(true);const equipped=skillLoadout.filter(Boolean);const tailored=UPG.filter(u=>!u.skill||equipped.includes(u.skill));const pool=tailored.slice().sort(()=>Math.random()-.5);upgCur=pool.slice(0,Math.min(7,pool.length)).map(u=>UPG.indexOf(u));
-      $('cards').innerHTML=upgCur.map((i,n)=>'<button data-n="'+n+'"><i>MEJORA '+String(n+1).padStart(2,'0')+'</i><b>'+UPG[i].name+'</b><span>'+UPG[i].desc+'</span></button>').join('');
+    function showUpgrades(){state='upg';const head=$('upg').querySelector('h2');if(head)head.textContent='ELIGE TU EVOLUCIÓN · NIVEL '+lvl;persist(true);const equipped=skillLoadout.filter(Boolean);const tailored=UPG.filter(u=>!u.skill||equipped.includes(u.skill));const pool=tailored.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}upgCur=pool.slice(0,Math.min(7,pool.length)).map(u=>UPG.indexOf(u));
+      $('cards').innerHTML=upgCur.map((i,n)=>'<button type="button" data-n="'+n+'"><i>MEJORA '+String(n+1).padStart(2,'0')+'</i><b>'+UPG[i].name+'</b><span>'+UPG[i].desc+'</span></button>').join('');
       $('upg').style.display='flex';SFX.up();
     }
     function pickUpg(n){if(state!=='upg'||upgCur[n]===undefined)return;UPG[upgCur[n]].apply();stats.upgrades++;permanentU={...U};permanentMaxHp=maxHp;$('cards').innerHTML='';$('upg').style.display='none';state='play';SFX.up();nextLevel();persist(true)}
