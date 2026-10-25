@@ -1108,13 +1108,14 @@
   </div>
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
-    let gameMode='survival';
-    const MAX_ACTIVE_ENEMIES=lowEndDevice?24:38;
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const mobileMQ=matchMedia('(pointer: coarse)');
     const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=6)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=6);
+    let mobile=mobileMQ.matches;
+    let gameMode='survival';
+    const MAX_ACTIVE_ENEMIES=lowEndDevice?24:38;
     const FX_PART_LIMIT=lowEndDevice?90:(mobile?120:150);
-    let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0,mobile=mobileMQ.matches;
+    let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0;
     function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1:(mobile?1.15:1.15)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
     addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
