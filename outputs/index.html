@@ -561,6 +561,7 @@
       #pbtn { left: auto; right: 24px; }
       #mute { left: auto; right: 72px; }
       #radar { top:118px; right:24px; bottom:auto; left:auto; width:clamp(112px,12vw,156px); }
+      #combos { left:24px; right:auto; bottom:24px; max-width:min(42vw,520px); justify-content:flex-start; }
     }
     @media (pointer:coarse) {
       #pbtn { left: max(12px, env(safe-area-inset-left, 0px) + 10px); right: auto; }
@@ -1167,7 +1168,7 @@
           if (this.k === 'armor' && i > 1 && i < this.n - 3) { ctx.beginPath(); ctx.arc(p.x, p.y, r * .6, this.A[i] - 1.2, this.A[i] + 1.2); ctx.lineWidth = 2.6; ctx.stroke(); ctx.lineWidth = 1.3 }
         }
         ctx.save(); ctx.translate(hd.x, hd.y); ctx.rotate(this.A[0]); ctx.scale(s, s);
-        if (this.boss) [-1, 1].forEach(sd => { ctx.beginPath(); ctx.moveTo(-2, sd * 9); ctx.lineTo(-14, sd * 18); ctx.moveTo(4, sd * 10); ctx.lineTo(0, sd * 20); ctx.stroke() });
+        if (this.boss) {ctx.save();ctx.globalAlpha=.22+Math.sin(performance.now()*.006)*.08;ctx.strokeStyle=this.bossGlow;ctx.lineWidth=3*sc;ctx.shadowColor=this.bossGlow;ctx.shadowBlur=26*sc;ctx.beginPath();ctx.arc(hd.x,hd.y,(34+Math.sin(performance.now()*.004)*4)*this.sc,0,TAU);ctx.stroke();ctx.restore();[-1, 1].forEach(sd => { ctx.beginPath(); ctx.moveTo(-2, sd * 9); ctx.lineTo(-14, sd * 18); ctx.moveTo(4, sd * 10); ctx.lineTo(0, sd * 20); ctx.stroke() });}
         const tl = this.tel > 0; ctx.shadowColor = tl ? '#ff2a1a' : this.col; ctx.shadowBlur = tl ? 14 : 6; ctx.fillStyle = tl ? '#ff2a1a' : this.col;
         [-1, 1].forEach(sd => { ctx.beginPath(); ctx.arc(3.5, sd * 6.2, tl ? 3.2 : 1.8, 0, TAU); ctx.fill() });
         ctx.restore();
@@ -1244,7 +1245,7 @@
     function resetLoadout(){skillLoadout=[...STARTER_LOADOUT];refreshSkillButtons();refreshComboUI();persist(true);toast('ARSENAL INICIAL RESTABLECIDO')}
     let U={...permanentU},maxHp=permanentMaxHp, saveTick=0, comet = 0, poolT = 0, bh = null, pools = [], lastK = null, lastT = 0, upgCur = [];
     const cdset = (k, m = 1) => { cd[k] = cooldownFor(k) * U.cd * m };
-    const mk = (k, x, y) => { const c=CF[k],boss=k==='boss',type=boss?Math.max(0,Math.floor(lvl/5)-1)%BOSS_ARCHETYPES.length:0,arch=BOSS_ARCHETYPES[type],lv=Math.max(1,lvl),scale=1+lv*.055+Math.pow(lv,1.28)*.006;return new Snake(x,y,{...c,col:boss?arch.color:c.col,bossType:type,bossName:boss?arch.name:'',bossGlow:boss?arch.glow:c.col,v:c.v*(boss?1.16:1.06+Math.min(.42,lv*.0035)),hp:c.hp*(boss?2.25:1.12)*scale*(boss?1+lv*.075+Math.pow(lv,1.25)*.012:1)},k)};
+    const mk = (k, x, y) => { const c=CF[k],boss=k==='boss',type=boss?Math.max(0,Math.floor(lvl/5)-1)%BOSS_ARCHETYPES.length:0,arch=BOSS_ARCHETYPES[type],lv=Math.max(1,lvl),scale=1+lv*.055+Math.pow(lv,1.28)*.006;return new Snake(x,y,{...c,col:boss?arch.color:c.col,bossType:type,bossName:boss?arch.name:'',bossGlow:boss?arch.glow:c.col,v:c.v*(boss?1.16:1.06+Math.min(.42,lv*.0035)),hp:c.hp*(boss?3.65:1.12)*scale*(boss?1+lv*.105+Math.pow(lv,1.38)*.018:1)},k)};
     const part = (x, y, vx, vy, l, r, col, add) => { if(parts.length>=FX_PART_LIMIT) return; parts.push({ x, y, vx, vy, l, m: l, r, col, add }); };
     function growPlayer(amount=4,scaleUp=.035){if(!pl)return;const old=pl.n,tail=pl.P[old-1],ang=pl.A[old-1]||pl.h;for(let j=0;j<amount;j++){const i=pl.n,rad=Math.max(2.5,2+6.5*Math.pow(1-i/(old+amount),.9));pl.R.push(rad);pl.SP.push((rad+pl.R[i-1])*.41);pl.P.push({x:tail.x-Math.cos(ang)*pl.SP[i]*pl.sc*(j+1),y:tail.y-Math.sin(ang)*pl.SP[i]*pl.sc*(j+1)});pl.A.push(ang);pl.n++}pl.sc=Math.min(1.75,pl.sc+scaleUp);toast('EVOLUCIÓN · SERPIENTE MÁS GRANDE')}
     const pop=(x,y,s,c,big)=>pops.push({x:Math.max(40,Math.min(WORLD_W-40,x+rnd(-14,14))),y,s,c,big,t:.9,m:.9});
@@ -1321,6 +1322,7 @@
         if (np !== e.pp) { e.pp=np;const arch=BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0];banner('FASE '+np+' · '+arch.name,np===2?'El jefe cambia su patrón de ataque':'Fase crítica · cuidado con sus embestidas');SFX.roar();shake=14;const addType=e.bossType===2?'armor':np===2?'spitter':'dasher';for(let i=0;i<(e.bossType===2?3:2);i++)en.push(mk(addType,h.x+rnd(-90,90),h.y+rnd(-90,90)))}
         e.cd2 = (e.cd2 === undefined ? 2 : e.cd2) - dt;
         if(e.cd2<=0){const aim=Math.atan2(p.y-h.y,p.x-h.x),style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style,phase=e.pp;if(style==='fan'){const n=phase===1?5:phase===2?7:9;for(let j=-(n>>1);j<=n>>1;j++)shoot(h,aim+j*(phase===3?.105:.16),phase===3?470:360,phase===3?27:21,e)}else if(style==='ring'){const n=phase===1?16:phase===2?24:32;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?390:315,phase===3?25:19,e);e.ang+=.18}else if(style==='burst'){const n=phase===1?12:phase===2?18:24;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?410:320,phase===3?25:19,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.12,350,18,e);e.ang+=.13}else if(style==='spiral'){const n=phase===1?12:phase===2?18:24;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?420:330,phase===3?25:19,e);e.ang+=phase===3?.58:.36}else{const n=phase===1?8:phase===2?14:20;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?330:260,phase===3?18:14,e);for(let j=-2;j<=2;j++)shoot(h,aim+j*.13,360,phase===3?20:16,e);e.ang+=.27}e.cd2=phase===1?1.85:phase===2?1.35:.92}
+        if(e.boss&&!e.dead){e.hp=Math.min(e.max,e.hp+e.max*(e.pp===3?.014:e.pp===2?.009:.005)*dt);e.v=Math.max(e.v,CF.boss.v*(1.2+Math.min(.4,lvl*.003)));}
         if(e.pp>=2){e.sp=(e.sp||0)-dt;if(e.sp<=0){const style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style;e.ang+=style==='spiral'?.7:.31;shoot(h,e.ang,style==='spiral'?300:250,style==='spiral'?16:13,e);e.sp=style==='spiral'?.16:.22}}
       }
       if (k === 'spitter') {
@@ -1406,7 +1408,7 @@
         default:return false;
       }
     }
-    function skillTierPower(k){const skill=skillForSlot(k);return skill?.tier==='ÉPICA'?4.8:skill?.tier==='LEGENDARIA'?7.2:skill?.tier==='MÍTICA'?10:1}
+    function skillTierPower(k){const skill=skillForSlot(k);return skill?.tier==='ÉPICA'?9.5:skill?.tier==='LEGENDARIA'?14:skill?.tier==='MÍTICA'?20:1}
     function atk(k) {
       if (state !== 'play') return; initAudio();
       const now = performance.now(), pair = lastK && lastK !== k ? [lastK, k].sort().join('') : '';
