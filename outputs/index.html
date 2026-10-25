@@ -461,7 +461,7 @@
       text-shadow: 0 0 18px var(--em)
     }
 
-    body[data-s=title] #hud,
+    body[data-s=title] #hud,\n    body[data-s=title] #radar,
     body[data-s=title] #keys,
     body[data-s=title] #combos,
     body[data-s=title] #pbtn,
@@ -534,11 +534,16 @@
         padding: 5px 10px
       }
     }
+      /* Radar, navegación y zonas táctiles */
+    #radar { position:fixed; z-index:2; top:calc(env(safe-area-inset-top,0px) + 84px); right:18px; width:clamp(112px,14vw,164px); height:auto; aspect-ratio:1; border:1px solid #bd8849; border-radius:50%; background:rgba(8,5,10,.82); box-shadow:0 0 18px #000b, inset 0 0 16px #ffb84a22; pointer-events:none; }
+    @media(pointer:coarse) { #radar { top:calc(env(safe-area-inset-top,0px) + 82px); right:10px; width:clamp(92px,25vw,128px); } #joystick { width:clamp(112px,30vw,140px); height:clamp(112px,30vw,140px); left:max(14px,env(safe-area-inset-left,0px) + 10px); bottom:calc(env(safe-area-inset-bottom,0px) + 22px); } #joyknob { width:46%; height:46%; } #keys { right:max(12px,env(safe-area-inset-right,0px) + 10px); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); width:min(36vw,158px); grid-template-columns:repeat(2,minmax(60px,1fr)); } .k { width:clamp(60px,18vw,74px); height:clamp(60px,18vw,74px); } #combos { bottom:calc(env(safe-area-inset-bottom,0px) + 174px); max-width:40vw; } }
+    @media(pointer:coarse) and (orientation:landscape) { #radar { top:calc(env(safe-area-inset-top,0px) + 64px); width:clamp(76px,16vh,104px); right:12px; } #joystick { width:100px; height:100px; bottom:calc(env(safe-area-inset-bottom,0px) + 12px); } #keys { width:142px; grid-template-columns:repeat(2,66px); bottom:calc(env(safe-area-inset-bottom,0px) + 12px); gap:6px; } .k { width:66px; height:66px; } #combos { display:none; } #hud { right:120px; } #lv { max-width:42%; } }
   </style>
 </head>
 
 <body data-s="title">
   <canvas id="c"></canvas>
+  <canvas id="radar" width="200" height="200" aria-label="Minimapa: posición del jugador y enemigos"></canvas>
   <div id="hud">
     <div class="bars">
       <div class="bar"><i id="hp"></i></div>
@@ -565,7 +570,7 @@
   </div>
   <div id="title" class="home-page">
     <header class="home-header"><div class="brand"><span class="home-mark">☠</span><span>ARENA <b>DE SERPIENTES</b></span></div><button id="installApp" class="secondary">INSTALAR APP</button></header>
-    <main class="home-layout"><section class="home-hero"><div class="eyebrow">SUPERVIVE. EVOLUCIONA. DOMINA.</div><h1>ARENA DE<br>SERPIENTES</h1><p class="sub">Eres un demonio hambriento. Devora las hordas, fortalece tus habilidades y derriba al Rey Serpiente.</p><div class="how"><div><b>MOVER</b><span>Ratón o joystick táctil</span></div><div><b>HABILIDADES</b><span>Embestida · Aliento · Sombras · Nova</span></div><div><b>COMBOS</b><span>A+S · S+D · D+F</span></div></div><div id="homeStats"></div><div class="home-actions"><button id="go">NUEVA PARTIDA</button></div><small id="tbest"></small></section><aside class="home-sessions"><div class="sessions-heading"><div class="eyebrow">TU PROGRESO</div><h2>MIS SESIONES</h2><p>Continúa una partida guardada cuando quieras.</p></div><div id="sessionList"></div><div class="save-note">Guardado automático en este dispositivo</div></aside></main><footer class="home-footer">Progreso permanente · Guardado local · Disponible sin conexión después de cargar</footer>
+    <main class="home-layout"><section class="home-hero"><div class="eyebrow">SUPERVIVE. EVOLUCIONA. DOMINA.</div><h1>ARENA DE<br>SERPIENTES</h1><p class="sub">Eres un demonio hambriento. Devora las hordas, fortalece tus habilidades y derriba al Rey Serpiente.</p><div class="how"><div><b>MOVER</b><span>Ratón, flechas o joystick táctil</span></div><div><b>HABILIDADES</b><span>Embestida · Aliento · Sombras · Nova</span></div><div><b>COMBOS</b><span>A+S · S+D · D+F</span></div></div><div id="homeStats"></div><div class="home-actions"><button id="go">NUEVA PARTIDA</button></div><small id="tbest"></small></section><aside class="home-sessions"><div class="sessions-heading"><div class="eyebrow">TU PROGRESO</div><h2>MIS SESIONES</h2><p>Continúa una partida guardada cuando quieras.</p></div><div id="sessionList"></div><div class="save-note">Guardado automático en este dispositivo</div></aside></main><footer class="home-footer">Progreso permanente · Guardado local · Disponible sin conexión después de cargar</footer>
   </div>
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
@@ -574,7 +579,7 @@
     let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0,mobile=mobileMQ.matches;
     function resize() { dpr = Math.min(devicePixelRatio || 1, 2); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
     addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
-    const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0};
+    const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
     const CF = {
       basic: { hp: 60, v: 120, col: '#e8e8f2', n: 20 }, spitter: { hp: 50, v: 100, col: '#7dffa0', n: 20 }, dasher: { hp: 70, v: 110, col: '#ffd36b', n: 22 },
       armor: { hp: 220, v: 70, col: '#8fb4ff', n: 24, s: 1.15 }, split: { hp: 90, v: 115, col: '#d98bff', n: 22, s: 1.1 }, mini: { hp: 25, v: 170, col: '#d98bff', n: 12, s: .6 }, boss: { hp: 1100, v: 85, col: '#ff6a5a', n: 34, s: 2 }
@@ -796,9 +801,13 @@
       if(state==='title'){updateCamera();const h=pl.P[0],d=Math.hypot(ptr.x-h.x,ptr.y-h.y); pl.move(ptr.x, ptr.y, d < 14 ? 0 : Math.min(280 * sc, d * 5), 7, dt); return }
       if(state!=='play')return;
       saveTick-=dt;if(saveTick<=0){saveTick=3;persist(true)}
-      updateCamera();const h=pl.P[0];if(joy.active){ptr.x=h.x+joy.dx*Math.min(W,H)*.75;ptr.y=h.y+joy.dy*Math.min(W,H)*.75}else if(mobile){ptr.x=h.x;ptr.y=h.y}const d=Math.hypot(ptr.x-h.x,ptr.y-h.y);
+      updateCamera();const h=pl.P[0];let moveMag=0;
+      if(joy.active){moveMag=Math.min(1,Math.hypot(joy.dx,joy.dy));const a=Math.atan2(joy.dy,joy.dx);ptr.x=h.x+Math.cos(a)*Math.max(1,Math.min(W,H)*.55);ptr.y=h.y+Math.sin(a)*Math.max(1,Math.min(W,H)*.55)}
+      else if(moveKeys.size){let mx=0,my=0;if(moveKeys.has('arrowleft'))mx--;if(moveKeys.has('arrowright'))mx++;if(moveKeys.has('arrowup'))my--;if(moveKeys.has('arrowdown'))my++;const m=Math.hypot(mx,my)||1;mx/=m;my/=m;moveMag=1;ptr.x=h.x+mx*Math.min(W,H)*.55;ptr.y=h.y+my*Math.min(W,H)*.55}
+      else if(mobile){ptr.x=h.x;ptr.y=h.y}
+      const d=Math.hypot(ptr.x-h.x,ptr.y-h.y);
       for(const k in cd) cd[k] = Math.max(0, cd[k] - dt); inv = Math.max(0, inv - dt); pm = Math.max(0, pm - dt * 3); streakT -= dt; if (streakT <= 0) streak = 0;
-      let spd = d < 14 ? 0 : Math.min(280 * sc * U.spd, d * 5), turn = 7;
+      let spd = moveMag ? 280 * sc * U.spd * moveMag : (d < 18 ? 0 : Math.min(280 * sc * U.spd, d * 3.2)), turn = moveMag ? 9 : 5.8;
       if (dash > 0) {
         dash -= dt; spd = 1000 * sc; turn = 0; pm = Math.max(pm, .7);
         en.forEach(e => { if (!dashHit.has(e) && !e.dead && dst(h, e.P[0]) < 30 * pl.sc + e.R[0] * e.sc) { dashHit.add(e); const a = pl.A[0]; hurt(e, (e.k === 'armor' ? 12 : 42) * U.dA, Math.cos(a) * 500, Math.sin(a) * 500); shake = Math.max(shake, 5) } })
@@ -907,6 +916,18 @@
       pops.forEach(p => { ctx.globalAlpha = Math.min(1, p.t / p.m * 2.2); ctx.font = '700 ' + (p.big ? 24 : 15) + 'px Cinzel,Georgia,serif'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText(p.s, p.x, p.y); ctx.fillStyle = p.c; ctx.fillText(p.s, p.x, p.y) });
       ctx.globalAlpha = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'
     }
+    function drawRadar() {
+      const r=$('radar'),g=r.getContext('2d'),w=r.width,h=r.height,pad=12,iw=w-pad*2,ih=h-pad*2;
+      g.clearRect(0,0,w,h);g.save();g.beginPath();g.arc(w/2,h/2,Math.min(iw,ih)/2,0,TAU);g.clip();
+      g.fillStyle='rgba(10,7,13,.92)';g.fillRect(0,0,w,h);g.strokeStyle='rgba(219,166,96,.22)';g.lineWidth=1;
+      for(let n=1;n<=3;n++){g.beginPath();g.arc(w/2,h/2,Math.min(iw,ih)*n/8,0,TAU);g.stroke()}
+      g.beginPath();g.moveTo(w/2,pad);g.lineTo(w/2,h-pad);g.moveTo(pad,h/2);g.lineTo(w-pad,h/2);g.stroke();
+      const px=pad+Math.max(0,Math.min(1,pl.P[0].x/WORLD_W))*iw,py=pad+Math.max(0,Math.min(1,pl.P[0].y/WORLD_H))*ih;
+      en.forEach(e=>{if(e.dead)return;const x=pad+Math.max(0,Math.min(1,e.P[0].x/WORLD_W))*iw,y=pad+Math.max(0,Math.min(1,e.P[0].y/WORLD_H))*ih;g.fillStyle=e.boss?'#ff594f':e.k==='spitter'?'#7dffa0':'#ffc66b';g.beginPath();g.arc(x,y,e.boss?4:2.5,0,TAU);g.fill()});
+      spawnQ.forEach(q=>{if(!q.pos)return;g.fillStyle='#d98bff';g.beginPath();g.arc(pad+q.pos.x/WORLD_W*iw,pad+q.pos.y/WORLD_H*ih,2,0,TAU);g.fill()});
+      g.fillStyle='#fff2c5';g.shadowColor='#ffe29a';g.shadowBlur=10;g.beginPath();g.arc(px,py,4,0,TAU);g.fill();g.restore();
+      g.strokeStyle='rgba(241,194,118,.9)';g.lineWidth=2;g.beginPath();g.arc(w/2,h/2,(Math.min(iw,ih)/2)+1,0,TAU);g.stroke()
+    }
     function draw(t) {
       if (state !== _ps) { _ps = state; document.body.dataset.s = state }
       const sk = RM ? shake * .25 : shake; ctx.setTransform(dpr, 0, 0, dpr, (Math.random() - .5) * sk * dpr, (Math.random() - .5) * sk * dpr); ctx.fillStyle = '#07050a'; ctx.fillRect(-30, -30, W + 60, H + 60);
@@ -919,7 +940,7 @@
       }
       drawTents(t);en.forEach(e=>e.drawBone());drawShots();drawDemon(t);if(mobile){const q=pl.P[0],a=joy.active?Math.atan2(ptr.y-q.y,ptr.x-q.x):pl.A[0],dist=joy.active?Math.min(Math.hypot(ptr.x-q.x,ptr.y-q.y),Math.min(W,H)*.75):Math.min(W,H)*.32,ax=q.x+Math.cos(a)*dist,ay=q.y+Math.sin(a)*dist,r=16*sc;ctx.save();ctx.globalAlpha=.88;ctx.strokeStyle='#f4cd78';ctx.fillStyle='#fff0bd';ctx.lineWidth=2;ctx.shadowColor='#ffb840';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(ax,ay,r,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(ax,ay,3*sc,0,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(ax-r*1.5,ay);ctx.lineTo(ax-r*.65,ay);ctx.moveTo(ax+r*.65,ay);ctx.lineTo(ax+r*1.5,ay);ctx.moveTo(ax,ay-r*1.5);ctx.lineTo(ax,ay-r*.65);ctx.moveTo(ax,ay+r*.65);ctx.lineTo(ax,ay+r*1.5);ctx.stroke();if(joy.active){ctx.globalAlpha=.22;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(ax,ay);ctx.stroke()}ctx.restore()}
       if (nova) { ctx.save(); ctx.shadowColor = '#ff7a2a'; ctx.shadowBlur = 30; ctx.strokeStyle = 'rgba(255,170,90,.85)'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, nova.r, 0, TAU); ctx.stroke(); ctx.strokeStyle = 'rgba(160,75,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, Math.max(0, nova.r - 14), 0, TAU); ctx.stroke(); ctx.restore() }
-      drawParts();drawPops();ctx.restore();ctx.globalAlpha=1; ctx.globalCompositeOperation = 'source-over';
+      drawParts();drawPops();ctx.restore();drawRadar();ctx.globalAlpha=1; ctx.globalCompositeOperation = 'source-over';
       const bs = en.find(e => e.boss); if (bs) { const w = Math.min(W * .5, 420), x = (W - w) / 2; ctx.fillStyle = '#200'; ctx.fillRect(x, 50, w, 8); ctx.fillStyle = '#ff6a5a'; ctx.fillRect(x, 50, w * Math.max(0, bs.hp / bs.max), 8); ctx.strokeStyle = '#ff6a5a'; ctx.strokeRect(x, 50, w, 8); ctx.fillStyle = '#ffb0a5'; ctx.font = '700 11px Cinzel,Georgia,serif'; ctx.textAlign = 'center'; ctx.fillText('EL REY SERPIENTE', W / 2, 44); ctx.textAlign = 'left' }
       if (hp < maxHp * .35 && state === 'play') { const v = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .75); v.addColorStop(0, 'rgba(150,0,10,0)'); v.addColorStop(1, 'rgba(150,0,10,' + (.3 + .2 * Math.sin(t / 180)) + ')'); ctx.fillStyle = v; ctx.fillRect(-30, -30, W + 60, H + 60) }
       if (rf > 0) { ctx.fillStyle = 'rgba(190,0,10,' + rf * .8 + ')'; ctx.fillRect(-30, -30, W + 60, H + 60) }
@@ -937,6 +958,8 @@
     const setP=e=>{const r=cv.getBoundingClientRect();ptr.x=e.clientX-r.left+camX;ptr.y=e.clientY-r.top+camY};if(!mobile){addEventListener('pointermove',setP);cv.addEventListener('pointerdown',e=>{setP(e);initAudio()})}const je=$('joystick'),jk=$('joyknob');function ju(e){const r=je.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,m=Math.hypot(dx,dy)||1,k=Math.min(1,m/(r.width*.36));joy.dx=dx/m*k;joy.dy=dy/m*k;jk.style.left=(50+joy.dx*36)+'%';jk.style.top=(50+joy.dy*36)+'%'}je.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;je.setPointerCapture(e.pointerId);ju(e);initAudio()});je.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)ju(e)});const jeEnd=e=>{if(e.pointerId===joy.id){joy.active=false;joy.dx=joy.dy=0;jk.style.left=jk.style.top='50%'}};je.addEventListener('pointerup',jeEnd);je.addEventListener('pointercancel',jeEnd);
     document.querySelectorAll('.k').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); atk(b.dataset.k) }));
     addEventListener('keydown', e => {
+      const moveKey=e.key.toLowerCase();
+      if(['arrowup','arrowdown','arrowleft','arrowright'].includes(moveKey)){moveKeys.add(moveKey);if(!mobile)e.preventDefault()}
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       initAudio(); const k = e.key.toLowerCase();
       if (k === 'p' || k === 'escape') { if (!e.repeat) togglePause(); return }
@@ -944,6 +967,7 @@
       if (k.length === 1 && 'asdf'.includes(k) && !e.repeat) { atk(k); e.preventDefault() }
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
+    addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
     $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('sessionList').addEventListener('click',e=>{const b=e.target.closest('[data-session-id]');if(b)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { if (state === 'play') togglePause() });
