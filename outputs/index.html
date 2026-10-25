@@ -1110,10 +1110,10 @@
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const mobileMQ=matchMedia('(pointer: coarse)');
-    const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4);
-    const FX_PART_LIMIT=lowEndDevice?110:(mobile?150:220);
+    const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=6)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=6);
+    const FX_PART_LIMIT=lowEndDevice?90:(mobile?120:150);
     let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0,mobile=mobileMQ.matches;
-    function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1.05:(mobile?1.25:1.3)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
+    function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1:(mobile?1.15:1.15)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
     addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
     const BOSS_ARCHETYPES=[
@@ -1480,7 +1480,7 @@
     function drawDemon(t) {
       const s = pl.sc, P = pl.P, A = pl.A, n = pl.n; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       ctx.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < n; i += (lowEndDevice?12:6)) { const p = P[i], g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, 'rgba(170,10,20,.22)'); g.addColorStop(1, 'rgba(170,10,20,0)'); ctx.fillStyle = g; ctx.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
+      for (let i = 0; i < n; i += (lowEndDevice?18:10)) { const p = P[i], g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, 'rgba(170,10,20,.22)'); g.addColorStop(1, 'rgba(170,10,20,0)'); ctx.fillStyle = g; ctx.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = inv > 0 && Math.floor(t / 70) % 2 ? .45 : 1;
       pl.legs.forEach(l => {
