@@ -993,7 +993,38 @@
     @keyframes mythicPulse{to{filter:brightness(1.22);box-shadow:0 0 27px #ff3769aa,inset 0 0 22px #ff376955}}
     @media(prefers-reduced-motion:reduce){.k[data-tier="MÍTICA"]{animation:none}}
 
-  </style>
+  /* UI refresh: ember / crimson visual system */
+#title.home-page{background:radial-gradient(ellipse at 78% 12%,#5b20252b,transparent 36%),radial-gradient(ellipse at 10% 88%,#9a542018,transparent 34%),#08070a;color:#f5e9df}
+#title.home-page:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+.brand-copy small,.section-brand small{color:#d08b70!important;letter-spacing:.22em!important}.home-mark{background:linear-gradient(145deg,#8f303b,#35151c)!important;border:1px solid #e68b7144}
+.home-hero h1{letter-spacing:-.055em!important;text-shadow:0 10px 50px #000}.home-hero h1 span{background:linear-gradient(90deg,#f4c39b,#c66a5c 52%,#8d3445);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.home-kicker{color:#d99b78!important;letter-spacing:.2em!important}.home-kicker i{background:#e78c62!important;box-shadow:0 0 14px #e78c62}
+#go,#campaignGo{min-height:68px!important;border:1px solid #d18a694a!important;border-radius:13px!important;background:linear-gradient(115deg,#78323b,#3d1b25 62%,#24131b)!important;box-shadow:0 12px 30px #0006,inset 0 1px #ffffff18!important;text-align:left!important;padding:14px 18px!important;position:relative}
+#campaignGo{background:linear-gradient(115deg,#714b2d,#35251c 62%,#211811)!important;border-color:#d7a36555!important}
+#go span,#campaignGo span{display:block;font-size:14px;letter-spacing:.14em;font-weight:950}#go small,#campaignGo small{display:block;margin-top:5px;color:#e4b8a0;font-size:9px;letter-spacing:.16em}
+.home-drawer-link,.section-back{border:1px solid #ffffff18!important;border-radius:12px!important;background:linear-gradient(145deg,#171217,#100d11)!important;color:#e7d8d0!important}
+.home-disclosure,.home-sessions,.section-panel{border:1px solid #ffffff17!important;background:linear-gradient(145deg,#171218ef,#0d0b10f2)!important;border-radius:16px!important}
+.section-page{background:radial-gradient(ellipse at 85% 0%,#5b202526,transparent 40%),#0b090d!important}
+.section-intro h2{color:#f4e6dd!important;letter-spacing:-.04em}
+#campaignPage{background:radial-gradient(ellipse at 50% 0%,#7a232d2e,transparent 52%),linear-gradient(145deg,#0b090d,#100b11 55%,#08070a)}
+.campaign-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 22px}
+.campaign-overview>div{border:1px solid #ffffff13;background:linear-gradient(145deg,#1a1318,#100d12);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:5px}
+.campaign-overview small,.campaign-map-heading span{font-size:9px;letter-spacing:.15em;color:#a99aa0;font-weight:800}.campaign-overview b{font-size:24px;color:#f2d6c1}
+.campaign-map-wrap{border:1px solid #b77a5638;background:#0c0a0e;border-radius:18px;padding:18px}
+.campaign-map-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.campaign-map-heading>b{font-size:12px;letter-spacing:.16em;color:#f1d5bd}
+.campaign-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:9px}
+.campaign-node{min-width:0;aspect-ratio:1;border:1px solid #ffffff16;border-radius:10px;background:linear-gradient(145deg,#211a21,#121015);color:#817780;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px;transition:transform .18s,border-color .18s;cursor:pointer}
+.campaign-node span{font-size:clamp(12px,1.5vw,18px);font-weight:900}.campaign-node small{font-size:7px;letter-spacing:.08em;font-weight:900}
+.campaign-node.is-done{border-color:#5a9a72;background:linear-gradient(145deg,#173324,#101a16);color:#a8e5b8}
+.campaign-node.is-open{border-color:#e6a65f;background:linear-gradient(145deg,#61351f,#241711);color:#ffe1b4;box-shadow:0 0 18px #e99c4c22;animation:campaignPulse 2.4s ease-in-out infinite}
+.campaign-node.is-locked{opacity:.48;cursor:not-allowed}.campaign-node.is-boss{border-color:#9d5360}.campaign-node.is-boss.is-open{background:linear-gradient(145deg,#702a39,#27121b);box-shadow:0 0 22px #d84c6a33}
+.campaign-node:not(:disabled):hover{transform:translateY(-3px);border-color:#f1c18a}
+.campaign-legend{display:flex;flex-wrap:wrap;gap:16px;margin:14px 2px;color:#a99da3;font-size:9px;font-weight:800;letter-spacing:.1em}.campaign-legend span{display:flex;align-items:center;gap:6px}
+.campaign-legend i{width:8px;height:8px;border-radius:3px;background:#5a9a72}.campaign-legend i.available{background:#e6a65f}.campaign-legend i.locked{background:#817780}.campaign-legend i.boss{background:#c35b70}
+.campaign-note{color:#d8b48f;font-size:12px;margin:12px 2px}@keyframes campaignPulse{50%{box-shadow:0 0 22px #e99c4c40}}
+@media(max-width:700px){.campaign-overview{gap:7px}.campaign-overview>div{padding:11px 9px}.campaign-overview b{font-size:19px}.campaign-map-wrap{padding:11px}.campaign-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.campaign-node small{font-size:8px}.campaign-map-heading{align-items:flex-start;flex-direction:column}.campaign-legend{gap:10px;font-size:8px}.home-actions{width:100%}#go,#campaignGo{min-height:62px!important}}
+
+</style>
 </head>
 
 <body data-s="title">
@@ -1034,7 +1065,7 @@
         <div class="home-kicker"><i></i> SOBREVIVE A LA HORDA</div>
         <h1 id="home-title">ARENA DE<br><span>SERPIENTES</span></h1>
         <p class="sub">Eres un demonio hambriento. <strong>Devora las hordas, evoluciona tus poderes</strong> y enfréntate al Rey Serpiente.</p>
-        <div class="home-actions"><button id="go" type="button"><span>SUPERVIVENCIA</span><small>OLEADAS SIN FIN</small></button><button id="campaignGo" type="button"><span>CAMPAÑA 1–100</span><small>100 NIVELES · JEFE FINAL</small></button><button class="home-drawer-link" type="button" data-page="skillsPage">✦ HABILIDADES <span class="home-nav-arrow">↗</span></button><button class="home-drawer-link shop-entry" type="button" data-page="shopPage">TIENDA <span class="home-coin-pill">◈ <b id="homeCoins">0</b></span><span class="home-nav-arrow">↗</span></button></div>
+        <div class="home-actions"><button id="go" type="button"><span>SUPERVIVENCIA</span><small>OLEADAS SIN FIN</small></button><button id="campaignGo" type="button"><span>CAMPAÑA</span><small>100 NIVELES · PROGRESO POR ETAPAS</small></button><button class="home-drawer-link" type="button" data-page="skillsPage">✦ HABILIDADES <span class="home-nav-arrow">↗</span></button><button class="home-drawer-link shop-entry" type="button" data-page="shopPage">TIENDA <span class="home-coin-pill">◈ <b id="homeCoins">0</b></span><span class="home-nav-arrow">↗</span></button></div>
         <div class="home-drawers">
 
 
@@ -1074,7 +1105,12 @@
       </aside>
     </main>
     </div>
-    <section class="section-page" id="skillsPage" aria-labelledby="skillsPageTitle">
+    <section class="section-page campaign-page" id="campaignPage" aria-labelledby="campaignPageTitle">
+<header class="section-header"><button class="section-back" type="button" data-page="homeView">← VOLVER</button><div class="section-brand"><span>☠</span><div><small>DEMON-SNIKE / CAMPAÑA</small><b>CAMINO DE CONQUISTA</b></div></div><div class="section-wallet">PROGRESO <b id="campaignProgress">00/100</b></div></header>
+<div class="section-content"><div class="section-intro"><div class="home-kicker"><i></i> UNA CONQUISTA, UN NIVEL A LA VEZ</div><h2 id="campaignPageTitle">CAMPAÑA</h2><p>Completa cada nivel para desbloquear el siguiente. Cada cinco niveles te espera un guardián. Tu avance queda guardado.</p></div>
+<div class="campaign-overview"><div><small>NIVEL DISPONIBLE</small><b id="campaignNextLevel">01</b></div><div><small>NIVELES CONQUISTADOS</small><b id="campaignCleared">00 / 100</b></div><div><small>JEFE FINAL</small><b>100</b></div></div>
+<div class="campaign-map-wrap"><div class="campaign-map-heading"><b>MAPA DE LA CAMPAÑA</b><span>LOS NIVELES SE DESBLOQUEAN EN ORDEN</span></div><div id="campaignGrid" class="campaign-grid" aria-label="Selección de nivel de campaña"></div></div>
+<div class="campaign-legend"><span><i class="done"></i> COMPLETADO</span><span><i class="available"></i> DISPONIBLE</span><span><i class="locked"></i> BLOQUEADO</span><span><i class="boss"></i> JEFE</span></div><p class="campaign-note" id="campaignHint">Completa el nivel 1 para abrir el camino.</p></div></section><section class="section-page" id="skillsPage" aria-labelledby="skillsPageTitle">
       <header class="section-header">
         <button class="section-back" type="button" data-page="homeView">← VOLVER</button>
         <div class="section-brand"><span>☠</span><div><small>DEMON-SNIKE / ARSENAL</small><b>GESTIÓN DE HABILIDADES</b></div></div>
@@ -1113,6 +1149,8 @@
     const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=6)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=6);
     let mobile=mobileMQ.matches;
     let gameMode='survival';
+    let campaignStartLevel=1;
+    let campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));
     const MAX_ACTIVE_ENEMIES=lowEndDevice?10:(mobile?14:20);
     const MAX_ACTIVE_SHOTS=lowEndDevice?70:(mobile?100:140);
     const MAX_ACTIVE_POOLS=14;
@@ -1213,7 +1251,13 @@
     let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
     if(saveData.checkpoint&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Partida guardada',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
     function runSnapshot(){return {mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
-    function persist(checkpoint=true){try{const cp=checkpoint&&['play','pause','upg'].includes(state)?runSnapshot():null;if(cp&&activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=cp;session.mode=cp.mode;session.level=cp.level;session.score=cp.score;session.updatedAt=Date.now()}}saveData={version:2,best,coins,ownedSkills:[...ownedSkills],skillLoadout:[...skillLoadout],metaU:{...permanentU},metaMaxHp:permanentMaxHp,stats:{...stats},sessions,activeSessionId,checkpoint:cp,savedAt:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}try{refreshHome()}catch(homeRefreshError){}return true}catch(e){return false}}
+    function persist(checkpoint=true){try{const cp=checkpoint&&['play','pause','upg'].includes(state)?runSnapshot():null;if(cp&&activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=cp;session.mode=cp.mode;session.level=cp.level;session.score=cp.score;session.updatedAt=Date.now()}}saveData={version:2,best,coins,campaignUnlocked,ownedSkills:[...ownedSkills],skillLoadout:[...skillLoadout],metaU:{...permanentU},metaMaxHp:permanentMaxHp,stats:{...stats},sessions,activeSessionId,checkpoint:cp,savedAt:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}try{refreshHome()}catch(homeRefreshError){}return true}catch(e){return false}}
+    function renderCampaign(){
+      const grid=$('campaignGrid');if(!grid)return;const cleared=campaignUnlocked-1;
+      $('campaignProgress').textContent=String(cleared).padStart(2,'0')+'/100';$('campaignNextLevel').textContent=String(campaignUnlocked).padStart(2,'0');$('campaignCleared').textContent=String(cleared).padStart(2,'0')+' / 100';
+      grid.innerHTML=Array.from({length:100},(_,i)=>{const n=i+1,done=n<campaignUnlocked,open=n===campaignUnlocked,boss=n%5===0;return '<button type="button" class="campaign-node '+(done?'is-done ':open?'is-open ':'is-locked ')+(boss?'is-boss':'')+'" data-campaign-level="'+n+'" '+(n>campaignUnlocked?'disabled':'')+' aria-label="Nivel '+n+(done?', completado':open?', disponible':', bloqueado')+'"><span>'+(done?'✓':boss?'♛':String(n).padStart(2,'0'))+'</span><small>'+(boss?'JEFE':done?'LISTO':open?'JUGAR':'CERRADO')+'</small></button>'}).join('');
+      $('campaignHint').textContent=campaignUnlocked===100?'El último guardián te espera.':campaignUnlocked===1?'Completa el nivel 1 para abrir el camino.':'Has llegado al nivel '+campaignUnlocked+'. Supera el desafío para desbloquear el siguiente.';
+    }
     function refreshHome(){
       const statsNode=$('homeStats'),list=$('sessionList'),count=$('homeSessionCount');const wallet=$('homeCoins');if(wallet)wallet.textContent=coins.toLocaleString('es');
       if(statsNode)statsNode.innerHTML='<span class="home-stat"><b>'+best+'</b><small>RÉCORD</small></span><span class="home-stat"><b>'+stats.bestLevel+'</b><small>NIVEL MÁX.</small></span><span class="home-stat"><b>'+stats.kills+'</b><small>DERROTADAS</small></span><span class="home-stat"><b>'+stats.upgrades+'</b><small>MEJORAS</small></span>';
@@ -1221,7 +1265,7 @@
       if(count)count.textContent=String(ordered.length).padStart(2,'0');
       if(list)list.innerHTML=ordered.length?ordered.map(x=>{const c=x.checkpoint;return '<article class="session-card"><div class="session-info"><b>'+x.name+'</b><small>'+(c?(x.mode==='campaign'?'CAMPAÑA ':'SUPERVIVENCIA · NIVEL ')+c.level+' · '+c.score+' PTS · GUARDADA '+new Date(x.updatedAt||x.createdAt).toLocaleString() :((x.mode==='campaign'?'CAMPAÑA COMPLETADA':'SUPERVIVENCIA')+' · NIVEL '+(x.level||1)+' · '+(x.score||0)+' PTS'))+'</small></div><button class="session-resume" data-session-id="'+x.id+'">'+(c?'CONTINUAR':'REPETIR CAZA')+'</button></article>'}).join(''):'<div class="sessions-empty"><span aria-hidden="true">☠</span><b>Tu historia empieza aquí</b><small>Juega tu primera partida y tus sesiones aparecerán en esta lista.</small></div>';
       const t=$('tbest');if(t)t.textContent=best?'MEJOR PUNTUACIÓN · '+best:'';
-      renderLoadout();renderShop();refreshSkillButtons();refreshComboUI();
+      renderLoadout();renderShop();renderCampaign();refreshSkillButtons();refreshComboUI();
     }
     function skillForSlot(k){const i=SLOT_KEYS.indexOf(k);return i<0?null:skillById(skillLoadout[i])}
     function cooldownFor(k){const skill=skillForSlot(k);return skill?skill.cooldown:(MAXCD[k]||0)}
@@ -1285,10 +1329,11 @@
     }
     function makePlayer() { pl = new Snake(WORLD_W/2,WORLD_H/2, { n: 30, hp: 1, v: 0, col: '#fff', s: 1.2 }, 'p'); pl.h = -Math.PI / 2 }
     function tryFullscreen(){if(document.fullscreenElement||matchMedia('(display-mode:fullscreen)').matches)return;const f=document.documentElement.requestFullscreen;if(f)f.call(document.documentElement).catch(()=>{})}
-    function startGame(mode='survival'){
+    function startGame(mode='survival',level=1){
       if(state!=='title')return;
       try{
         gameMode=mode;
+        campaignStartLevel=mode==='campaign'?Math.max(1,Math.min(campaignUnlocked,level)):1;
         initAudio();
         newGame(false);
         $('title').style.display='none';
@@ -1308,7 +1353,7 @@
       else if (state === 'pause') { state = 'play'; $('pz').style.display = 'none'; if (AC && AC.resume) AC.resume() }
     }
     function newGame(resume=false,sessionId=null){
-      const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];bossDue=false;bossSpawned=false;lvl=cp?cp.level:0;score=cp?cp.score:0;maxHp=permanentMaxHp;hp=cp?Math.min(maxHp,cp.hp):maxHp;U={...permanentU}; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
+      const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];bossDue=false;bossSpawned=false;lvl=cp?cp.level:(gameMode==='campaign'?campaignStartLevel-1:0);score=cp?cp.score:0;maxHp=permanentMaxHp;hp=cp?Math.min(maxHp,cp.hp):maxHp;U={...permanentU}; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
       rf=wf=shake=0;pops=[];streak=streakT=0;slow=1;lastK=null;fury=cp?cp.fury:0;makePlayer();if(resume&&cp&&cp.player){pl=Object.assign(new Snake(cp.player.P[0].x,cp.player.P[0].y,{n:cp.player.n,hp:cp.player.max,col:'#fff',v:0,s:1.2},'p'),cp.player);const sameBuild=!Array.isArray(cp.loadout)||SLOT_KEYS.every((key,i)=>cp.loadout[i]===skillLoadout[i]);guard=sameBuild?(cp.guard||0):0;cd.a=sameBuild?(cp.cooldowns?.a||0):0;cd.s=sameBuild?(cp.cooldowns?.s||0):0;cd.d=sameBuild?(cp.cooldowns?.d||0):0;cd.f=sameBuild?(cp.cooldowns?.f||0):0}state='play'; $('over').style.display='none';$('pz').style.display='none';$('title').style.display='none';if(!resume){saveData.checkpoint=null;if(sessionId){activeSessionId=sessionId;const existing=sessions.find(x=>x.id===sessionId);if(existing){existing.checkpoint=null;existing.ended=false;existing.updatedAt=Date.now()}}else{stats.runs++;activeSessionId='run-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);sessions.unshift({id:activeSessionId,name:'Partida '+new Date().toLocaleString(),mode:gameMode,createdAt:Date.now(),updatedAt:Date.now(),level:1,score:0,checkpoint:null,ended:false})}}if(resume&&cp&&Array.isArray(cp.enemies)&&Array.isArray(cp.spawnQ)){en=cp.enemies.map(raw=>Object.assign(new Snake(raw.P[0].x,raw.P[0].y,{...CF[raw.k],hp:raw.max},raw.k),raw));spawnQ=cp.spawnQ}else{if(resume&&cp)lvl=Math.max(0,cp.level-1);nextLevel()}persist(true);
     }
     function hurt(e, d, kx, ky, quiet) {
@@ -1493,7 +1538,7 @@
       if(en.length<MAX_ACTIVE_ENEMIES){let budget=1;for(let i=0;i<spawnQ.length;i++){const q=spawnQ[i];q.t-=dt;if(q.t<=0&&budget>0){if(!q.pos)q.pos=spawnPos();spawn(q.k,q.pos);q.done=true;budget--}}}spawnQ=spawnQ.filter(q=>!q.done);
       en.slice().forEach(e => ai(e, dt)); en = en.filter(e => !e.dead);
       shots.forEach(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;s.l-=dt;if(s.owner&&pl.P.slice(0,9).some(q=>Math.hypot(q.x-s.x,q.y-s.y)<14*pl.sc)){hurtP(s.d);s.l=0}else if(s.owner){for(const t of en)if(t!==s.owner&&!t.dead&&dst(t.P[0],s)<t.R[0]*t.sc+5*sc){hurt(t,s.d,s.vx*.1,s.vy*.1,true);s.l=0;break}}if(s.x<0||s.y<0||s.x>WORLD_W||s.y>WORLD_H)s.l=0}); shots = shots.filter(s => s.l > 0);if(shots.length>MAX_ACTIVE_SHOTS)shots.splice(0,shots.length-MAX_ACTIVE_SHOTS);
-      if (!spawnQ.length && !en.length) { clearT += dt; if(clearT>1.6){clearT=0;if(bossDue&&!bossSpawned){bossSpawned=true;const arch=BOSS_ARCHETYPES[(Math.max(0,Math.floor(lvl/5)-1))%BOSS_ARCHETYPES.length];banner('EL GUARDIÁN HA DESPERTADO',arch.name+' · '+arch.intro);SFX.roar();spawn('boss')}else{const bonus=150+lvl*42,coinBonus=5+Math.floor(lvl/4);score+=bonus;coins+=coinBonus;pop(pl.P[0].x,pl.P[0].y-42,'+'+bonus+' BONUS · +'+coinBonus+' ◈','#ffe09a',true);if(gameMode==='campaign'&&lvl>=100){state='over';overAt=performance.now();best=Math.max(best,score);const finished=sessions.find(x=>x.id===activeSessionId);if(finished){finished.checkpoint=null;finished.ended=true;finished.level=lvl;finished.score=score;finished.updatedAt=Date.now()}activeSessionId=null;saveData.checkpoint=null;persist(false);$('over').querySelector('h1').textContent='CAMPAÑA COMPLETADA';$('ovp').textContent='Has conquistado los 100 niveles · '+score+' puntos · Récord '+best;$('over').style.display='flex';SFX.up()}else showUpgrades()}} } else clearT = 0;
+      if (!spawnQ.length && !en.length) { clearT += dt; if(clearT>1.6){clearT=0;if(bossDue&&!bossSpawned){bossSpawned=true;const arch=BOSS_ARCHETYPES[(Math.max(0,Math.floor(lvl/5)-1))%BOSS_ARCHETYPES.length];banner('EL GUARDIÁN HA DESPERTADO',arch.name+' · '+arch.intro);SFX.roar();spawn('boss')}else{const bonus=150+lvl*42,coinBonus=5+Math.floor(lvl/4);score+=bonus;coins+=coinBonus;pop(pl.P[0].x,pl.P[0].y-42,'+'+bonus+' BONUS · +'+coinBonus+' ◈','#ffe09a',true);if(gameMode==='campaign'){campaignUnlocked=Math.max(campaignUnlocked,Math.min(100,lvl+1));persist(false)}if(gameMode==='campaign'&&lvl>=100){state='over';overAt=performance.now();best=Math.max(best,score);const finished=sessions.find(x=>x.id===activeSessionId);if(finished){finished.checkpoint=null;finished.ended=true;finished.level=lvl;finished.score=score;finished.updatedAt=Date.now()}activeSessionId=null;saveData.checkpoint=null;persist(false);$('over').querySelector('h1').textContent='CAMPAÑA COMPLETADA';$('ovp').textContent='Has conquistado los 100 niveles · '+score+' puntos · Récord '+best;$('over').style.display='flex';SFX.up()}else showUpgrades()}} } else clearT = 0;
     }
 
     function drawDemon(t) {
@@ -1632,7 +1677,7 @@
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>startGame('campaign'));$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});function showHomePage(pageId){document.querySelectorAll('#title .home-view,#title .section-page').forEach(v=>v.style.display=v.id===pageId?(pageId==='homeView'?'contents':'flex'):'none');const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout()}document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showHomePage(b.dataset.page)));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});function showHomePage(pageId){document.querySelectorAll('#title .home-view,#title .section-page').forEach(v=>v.style.display=v.id===pageId?(pageId==='homeView'?'contents':'flex'):'none');const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout();if(pageId==='campaignPage')renderCampaign()}document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showHomePage(b.dataset.page)));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { if (state === 'play') togglePause() });
     document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') togglePause() });
