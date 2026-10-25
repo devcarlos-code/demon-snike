@@ -474,6 +474,45 @@
       left: 14px
     }
 
+
+    /* ---- Experiencia de escritorio ---- */
+    @media (pointer:fine) and (min-width:800px) {
+      canvas { cursor: crosshair; }
+      #hud { left:24px; right:24px; top:20px; gap:24px; align-items:flex-start; font-size:12px; }
+      .bars { flex:0 0 260px; max-width:260px; padding:10px 12px; border:1px solid #65402b; border-radius:8px; background:linear-gradient(135deg,rgba(23,12,12,.9),rgba(8,6,10,.78)); box-shadow:0 8px 26px #0008,inset 0 1px #ffffff12; }
+      .bar { height:11px; margin-bottom:7px; }
+      #lv { margin-left:auto; min-width:180px; padding:10px 14px; border:1px solid #65402b; border-radius:8px; background:linear-gradient(135deg,rgba(23,12,12,.88),rgba(8,6,10,.76)); box-shadow:0 8px 26px #0008; line-height:1.8; }
+      #keys { left:auto; right:24px; bottom:24px; display:flex; justify-content:flex-end; gap:12px; }
+      .k { width:88px; height:88px; border-radius:16px; padding:8px; gap:5px; background:linear-gradient(145deg,#39291d,#130d0e 72%); border:1px solid #a77a3a; box-shadow:inset 0 1px #ffe4a044,0 8px 22px #0009,0 0 14px #a56a2922; transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,filter .16s ease; }
+      .k b { font-size:26px; }
+      .k span { font:600 10px Arial,sans-serif; letter-spacing:.06em; }
+      .k small { position:absolute; right:7px; top:6px; font:700 10px Arial,sans-serif; color:#fff2d5; }
+      .k::before { display:none; }
+      .k::after { border-radius:14px; }
+      .k:hover { transform:translateY(-5px); border-color:#ffe0a0; filter:brightness(1.18); box-shadow:inset 0 1px #fff6,0 12px 28px #000b,0 0 20px #d79a4266; }
+      .k:focus-visible { outline:2px solid #ffe4a2; outline-offset:4px; }
+      .k:active { transform:translateY(-1px) scale(.97); }
+      .k.rdy { border-color:#ffe4a2; box-shadow:0 0 20px #ffc25288,inset 0 0 14px #b46c2944; }
+      #combos { left:24px; right:auto; bottom:28px; justify-content:flex-start; max-width: min(48vw,560px); gap:8px; font:600 10px Arial,sans-serif; letter-spacing:.07em; }
+      #combos::before { content:"COMBOS"; flex-basis:100%; color:#bd9d79; opacity:.8; font-size:9px; letter-spacing:.2em; margin-bottom:1px; }
+      #combos span { padding:7px 11px; border-radius:6px; background:#100b10cc; border-color:#573044; opacity:.72; }
+      #combos span.on { background:#251331e8; }
+      #pbtn, #mute { top:20px; bottom:auto; }
+      #pbtn { right:24px; }
+      #mute { right:72px; }
+      #toast { top:24%; font-size:14px; }
+      #ban { top:27%; }
+    }
+    @media (pointer:fine) and (min-width:800px) and (max-height:650px) {
+      #keys { right:14px; bottom:12px; gap:7px; }
+      .k { width:72px; height:72px; }
+      #combos { left:14px; bottom:14px; }
+      #hud { top:10px; left:14px; right:14px; }
+      #pbtn, #mute { top:10px; }
+      #pbtn { right:14px; }
+      #mute { right:60px; }
+    }
+
     @media(pointer:coarse){canvas{cursor:none}#keys,.k,#joystick{ -webkit-tap-highlight-color:transparent}#keys{padding-bottom:env(safe-area-inset-bottom,0px)}#title{padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}.home-layout{grid-template-columns:1fr;gap:18px;align-content:start;height:auto;min-height:0}.home-hero{padding:8px 0;gap:14px}.home-hero h1{font-size:clamp(42px,12vw,72px)!important}.home-hero .how{grid-template-columns:1fr 1fr}.home-sessions{max-height:none;padding:18px}.home-footer{font-size:9px}#joystick{display:block}#keys{left:auto;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:158px;display:grid;grid-template-columns:repeat(2,74px);gap:8px;justify-content:end}.k{width:74px;height:74px;border-radius:50%;touch-action:manipulation}.k b{font-size:23px}.k span{font-size:9px}.k small{position:absolute;z-index:3;right:5px;top:4px;font:700 10px Arial;color:white}#combos{bottom:calc(env(safe-area-inset-bottom,0px) + 190px);font-size:8px;gap:3px}#combos span{padding:2px 5px}#hud{left:8px;right:8px;font-size:10px;gap:6px}.bars{max-width:45%}.ib{top:calc(env(safe-area-inset-top,0px) + 48px)}}
     @media(max-width:430px){.home-header{align-items:flex-start;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.12em}#installApp{padding:9px 12px!important;font-size:11px!important}.home-hero .how{grid-template-columns:1fr}.home-hero .how div{align-items:flex-start}.home-hero .how b{min-width:88px}.home-hero h1{font-size:clamp(38px,11vw,54px)!important;letter-spacing:.05em!important}.home-layout{height:auto}.home-sessions{overflow:visible}.session-card{padding:10px}.session-info small{font-size:9px}}
     @media(pointer:coarse){#upg{overflow-y:auto;justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px calc(env(safe-area-inset-bottom,0px) + 18px);gap:12px}#upg h2{font-size:18px;line-height:1.25}#cards{width:min(100%,440px);display:grid;grid-template-columns:1fr;gap:9px;margin:auto}#cards button{width:100%;min-height:86px;padding:10px 14px;display:grid;grid-template-columns:36px 1fr;grid-template-rows:auto auto;text-align:left;gap:4px 10px}#cards i{grid-row:1/3;align-self:center}#cards b{font-size:14px}#cards span{font-size:11px}#over{overflow-y:auto}}
@@ -508,7 +547,7 @@
     <div id="lv"></div>
   </div>
   <div id="ban"></div>
-  <div id="keys"><button class="k" data-k="a" aria-label="Embestida" title="Embestida"><b aria-hidden="true">⚡</b><span>Embestida</span><small></small></button><button class="k" data-k="s" aria-label="Aliento" title="Aliento"><b aria-hidden="true">🔥</b><span>Aliento</span><small></small></button><button class="k" data-k="d" aria-label="Sombras" title="Sombras"><b aria-hidden="true">👁</b><span>Sombras</span><small></small></button><button class="k" data-k="f" aria-label="Nova" title="Nova"><b aria-hidden="true">✦</b><span>Nova</span><small></small></button></div><div id="joystick"><div id="joyknob"></div></div>
+  <div id="keys"><button class="k" data-k="a" data-hotkey="A" aria-keyshortcuts="A" aria-label="Embestida, tecla A" title="Embestida (A)"><b aria-hidden="true">⚡</b><span>Embestida</span><small></small></button><button class="k" data-k="s" data-hotkey="S" aria-keyshortcuts="S" aria-label="Aliento, tecla S" title="Aliento (S)"><b aria-hidden="true">🔥</b><span>Aliento</span><small></small></button><button class="k" data-k="d" data-hotkey="D" aria-keyshortcuts="D" aria-label="Sombras, tecla D" title="Sombras (D)"><b aria-hidden="true">👁</b><span>Sombras</span><small></small></button><button class="k" data-k="f" data-hotkey="F" aria-keyshortcuts="F" aria-label="Nova, tecla F" title="Nova (F)"><b aria-hidden="true">✦</b><span>Nova</span><small></small></button></div><div id="joystick"><div id="joyknob"></div></div>
   <div id="combos"><span>A+S Cometa</span><span>S+D Infierno</span><span>D+F Singularidad</span></div>
   <div id="toast"></div>
   <button id="mute" class="ib">🔊</button><button id="pbtn" class="ib">❚❚</button>
