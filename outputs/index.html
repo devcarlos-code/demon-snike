@@ -1121,6 +1121,13 @@
     function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1.15:(mobile?1.4:1.75)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
     addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
+    const BOSS_ARCHETYPES=[
+      {name:'EL REY CARMESÍ',color:'#ff625e',glow:'#ff3d36',style:'fan',intro:'Un cazador brutal que concentra ráfagas directas'},
+      {name:'LA MATRIARCA DE CENIZA',color:'#ffad62',glow:'#ff873b',style:'ring',intro:'Lanza anillos de fuego que cierran rutas de escape'},
+      {name:'EL COLOSO DE HUESO',color:'#d7d5c8',glow:'#c8c0a8',style:'burst',intro:'Invoca guardianes y dispara salvas desde todas direcciones'},
+      {name:'EL ABISMO VIVIENTE',color:'#ad83ff',glow:'#824cff',style:'spiral',intro:'Teje espirales de energía que cubren la arena'},
+      {name:'EL SOBERANO ECLIPSADO',color:'#ff6fba',glow:'#ff3f9f',style:'mixed',intro:'Combina todas sus técnicas en una última prueba'}
+    ];
     const CF = {
       basic: { hp: 72, v: 128, col: '#e8e8f2', n: 20 }, spitter: { hp: 62, v: 108, col: '#7dffa0', n: 20 }, dasher: { hp: 84, v: 120, col: '#ffd36b', n: 22 },
       armor: { hp: 285, v: 76, col: '#8fb4ff', n: 24, s: 1.15 }, split: { hp: 112, v: 124, col: '#d98bff', n: 22, s: 1.1 }, mini: { hp: 32, v: 182, col: '#d98bff', n: 12, s: .6 }, boss: { hp: 1750, v: 96, col: '#ff6a5a', n: 34, s: 2 }
@@ -1128,7 +1135,7 @@
 
     class Snake {
       constructor(x, y, o, k) {
-        Object.assign(this, { k, sc: (o.s || 1) * sc, n: o.n, hp: o.hp, max: o.hp, v: o.v, col: o.col, R: [], SP: [], P: [], A: [], ph: 0, stun: 0, burn: 0, flash: 0, cd: rnd(1, 2.5), st: 0, stT: 0, tel: 0, vx: 0, vy: 0, bc: 0, h: Math.random() * TAU, dead: false, lock: 0, boss: k === 'boss', pp: 1, ang: 0 });
+        Object.assign(this, { k, sc: (o.s || 1) * sc, n: o.n, hp: o.hp, max: o.hp, v: o.v, col: o.col, bossType:o.bossType??0,bossName:o.bossName||'',bossGlow:o.bossGlow||o.col, R: [], SP: [], P: [], A: [], ph: 0, stun: 0, burn: 0, flash: 0, cd: rnd(1, 2.5), st: 0, stT: 0, tel: 0, vx: 0, vy: 0, bc: 0, h: Math.random() * TAU, dead: false, lock: 0, boss: k === 'boss', pp: 1, ang: 0 });
         for (let i = 0; i < this.n; i++)this.R[i] = i ? 2 + 6.5 * Math.pow(1 - i / this.n, .9) + (i > 1 && i < 8 ? 1.4 * Math.sin((i - 2) / 6 * Math.PI) : 0) : 12;
         for (let i = 1; i < this.n; i++)this.SP[i] = (this.R[i] + this.R[i - 1]) * .41;
         let px = x, py = y; for (let i = 0; i < this.n; i++) { if (i) { px -= Math.cos(this.h) * this.SP[i] * this.sc; py -= Math.sin(this.h) * this.SP[i] * this.sc } this.P.push({ x: px, y: py }); this.A.push(this.h) }
@@ -1237,12 +1244,13 @@
         return '<article class="shop-card" data-tier="'+skill.tier+'"><div class="shop-skill-icon">'+skill.icon+'</div><div class="shop-skill-info"><div class="shop-skill-title"><b>'+skill.name+'</b><span>'+skill.tier+'</span></div><p>'+skill.description+'</p><div class="shop-skill-meta"><small>RECARGA · '+skill.cooldown.toFixed(1)+' S</small><strong class="shop-price">'+(skill.price?('◈ '+skill.price.toLocaleString('es')):'GRATUITA')+'</strong></div></div><button type="button" data-buy-skill="'+skill.id+'"'+(owned||short?' disabled':'')+'>'+label+'</button></article>'
       }).join('');
     }
-    function buySkill(id){const skill=skillById(id);if(!skill||skill.price<=0||ownedSkills.includes(id))return;if(coins<skill.price){toast('TE FALTAN '+(skill.price-coins)+' MONEDAS');return}coins-=skill.price;ownedSkills.push(id);persist(true);toast(skill.name.toUpperCase()+' · ADQUIRIDA');SFX.up()}
+    const buyingSkills=new Set();
+    function buySkill(id){if(buyingSkills.has(id))return false;const skill=skillById(id);if(!skill||!Number.isSafeInteger(skill.price)||skill.price<=0||ownedSkills.includes(id))return false;if(!Number.isFinite(coins)||coins<skill.price){toast('MONEDAS INSUFICIENTES · FALTAN '+Math.max(0,skill.price-coins).toLocaleString('es')+' ◈');renderShop();return false}buyingSkills.add(id);const previousCoins=coins;try{coins-=skill.price;ownedSkills.push(id);if(!persist(false)){coins=previousCoins;ownedSkills=ownedSkills.filter(x=>x!==id);toast('NO SE PUDO GUARDAR LA COMPRA · INTÉNTALO DE NUEVO');renderShop();return false}renderShop();renderLoadout();toast(skill.name.toUpperCase()+' · COMPRA GUARDADA');SFX.up();return true}catch(err){coins=previousCoins;ownedSkills=ownedSkills.filter(x=>x!==id);toast('ERROR AL COMPRAR · NO SE DESCONTARON MONEDAS');renderShop();return false}finally{buyingSkills.delete(id)}}
     function equipSkill(slot,id){if(!Number.isInteger(slot)||slot<0||slot>=SLOT_KEYS.length)return;if(id&&!ownedSkills.includes(id)){toast('HABILIDAD AÚN NO DESBLOQUEADA');return}if(id&&skillLoadout.some((other,i)=>i!==slot&&other===id)){toast('ESA HABILIDAD YA OCUPA OTRO ESPACIO');renderLoadout();return}skillLoadout[slot]=id;refreshSkillButtons();refreshComboUI();persist(true);toast(id?'HABILIDAD EQUIPADA':'ESPACIO LIBERADO')}
     function resetLoadout(){skillLoadout=[...STARTER_LOADOUT];refreshSkillButtons();refreshComboUI();persist(true);toast('ARSENAL INICIAL RESTABLECIDO')}
     let U={...permanentU},maxHp=permanentMaxHp, saveTick=0, comet = 0, poolT = 0, bh = null, pools = [], lastK = null, lastT = 0, upgCur = [];
     const cdset = (k, m = 1) => { cd[k] = cooldownFor(k) * U.cd * m };
-    const mk = (k, x, y) => { const c = CF[k],boss=k==='boss',growth=boss?.24:.32,base=boss?1.18:1.12; return new Snake(x, y, { ...c, v:c.v*(boss?1.08:1.06), hp:c.hp*base*(1+growth*(Math.max(1,lvl)-1)) }, k) };
+    const mk = (k, x, y) => { const c=CF[k],boss=k==='boss',type=boss?Math.max(0,Math.floor(lvl/5)-1)%BOSS_ARCHETYPES.length:0,arch=BOSS_ARCHETYPES[type];return new Snake(x,y,{...c,col:boss?arch.color:c.col,bossType:type,bossName:boss?arch.name:'',bossGlow:boss?arch.glow:c.col,v:c.v*(boss?1.08:1.06),hp:c.hp*(boss?1.18:1.12)*(1+(boss?.24:.32)*(Math.max(1,lvl)-1))},k)};
     const part = (x, y, vx, vy, l, r, col, add) => { if(parts.length>=FX_PART_LIMIT) return; parts.push({ x, y, vx, vy, l, m: l, r, col, add }); };
     function growPlayer(amount=4,scaleUp=.035){if(!pl)return;const old=pl.n,tail=pl.P[old-1],ang=pl.A[old-1]||pl.h;for(let j=0;j<amount;j++){const i=pl.n,rad=Math.max(2.5,2+6.5*Math.pow(1-i/(old+amount),.9));pl.R.push(rad);pl.SP.push((rad+pl.R[i-1])*.41);pl.P.push({x:tail.x-Math.cos(ang)*pl.SP[i]*pl.sc*(j+1),y:tail.y-Math.sin(ang)*pl.SP[i]*pl.sc*(j+1)});pl.A.push(ang);pl.n++}pl.sc=Math.min(1.75,pl.sc+scaleUp);toast('EVOLUCIÓN · SERPIENTE MÁS GRANDE')}
     const pop=(x,y,s,c,big)=>pops.push({x:Math.max(40,Math.min(WORLD_W-40,x+rnd(-14,14))),y,s,c,big,t:.9,m:.9});
@@ -1265,7 +1273,7 @@
       lvl++;stats.bestLevel=Math.max(stats.bestLevel,lvl);spawnQ=compose(lvl).map((k,i)=>({k,t:.45+i*.14}));
       const act=Math.floor((lvl-1)/5)+1,stage=['LLANURA CARMESÍ','CATACUMBAS DE CENIZA','PÁRAMO DE HUESO','TEMPLO ABISMAL','TRONO DEL REY'][(act-1)%5],boss=lvl%5===0;
       if(lvl>1){hp=Math.min(maxHp,hp+18);fury=Math.min(100,fury+18);cd.a=cd.s=cd.d=cd.f=0}
-      const t=LN[lvl]||[boss?'JEFE DEL ACTO':'OLEADA '+lvl,boss?'El Rey serpiente entra en combate':'Más enemigos y criaturas nuevas'];banner('ACTO '+act+' · NIVEL '+lvl+' — '+(boss?'JEFE: ':'')+stage,t[1]||t[0]); once('lv', 200, () => lvl % 5 === 0 ? SFX.roar() : SFX.horn());
+      const arch=BOSS_ARCHETYPES[(act-1)%BOSS_ARCHETYPES.length],t=LN[lvl]||[boss?arch.name:'OLEADA '+lvl,boss?arch.intro:'Más enemigos y criaturas nuevas'];banner('ACTO '+act+' · NIVEL '+lvl+' — '+(boss?'JEFE: ':'')+stage,boss?arch.name+' · '+arch.intro:(t[1]||t[0])); once('lv', 200, () => lvl % 5 === 0 ? SFX.roar() : SFX.horn());
     }
     function spawnPos() {
       let x,y,tries=0;do{const a=rnd(0,TAU),r=Math.min(WORLD_W,WORLD_H)*rnd(.35,.48);x=Math.max(30,Math.min(WORLD_W-30,pl.P[0].x+Math.cos(a)*r));y=Math.max(30,Math.min(WORLD_H-30,pl.P[0].y+Math.sin(a)*r))}while(dst({x,y},pl.P[0])<Math.min(W,H)*.65&&++tries<10);
@@ -1317,10 +1325,10 @@
       let tx=target.x,ty=target.y,spd=sp0,turn=4;
       if (e.boss) {
         const np = e.hp / e.max > .6 ? 1 : e.hp / e.max > .3 ? 2 : 3;
-        if (np !== e.pp) { e.pp = np; banner('FASE ' + np, 'El Rey se enfurece'); SFX.roar(); shake = 14; for (let i = 0; i < 2; i++)en.push(mk(np === 2 ? 'spitter' : 'basic', h.x + rnd(-60, 60), h.y + rnd(-60, 60))) }
+        if (np !== e.pp) { e.pp=np;const arch=BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0];banner('FASE '+np+' · '+arch.name,np===2?'El jefe cambia su patrón de ataque':'Fase crítica · cuidado con sus embestidas');SFX.roar();shake=14;const addType=e.bossType===2?'armor':np===2?'spitter':'dasher';for(let i=0;i<(e.bossType===2?3:2);i++)en.push(mk(addType,h.x+rnd(-90,90),h.y+rnd(-90,90)))}
         e.cd2 = (e.cd2 === undefined ? 2 : e.cd2) - dt;
-        if (e.cd2 <= 0) { const N=e.pp===1?5:(e.pp===2?16:7); if(e.pp===1){const aim=Math.atan2(p.y-h.y,p.x-h.x);for(let j=-1;j<=1;j++)shoot(h,aim+j*.15,300,16,e)}else if(e.pp===2){for(let j=0;j<N;j++)shoot(h,j/N*TAU+e.ang,270,15,e);e.ang+=.24}else{const aim=Math.atan2(p.y-h.y,p.x-h.x);for(let j=-2;j<=2;j++)shoot(h,aim+j*.105,360,19,e)}e.cd2=e.pp===1?2.35:(e.pp===2?2.7:1.85)}
-        if(e.pp===2){e.sp=(e.sp||0)-dt;if(e.sp<=0){e.ang+=.31;shoot(h,e.ang,250,13,e);e.sp=.22}}
+        if(e.cd2<=0){const aim=Math.atan2(p.y-h.y,p.x-h.x),style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style,phase=e.pp;if(style==='fan'){const n=phase===1?3:phase===2?5:7;for(let j=-(n>>1);j<=n>>1;j++)shoot(h,aim+j*(phase===3?.13:.19),phase===3?390:310,phase===3?20:16,e)}else if(style==='ring'){const n=phase===1?12:phase===2?18:24;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?310:260,phase===3?18:14,e);e.ang+=.18}else if(style==='burst'){const n=phase===1?8:phase===2?12:16;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?330:255,phase===3?19:15,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.12,350,18,e);e.ang+=.13}else if(style==='spiral'){const n=phase===1?8:phase===2?12:16;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?340:270,phase===3?18:14,e);e.ang+=phase===3?.58:.36}else{const n=phase===1?8:phase===2?14:20;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?330:260,phase===3?18:14,e);for(let j=-2;j<=2;j++)shoot(h,aim+j*.13,360,phase===3?20:16,e);e.ang+=.27}e.cd2=phase===1?2.4:phase===2?2.05:1.55}
+        if(e.pp>=2){e.sp=(e.sp||0)-dt;if(e.sp<=0){const style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style;e.ang+=style==='spiral'?.7:.31;shoot(h,e.ang,style==='spiral'?300:250,style==='spiral'?16:13,e);e.sp=style==='spiral'?.16:.22}}
       }
       if (k === 'spitter') {
         if (d < 220 * sc) { tx = h.x - dx; ty = h.y - dy } else if (d < 330 * sc) { spd *= .4; tx = h.x - dy; ty = h.y + dx }
@@ -1579,7 +1587,7 @@
       if(dash>0||comet>0||breath>0){const h=pl.P[0],a=pl.A[0];ctx.save();ctx.translate(h.x,h.y);ctx.rotate(a);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=lowEndDevice?.28:.48;ctx.strokeStyle=breath>0?'#ff9a36':'#a94cff';ctx.lineWidth=lowEndDevice?3:5;ctx.beginPath();if(breath>0){ctx.moveTo(8,-5);ctx.lineTo(150*sc,-52*sc);ctx.lineTo(190*sc,0);ctx.lineTo(150*sc,52*sc);ctx.lineTo(8,5)}else{ctx.moveTo(-12,-pl.R[0]*2);ctx.lineTo(-42*sc,-pl.R[0]*3);ctx.moveTo(-12,pl.R[0]*2);ctx.lineTo(-42*sc,pl.R[0]*3)}ctx.stroke();ctx.restore()}
       if (nova) { ctx.save(); ctx.shadowColor = '#ff7a2a'; ctx.shadowBlur = 30; ctx.strokeStyle = 'rgba(255,170,90,.85)'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, nova.r, 0, TAU); ctx.stroke(); ctx.strokeStyle = 'rgba(160,75,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, Math.max(0, nova.r - 14), 0, TAU); ctx.stroke(); ctx.restore() }
       drawParts();drawPops();ctx.restore();drawRadar();ctx.globalAlpha=1; ctx.globalCompositeOperation = 'source-over';
-      const bs = en.find(e => e.boss); if (bs) { const w = Math.min(W * .5, 420), x = (W - w) / 2; ctx.fillStyle = '#200'; ctx.fillRect(x, 50, w, 8); ctx.fillStyle=bs.bossGlow||'#ff6a5a';ctx.fillRect(x,50,w*Math.max(0,bs.hp/bs.max),8);ctx.strokeStyle=bs.bossGlow||'#ff6a5a'; ctx.strokeRect(x, 50, w, 8); ctx.fillStyle = '#ffb0a5'; ctx.font = '700 11px Cinzel,Georgia,serif'; ctx.textAlign = 'center'; ctx.fillText('EL REY SERPIENTE', W / 2, 44); ctx.textAlign = 'left' }
+      const bs = en.find(e => e.boss); if (bs) { const w = Math.min(W * .5, 420), x = (W - w) / 2; ctx.fillStyle = '#200'; ctx.fillRect(x, 50, w, 8); ctx.fillStyle=bs.bossGlow||'#ff6a5a';ctx.fillRect(x,50,w*Math.max(0,bs.hp/bs.max),8);ctx.strokeStyle=bs.bossGlow||'#ff6a5a'; ctx.strokeRect(x, 50, w, 8); ctx.fillStyle=bs.bossGlow||'#ffb0a5';ctx.font='700 11px Cinzel,Georgia,serif';ctx.textAlign='center';ctx.fillText(bs.bossName||'JEFE DE LA ARENA',W/2,44); ctx.textAlign = 'left' }
       if (hp < maxHp * .35 && state === 'play') { const v = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .75); v.addColorStop(0, 'rgba(150,0,10,0)'); v.addColorStop(1, 'rgba(150,0,10,' + (.3 + .2 * Math.sin(t / 180)) + ')'); ctx.fillStyle = v; ctx.fillRect(-30, -30, W + 60, H + 60) }
       if (rf > 0) { ctx.fillStyle = 'rgba(190,0,10,' + rf * .8 + ')'; ctx.fillRect(-30, -30, W + 60, H + 60) }
       if (wf > 0) { ctx.fillStyle = 'rgba(255,200,150,' + wf * 1.2 + ')'; ctx.fillRect(-30, -30, W + 60, H + 60) }
