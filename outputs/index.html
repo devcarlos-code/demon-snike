@@ -1150,7 +1150,7 @@
     let mobile=mobileMQ.matches;
     let gameMode='survival';
     let campaignStartLevel=1;
-    let campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));
+    let campaignUnlocked=1;
     const MAX_ACTIVE_ENEMIES=lowEndDevice?10:(mobile?14:20);
     const MAX_ACTIVE_SHOTS=lowEndDevice?70:(mobile?100:140);
     const MAX_ACTIVE_POOLS=14;
@@ -1246,7 +1246,7 @@
     const U0={dA:1,dS:1,dD:1,cd:1,spd:1,def:1,fury:1,life:0,combo:1,tn:4};
     const SAVE_KEY='arena_serpientes_save_v2';
     function loadSave(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');return x&&x.version===2?x:{}}catch(e){return {}}}
-    let saveData=loadSave();best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let permanentU={...U0,...(saveData.metaU||{})}, permanentMaxHp=Math.max(100,+saveData.metaMaxHp||100);
+    let saveData=loadSave();best=Math.max(best,Number(saveData.best)||0);campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let permanentU={...U0,...(saveData.metaU||{})}, permanentMaxHp=Math.max(100,+saveData.metaMaxHp||100);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
     let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
     if(saveData.checkpoint&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Partida guardada',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
