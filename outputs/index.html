@@ -693,7 +693,7 @@
       e.move(tx, ty, spd, turn, dt);
       if (e.bc <= 0 && state === 'play') {
         const rr = e.R[0] * e.sc + 9 * pl.sc, q = e.P[0];
-        if(pl.P.some((z,i)=>i<10&&Math.hypot(z.x-q.x,z.y-q.y)<rr)){hurtP(e.boss?20:e.st===2?18:9);e.bc=.9;const a=Math.atan2(dy,dx);pl.vx+=Math.cos(a)*350;pl.vy+=Math.sin(a)*350;e.vx-=Math.cos(a)*200;e.vy-=Math.sin(a)*200}else{const other=en.find(o=>o!==e&&!o.dead&&dst(o.P[0],q)<e.R[0]*e.sc+o.R[0]*o.sc);if(other){hurt(other,e.boss?22:14,Math.cos(Math.atan2(other.P[0].y-q.y,other.P[0].x-q.x))*220,Math.sin(Math.atan2(other.P[0].y-q.y,other.P[0].x-q.x))*220,true);e.bc=.65;other.bc=.65}}
+        const touchesPlayer=pl.P.some((z,i)=>i<10&&Math.hypot(z.x-q.x,z.y-q.y)<rr);if(touchesPlayer){hurtP(e.boss?20:e.st===2?18:9);e.bc=.9;const a=Math.atan2(dy,dx);pl.vx+=Math.cos(a)*350;pl.vy+=Math.sin(a)*350;e.vx-=Math.cos(a)*200;e.vy-=Math.sin(a)*200}const other=en.find(o=>o!==e&&!o.dead&&dst(o.P[0],q)<e.R[0]*e.sc+o.R[0]*o.sc);if(other){hurt(other,e.boss?22:14,Math.cos(Math.atan2(other.P[0].y-q.y,other.P[0].x-q.x))*220,Math.sin(Math.atan2(other.P[0].y-q.y,other.P[0].x-q.x))*220,true);e.bc=Math.max(e.bc,.65);other.bc=Math.max(other.bc,.65)}
       }
     }
 
