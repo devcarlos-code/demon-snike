@@ -1030,12 +1030,20 @@
       {id:'breath',name:'Aliento',icon:'🔥',tier:'INICIAL',price:0,cooldown:2.8,effect:'breath',description:'Quema a los enemigos que tengas delante.'},
       {id:'shadows',name:'Sombras',icon:'👁',tier:'INICIAL',price:0,cooldown:3.8,effect:'shadows',description:'Golpea y aturde a varios enemigos cercanos.'},
       {id:'nova',name:'Nova',icon:'✦',tier:'INICIAL',price:0,cooldown:0,furyCost:100,effect:'nova',description:'Explosión expansiva y breve invulnerabilidad.'},
-      {id:'soul_lance',name:'Lanza espectral',icon:'☄',tier:'COMÚN',price:240,cooldown:3.4,effect:'soul_lance',description:'Atraviesa hasta tres enemigos con daño espiritual.'},
-      {id:'iron_ward',name:'Égida de hierro',icon:'🛡',tier:'COMÚN',price:280,cooldown:9,effect:'iron_ward',description:'Un escudo temporal absorbe el siguiente golpe.'},
-      {id:'ember_ring',name:'Anillo de brasas',icon:'🌋',tier:'ÉPICA',price:620,cooldown:7.5,effect:'ember_ring',description:'Una explosión ardiente daña y quema alrededor.'},
-      {id:'void_chain',name:'Cadena abisal',icon:'⛓',tier:'ÉPICA',price:680,cooldown:6.8,effect:'void_chain',description:'Ata a varios enemigos y los aturde.'},
-      {id:'void_rift',name:'Falla del vacío',icon:'🌀',tier:'LEGENDARIA',price:1250,cooldown:13,effect:'void_rift',description:'Un vórtice arrastra y consume a los enemigos.'},
-      {id:'cataclysm',name:'Cataclismo',icon:'☄️',tier:'LEGENDARIA',price:1450,cooldown:14,effect:'cataclysm',description:'Impacto devastador en el punto señalado.'}
+      {id:'soul_lance',name:'Lanza espectral',icon:'☄',tier:'COMÚN',price:650,cooldown:3.4,effect:'soul_lance',description:'Atraviesa hasta tres enemigos con daño espiritual.'},
+      {id:'iron_ward',name:'Égida de hierro',icon:'🛡',tier:'COMÚN',price:850,cooldown:9,effect:'iron_ward',description:'Un escudo temporal absorbe el siguiente golpe.'},
+      {id:'ember_ring',name:'Anillo de brasas',icon:'🌋',tier:'ÉPICA',price:1600,cooldown:7.5,effect:'ember_ring',description:'Una explosión ardiente daña y quema alrededor.'},
+      {id:'void_chain',name:'Cadena abisal',icon:'⛓',tier:'ÉPICA',price:1900,cooldown:6.8,effect:'void_chain',description:'Ata a varios enemigos y los aturde.'},
+      {id:'void_rift',name:'Falla del vacío',icon:'🌀',tier:'LEGENDARIA',price:3200,cooldown:13,effect:'void_rift',description:'Un vórtice arrastra y consume a los enemigos.'},
+      {id:'cataclysm',name:'Cataclismo',icon:'☄️',tier:'LEGENDARIA',price:4500,cooldown:14,effect:'cataclysm',description:'Impacto devastador en el punto señalado.'},
+      {id:'frost_bloom',name:'Floración glacial',icon:'❄️',tier:'ÉPICA',price:1900,cooldown:10,effect:'frost_bloom',description:'Congela a los enemigos cercanos y los deja vulnerables.'},
+      {id:'venom_storm',name:'Tormenta tóxica',icon:'☣️',tier:'ÉPICA',price:2800,cooldown:12,effect:'venom_storm',description:'Una nube venenosa castiga a todos los enemigos alrededor.'},
+      {id:'blood_siphon',name:'Pacto sanguíneo',icon:'🩸',tier:'ÉPICA',price:4200,cooldown:15,effect:'blood_siphon',description:'Drena la fuerza de los enemigos y restaura tu vida.'},
+      {id:'gravity_well',name:'Pozo gravitatorio',icon:'🪐',tier:'LEGENDARIA',price:5800,cooldown:16,effect:'gravity_well',description:'Arrastra a los enemigos hacia un punto y los aplasta.'},
+      {id:'meteor_swarm',name:'Lluvia de meteoros',icon:'☄️',tier:'LEGENDARIA',price:7600,cooldown:18,effect:'meteor_swarm',description:'Invoca una cadena de impactos explosivos en la arena.'},
+      {id:'mirror_skin',name:'Piel de espejo',icon:'🔮',tier:'LEGENDARIA',price:9800,cooldown:22,effect:'mirror_skin',description:'Activa una defensa extrema y una ventana de invulnerabilidad.'},
+      {id:'soul_reaper',name:'Segador de almas',icon:'💀',tier:'MÍTICA',price:12500,cooldown:20,effect:'soul_reaper',description:'Marca y ejecuta a los enemigos más peligrosos.'},
+      {id:'eclipse',name:'Eclipse absoluto',icon:'🌑',tier:'MÍTICA',price:17000,cooldown:28,effect:'eclipse',description:'Desata una onda oscura que golpea, quema y paraliza a toda la horda.'}
     ];
     const skillById=id=>SKILL_CATALOG.find(x=>x.id===id)||null;
     const cd = { a: 0, s: 0, d: 0, f: 0 }, MAXCD = { a: .7, s: 2.8, d: 3.8, f: 0 };
@@ -1082,7 +1090,7 @@
     function resetLoadout(){skillLoadout=[...STARTER_LOADOUT];refreshSkillButtons();persist(true);toast('ARSENAL INICIAL RESTABLECIDO')}
     let U={...permanentU},maxHp=permanentMaxHp, saveTick=0, comet = 0, poolT = 0, bh = null, pools = [], lastK = null, lastT = 0, upgCur = [];
     const cdset = (k, m = 1) => { cd[k] = cooldownFor(k) * U.cd * m };
-    const mk = (k, x, y) => { const c = CF[k]; return new Snake(x, y, { ...c, hp: c.hp * (1 + .2 * (Math.max(1, lvl) - 1)) }, k) };
+    const mk = (k, x, y) => { const c = CF[k]; return new Snake(x, y, { ...c, hp: c.hp * (1 + .28 * (Math.max(1, lvl) - 1)) }, k) };
     const part = (x, y, vx, vy, l, r, col, add) => { if(parts.length>=FX_PART_LIMIT) return; parts.push({ x, y, vx, vy, l, m: l, r, col, add }); };
     function growPlayer(amount=4,scaleUp=.035){if(!pl)return;const old=pl.n,tail=pl.P[old-1],ang=pl.A[old-1]||pl.h;for(let j=0;j<amount;j++){const i=pl.n,rad=Math.max(2.5,2+6.5*Math.pow(1-i/(old+amount),.9));pl.R.push(rad);pl.SP.push((rad+pl.R[i-1])*.41);pl.P.push({x:tail.x-Math.cos(ang)*pl.SP[i]*pl.sc*(j+1),y:tail.y-Math.sin(ang)*pl.SP[i]*pl.sc*(j+1)});pl.A.push(ang);pl.n++}pl.sc=Math.min(1.75,pl.sc+scaleUp);toast('EVOLUCIÓN · SERPIENTE MÁS GRANDE')}
     const pop=(x,y,s,c,big)=>pops.push({x:Math.max(40,Math.min(WORLD_W-40,x+rnd(-14,14))),y,s,c,big,t:.9,m:.9});
@@ -1090,13 +1098,13 @@
     function banner(t, s) { const b = $('ban'); b.innerHTML = t + '<small>' + s + '</small>'; b.style.opacity = 1; clearTimeout(banner.h); banner.h = setTimeout(() => b.style.opacity = 0, 2900) }
     function compose(n){
       const a=[],add=(k,c)=>{for(let i=0;i<c;i++)a.push(k)};
-      const base=Math.min(lowEndDevice?58:100,18+Math.floor(n*(lowEndDevice?2.8:4)));
+      const base=Math.min(lowEndDevice?76:132,20+Math.floor(n*(lowEndDevice?3.5:5.2)));
       if(n%5===0)add('boss',1);
       add('basic',Math.max(7,Math.ceil(base*(n<2?.88:n<3?.72:.58))));
-      if(n>=2)add('spitter',Math.min(14,Math.ceil(base*.24)));
-      if(n>=3)add('dasher',Math.min(12,Math.ceil(base*.2)));
-      if(n>=4)add('armor',Math.min(10,Math.ceil(base*.16)));
-      if(n>=6)add('split',Math.min(10,Math.ceil(base*.14)));
+      if(n>=2)add('spitter',Math.min(18,Math.ceil(base*.28)));
+      if(n>=3)add('dasher',Math.min(16,Math.ceil(base*.24)));
+      if(n>=4)add('armor',Math.min(14,Math.ceil(base*.2)));
+      if(n>=6)add('split',Math.min(14,Math.ceil(base*.18)));
       let regular=a.filter(k=>k!=='boss').length;while(regular<base){a.push('basic');regular++}
       for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a
     }
@@ -1136,7 +1144,7 @@
       if (e.hp <= 0) kill(e);
     }
     function kill(e) {
-      if(e.dead)return;e.dead=true;const coinGain=e.boss?65:3;coins+=coinGain;pop(e.P[0].x+12,e.P[0].y+10,'+'+coinGain+' ◈','#ffe3a0',e.boss);stats.kills++;if(e.boss)stats.bosses++;stats.totalScore+=(e.boss?1000:100)*mult();streak++; streakT = 3.2; const gain = (e.boss ? 1000 : 100) * mult(); score += gain; pop(e.P[0].x, e.P[0].y - 20, '+' + gain + (mult() > 1 ? ' ×' + mult() : ''), e.boss ? '#ffb066' : '#ffd36b', e.boss); fury = Math.min(100, fury + 10 * U.fury); hp = Math.min(maxHp, hp + U.life); SFX[e.boss ? 'boom' : 'kill'](); shake = Math.max(shake, e.boss ? 18 : 5);
+      if(e.dead)return;e.dead=true;const coinGain=({basic:50,spitter:65,dasher:75,armor:100,split:85,mini:30,boss:500}[e.k]||50);coins+=coinGain;pop(e.P[0].x+12,e.P[0].y+10,'+'+coinGain+' ◈','#ffe3a0',e.boss);stats.kills++;if(e.boss)stats.bosses++;stats.totalScore+=(e.boss?1000:100)*mult();streak++; streakT = 3.2; const gain = (e.boss ? 1000 : 100) * mult(); score += gain; pop(e.P[0].x, e.P[0].y - 20, '+' + gain + (mult() > 1 ? ' ×' + mult() : ''), e.boss ? '#ffb066' : '#ffd36b', e.boss); fury = Math.min(100, fury + 10 * U.fury); hp = Math.min(maxHp, hp + U.life); SFX[e.boss ? 'boom' : 'kill'](); shake = Math.max(shake, e.boss ? 18 : 5);
       for (let i = 0; i < e.n; i += 2) { const p = e.P[i]; for (let j = 0; j < 3; j++)part(p.x, p.y, rnd(-240, 240), rnd(-240, 240), rnd(.4, .9), 2.5, e.col, true) }
       if (e.k === 'split') for (let i = 0; i < 2; i++)en.push(mk('mini', e.P[0].x + rnd(-20, 20), e.P[0].y + rnd(-20, 20)));
       if (e.boss) { shots.length = 0; slow = .2; banner('EL REY HA CAÍDO', 'Su reinado de ceniza termina') }
@@ -1228,6 +1236,14 @@
         }
         case 'void_rift': {const target=en.filter(e=>!e.dead&&dst(h,e.P[0])<720*sc).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0]))[0];cdset(k);bh={x:target?target.P[0].x:h.x,y:target?target.P[0].y:h.y,t:0,d:3};fx('FALLA DEL VACÍO');return true}
         case 'cataclysm': {const target=en.filter(e=>!e.dead).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0]))[0],point=target?target.P[0]:{x:ptr.x,y:ptr.y};cdset(k);explode(point.x,point.y,360*sc*(U.area||1),340*U.dA);fx('CATACLISMO');return true}
+        case 'frost_bloom': {cdset(k);let hit=0;en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<620*sc*(U.area||1)){hurt(e,95*U.dA,0,0,true);e.stun=Math.max(e.stun,e.boss?1.1:3.2);hit++}});if(!hit)return false;for(let i=0;i<(lowEndDevice?14:30);i++)part(h.x,h.y,rnd(-250,250),rnd(-250,250),.7,3,'#8deaff',true);fx('FLORACIÓN GLACIAL');return true}
+        case 'venom_storm': {cdset(k);let hit=0;en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<700*sc*(U.area||1)){hurt(e,125*U.dS,0,0,true);e.burn=Math.max(e.burn,6);e.stun=Math.max(e.stun,.65);hit++}});if(!hit)return false;fx('TORMENTA TÓXICA');return true}
+        case 'blood_siphon': {cdset(k);let drained=0;en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<650*sc*(U.area||1)){const before=e.hp;hurt(e,145*U.dD,0,0,true);drained+=Math.min(before,145*U.dD)}});if(!drained)return false;hp=Math.min(maxHp,hp+Math.min(85,drained*.16));fury=Math.min(100,fury+18);fx('PACTO SANGUÍNEO');return true}
+        case 'gravity_well': {cdset(k);const targets=en.filter(e=>!e.dead&&dst(h,e.P[0])<900*sc*(U.area||1));if(!targets.length)return false;targets.forEach(e=>{const q=e.P[0],a=Math.atan2(h.y-q.y,h.x-q.x);e.vx+=Math.cos(a)*850;e.vy+=Math.sin(a)*850;hurt(e,180*U.dA,0,0,true);e.stun=Math.max(e.stun,e.boss?.7:1.8)});fx('POZO GRAVITATORIO');return true}
+        case 'meteor_swarm': {cdset(k);const targets=en.filter(e=>!e.dead).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0])).slice(0,lowEndDevice?4:7);if(!targets.length)return false;targets.forEach(e=>{const q=e.P[0];explode(q.x,q.y,175*sc,115*U.dA)});fx('LLUVIA DE METEOROS');return true}
+        case 'mirror_skin': {cdset(k);guard=18;guardFlash=1;inv=Math.max(inv,2.4);en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<240*sc){hurt(e,110*U.dD,0,0,true);e.stun=Math.max(e.stun,.8)}});fx('PIEL DE ESPEJO');return true}
+        case 'soul_reaper': {cdset(k);const targets=en.filter(e=>!e.dead).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0])).slice(0,5);if(!targets.length)return false;targets.forEach(e=>{const damage=e.boss?320:Math.min(e.hp*.72,520);hurt(e,damage*U.dA,0,0,true);e.burn=Math.max(e.burn,3)});fx('SEGADOR DE ALMAS');return true}
+        case 'eclipse': {cdset(k);let count=0;en.forEach(e=>{if(!e.dead){hurt(e,260*U.dA,0,0,true);e.burn=Math.max(e.burn,5);e.stun=Math.max(e.stun,e.boss?1.2:2);count++}});if(!count)return false;shake=24;wf=.7;fx('ECLIPSE ABSOLUTO');return true}
         default:return false;
       }
     }
