@@ -1113,7 +1113,9 @@
     const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=6)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=6);
     let mobile=mobileMQ.matches;
     let gameMode='survival';
-    const MAX_ACTIVE_ENEMIES=lowEndDevice?24:38;
+    const MAX_ACTIVE_ENEMIES=lowEndDevice?18:32;
+    const MAX_ACTIVE_SHOTS=180;
+    const MAX_ACTIVE_POOLS=14;
     const FX_PART_LIMIT=lowEndDevice?90:(mobile?120:150);
     let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0;
     function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1:(mobile?1.15:1.15)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
@@ -1300,7 +1302,7 @@
     }
     function continueSavedGame(id){const session=sessions.find(x=>x.id===id);if(!session)return;activeSessionId=session.id;saveData.checkpoint=session.checkpoint||null;$('title').style.display='none';initAudio();if(session.checkpoint)newGame(true);else newGame(false,session.id);tryFullscreen()}
     function goHome(){if(state==='play'||state==='pause'||state==='upg')persist(true);state='title';$('title').style.display='grid';$('over').style.display='none';$('pz').style.display='none';$('upg').style.display='none';refreshHome()}
-    function restart() { if (state === 'over' && performance.now() - overAt > 700) newGame() }
+    function restart() { if (state === 'over' && performance.now() - overAt > 700) { $('over').querySelector('h1').textContent='FIN DE PARTIDA';gameMode='survival';newGame(false)} }
     function togglePause(){
       if(state==='play'){persist(true);state='pause'; $('pz').style.display = 'flex'; if (AC && AC.suspend) AC.suspend() }
       else if (state === 'pause') { state = 'play'; $('pz').style.display = 'none'; if (AC && AC.resume) AC.resume() }
@@ -1317,26 +1319,26 @@
     function kill(e) {
       if(e.dead)return;e.dead=true;const coinBase=({basic:8,spitter:10,dasher:12,armor:16,split:14,mini:5,boss:180}[e.k]||8);const survivalGain=e.boss?Math.min(35,10+Math.floor(lvl/2)):Math.min(3,1+Math.floor(lvl/12));const campaignGain=e.boss?250+lvl*18:Math.min(24,12+Math.floor(lvl/8)+(coinBase>=14?4:0));const coinGain=gameMode==='campaign'?campaignGain:survivalGain;coins+=coinGain;pop(e.P[0].x+12,e.P[0].y+10,'+'+coinGain+' ◈','#ffe3a0',e.boss);stats.kills++;if(e.boss)stats.bosses++;stats.totalScore+=(e.boss?1000:100)*mult();streak++; streakT = 3.2; const gain = (e.boss ? 1000 : 100) * mult(); score += gain; pop(e.P[0].x, e.P[0].y - 20, '+' + gain + (mult() > 1 ? ' ×' + mult() : ''), e.boss ? '#ffb066' : '#ffd36b', e.boss); fury = Math.min(100, fury + 10 * U.fury); hp = Math.min(maxHp, hp + U.life); SFX[e.boss ? 'boom' : 'kill'](); shake = Math.max(shake, e.boss ? 18 : 5);
       for (let i = 0; i < e.n; i += 2) { const p = e.P[i]; for (let j = 0; j < 3; j++)part(p.x, p.y, rnd(-240, 240), rnd(-240, 240), rnd(.4, .9), 2.5, e.col, true) }
-      if (e.k === 'split') for (let i = 0; i < 2; i++)en.push(mk('mini', e.P[0].x + rnd(-20, 20), e.P[0].y + rnd(-20, 20)));
+      if (e.k === 'split') for (let i = 0; i < 2 && en.length < MAX_ACTIVE_ENEMIES; i++) en.push(mk('mini', e.P[0].x + rnd(-20, 20), e.P[0].y + rnd(-20, 20)));
       if (e.boss) { if(gameMode==='campaign'){const clearReward=300+lvl*25;coins+=clearReward;pop(e.P[0].x,e.P[0].y-54,'BONUS +'+clearReward+' ◈','#ffe3a0',true)} shots.length = 0; slow = .2; banner('EL REY HA CAÍDO', 'Su reinado de ceniza termina') }
     }
     function hurtP(d) { if (state !== 'play') return; if(guard>0){guard=0;guardFlash=.45;inv=Math.max(inv,.35);toast('ESCUDO ROTO');SFX.hit();return} if (inv > 0) return; hp -= d * U.def; inv = .55; streak = 0; shake = Math.max(shake, 8); rf = .3; fury = Math.min(100, fury + d * .4 * U.fury); SFX.hurt(); if (hp <= 0) { hp = 0; gameOver() } }
     function gameOver(){state='over';overAt=performance.now();SFX.over();const nr=score>best&&score>0;best=Math.max(best,score);const finished=sessions.find(x=>x.id===activeSessionId);if(finished){finished.checkpoint=null;finished.ended=true;finished.level=lvl;finished.score=score;finished.updatedAt=Date.now()}activeSessionId=null;saveData.checkpoint=null;persist(false);
       $('ovp').textContent = 'Nivel ' + lvl + ' · ' + score + ' puntos · Récord ' + best + (nr ? ' · ¡NUEVO RÉCORD!' : ''); $('over').style.display = 'flex'
     }
-    function shoot(h,a,v,d,owner=null){once('sh',80,SFX.shoot);shots.push({x:h.x,y:h.y,vx:Math.cos(a)*v*sc,vy:Math.sin(a)*v*sc,d,l:5,owner})}
+    function shoot(h,a,v,d,owner=null){if(shots.length>=MAX_ACTIVE_SHOTS)return;once('sh',80,SFX.shoot);shots.push({x:h.x,y:h.y,vx:Math.cos(a)*v*sc,vy:Math.sin(a)*v*sc,d,l:5,owner})}
 
-    function chooseTarget(e){const h=e.P[0],p=pl.P[0];let best=p,bd=dst(h,p)*.9;for(const o of en){if(o===e||o.dead)continue;const d=dst(h,o.P[0])*(o.boss?.7:1);if(d<bd){best=o.P[0];bd=d}}return best}
+    function chooseTarget(e){const h=e.P[0],p=pl.P[0];let best=p,bd=dst(h,p)*.9;for(let i=0;i<en.length;i++){const o=en[i];if(o===e||o.dead)continue;const q=o.P[0],dx=h.x-q.x,dy=h.y-q.y,d2=dx*dx+dy*dy,limit=bd/(o.boss?.7:1);if(d2<limit*limit){const d=Math.sqrt(d2)*(o.boss?.7:1);if(d<bd){best=q;bd=d}}}return best}
      function ai(e, dt) {
       if (e.dead) return;
       const p=pl.P[0],h=e.P[0],target=chooseTarget(e),dx=target.x-h.x,dy=target.y-h.y,d=Math.hypot(dx,dy)||1,k=e.k,sp0= e.v * sc * (e.boss && e.pp === 3 ? 1.5 : 1);
-      e.flash = Math.max(0, e.flash - dt); e.bc -= dt; e.cd -= dt;if(e.boss&&e.hp>0)e.hp=Math.min(e.max,e.hp+e.max*(.0007+Math.min(.001,lvl*.00001))*dt);
+      e.flash = Math.max(0, e.flash - dt); e.bc -= dt; e.cd -= dt;
       if (e.burn > 0) { e.burn -= dt; e.hp -= 12 * dt; if (Math.random() < .3) part(h.x, h.y, rnd(-30, 30), -40, .6, 1.6, '#ff7a2a', true); if (e.hp <= 0) { kill(e); return } }
       if (e.stun > 0) { e.stun -= dt; e.move(p.x, p.y, 0, 1, dt); return }
       let tx=target.x,ty=target.y,spd=sp0,turn=4;
       if (e.boss) {
         const np = e.hp / e.max > .6 ? 1 : e.hp / e.max > .3 ? 2 : 3;
-        if (np !== e.pp) { e.pp=np;const arch=BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0];banner('FASE '+np+' · '+arch.name,np===2?'El jefe cambia su patrón de ataque':'Fase crítica · cuidado con sus embestidas');SFX.roar();shake=14;const addType=e.bossType===2?'armor':np===2?'spitter':'dasher';for(let i=0;i<(e.bossType===2?3:2);i++)en.push(mk(addType,h.x+rnd(-90,90),h.y+rnd(-90,90)))}
+        if (np !== e.pp) { e.pp=np;const arch=BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0];banner('FASE '+np+' · '+arch.name,np===2?'El jefe cambia su patrón de ataque':'Fase crítica · cuidado con sus embestidas');SFX.roar();shake=14;const addType=e.bossType===2?'armor':np===2?'spitter':'dasher';for(let i=0;i<(e.bossType===2?3:2)&&en.length<MAX_ACTIVE_ENEMIES;i++)en.push(mk(addType,h.x+rnd(-90,90),h.y+rnd(-90,90)))}
         e.cd2 = (e.cd2 === undefined ? 2 : e.cd2) - dt;
         if(e.cd2<=0){const aim=Math.atan2(p.y-h.y,p.x-h.x),style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style,phase=e.pp;if(style==='fan'){const n=phase===1?5:phase===2?7:9;for(let j=-(n>>1);j<=n>>1;j++)shoot(h,aim+j*(phase===3?.105:.16),phase===3?470:360,phase===3?27:21,e)}else if(style==='ring'){const n=phase===1?16:phase===2?24:32;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?390:315,phase===3?25:19,e);e.ang+=.18}else if(style==='burst'){const n=phase===1?12:phase===2?18:24;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?410:320,phase===3?25:19,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.12,350,18,e);e.ang+=.13}else if(style==='spiral'){const n=phase===1?12:phase===2?18:24;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?420:330,phase===3?25:19,e);e.ang+=phase===3?.58:.36}else{const n=phase===1?8:phase===2?14:20;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?330:260,phase===3?18:14,e);for(let j=-2;j<=2;j++)shoot(h,aim+j*.13,360,phase===3?20:16,e);e.ang+=.27}e.cd2=phase===1?1.85:phase===2?1.35:.92}
         if(e.boss&&!e.dead){e.hp=Math.min(e.max,e.hp+e.max*(e.pp===3?.014:e.pp===2?.009:.005)*dt);e.v=Math.max(e.v,CF.boss.v*(1.2+Math.min(.4,lvl*.003)));}
@@ -1467,7 +1469,7 @@
       }
       if (breath > 0) { breath -= dt; spd *= .35; turn = 3.5; pm = 1; fireTick(dt) }
       if (comet > 0) {
-        comet -= dt; spd = 1300 * sc; turn = 0; pm = 1; poolT -= dt; if (poolT <= 0) { pools.push({ x: h.x, y: h.y, t: 3 }); poolT = .04 }
+        comet -= dt; spd = 1300 * sc; turn = 0; pm = 1; poolT -= dt; if (poolT <= 0) { if(pools.length>=MAX_ACTIVE_POOLS)pools.shift();pools.push({ x: h.x, y: h.y, t: 2.4 }); poolT = .12 }
         for (let i = 0; i < 4; i++)part(h.x, h.y, rnd(-120, 120), rnd(-120, 120), rnd(.3, .6), rnd(4, 8), 'fire', true);
         en.forEach(e => { if (!dashHit.has(e) && !e.dead && dst(h, e.P[0]) < 34 * pl.sc + e.R[0] * e.sc) { dashHit.add(e); hurt(e, 60 * U.combo, Math.cos(pl.A[0]) * 600, Math.sin(pl.A[0]) * 600); e.burn = 3 } });
         if (comet <= 0) explode(h.x, h.y, 190 * sc, 100 * U.combo)
@@ -1491,7 +1493,7 @@
       if(en.length<MAX_ACTIVE_ENEMIES){let budget=Math.min(2,MAX_ACTIVE_ENEMIES-en.length);for(let i=0;i<spawnQ.length;i++){const q=spawnQ[i];q.t-=dt;if(q.t<=0&&budget>0){if(!q.pos)q.pos=spawnPos();spawn(q.k,q.pos);q.done=true;budget--}}}spawnQ=spawnQ.filter(q=>!q.done);
       en.slice().forEach(e => ai(e, dt)); en = en.filter(e => !e.dead);
       shots.forEach(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;s.l-=dt;if(s.owner&&pl.P.slice(0,9).some(q=>Math.hypot(q.x-s.x,q.y-s.y)<14*pl.sc)){hurtP(s.d);s.l=0}else if(s.owner){for(const t of en)if(t!==s.owner&&!t.dead&&dst(t.P[0],s)<t.R[0]*t.sc+5*sc){hurt(t,s.d,s.vx*.1,s.vy*.1,true);s.l=0;break}}if(s.x<0||s.y<0||s.x>WORLD_W||s.y>WORLD_H)s.l=0}); shots = shots.filter(s => s.l > 0);
-      if (!spawnQ.length && !en.length) { clearT += dt; if(clearT>1.6){clearT=0;if(bossDue&&!bossSpawned){bossSpawned=true;const arch=BOSS_ARCHETYPES[(Math.max(0,Math.floor(lvl/5)-1))%BOSS_ARCHETYPES.length];banner('EL GUARDIÁN HA DESPERTADO',arch.name+' · '+arch.intro);SFX.roar();spawn('boss')}else{const bonus=150+lvl*42,coinBonus=5+Math.floor(lvl/4);score+=bonus;coins+=coinBonus;pop(pl.P[0].x,pl.P[0].y-42,'+'+bonus+' BONUS · +'+coinBonus+' ◈','#ffe09a',true);if(gameMode==='campaign'&&lvl>=100){state='over';$('over').querySelector('h1').textContent='NIVEL 100';$('ovp').textContent='Has conquistado los 100 niveles · '+score+' puntos';$('over').style.display='flex';SFX.up()}else showUpgrades()}} } else clearT = 0;
+      if (!spawnQ.length && !en.length) { clearT += dt; if(clearT>1.6){clearT=0;if(bossDue&&!bossSpawned){bossSpawned=true;const arch=BOSS_ARCHETYPES[(Math.max(0,Math.floor(lvl/5)-1))%BOSS_ARCHETYPES.length];banner('EL GUARDIÁN HA DESPERTADO',arch.name+' · '+arch.intro);SFX.roar();spawn('boss')}else{const bonus=150+lvl*42,coinBonus=5+Math.floor(lvl/4);score+=bonus;coins+=coinBonus;pop(pl.P[0].x,pl.P[0].y-42,'+'+bonus+' BONUS · +'+coinBonus+' ◈','#ffe09a',true);if(gameMode==='campaign'&&lvl>=100){state='over';overAt=performance.now();best=Math.max(best,score);const finished=sessions.find(x=>x.id===activeSessionId);if(finished){finished.checkpoint=null;finished.ended=true;finished.level=lvl;finished.score=score;finished.updatedAt=Date.now()}activeSessionId=null;saveData.checkpoint=null;persist(false);$('over').querySelector('h1').textContent='CAMPAÑA COMPLETADA';$('ovp').textContent='Has conquistado los 100 niveles · '+score+' puntos · Récord '+best;$('over').style.display='flex';SFX.up()}else showUpgrades()}} } else clearT = 0;
     }
 
     function drawDemon(t) {
@@ -1696,7 +1698,7 @@
     const installButton=$('installApp');let installPrompt=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;installButton.style.display='inline-block'});installButton.addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null}else toast('En el menú del navegador: “Añadir a pantalla de inicio” o “Instalar app”')});addEventListener('appinstalled',()=>{installButton.style.display='none';toast('APP INSTALADA')});if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./service-worker.js').catch(()=>{});installButton.style.display='inline-block';
     $('mute').addEventListener('click', () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; $('mute').setAttribute('aria-label',muted?'Activar sonido':'Silenciar sonido'); $('mute').title=muted?'Activar sonido':'Silenciar sonido'; if (master) master.gain.value = muted ? 0 : .6; initAudio() });
     let prev = performance.now();
-    function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now); requestAnimationFrame(loop) }
+    function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; try { slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now) } catch(error) { console.error('Error del juego:',error);state='pause';$('pz').style.display='flex';const msg=$('pz').querySelector('p');if(msg)msg.textContent='Se detuvo una acción para proteger la partida. Recarga la página si el problema continúa.' } requestAnimationFrame(loop) }
     makePlayer();refreshHome();requestAnimationFrame(loop);
   </script>
 </body>
