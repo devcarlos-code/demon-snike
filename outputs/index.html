@@ -538,6 +538,47 @@
     #radar { position:fixed; z-index:2; top:calc(env(safe-area-inset-top,0px) + 84px); right:18px; width:clamp(112px,14vw,164px); height:auto; aspect-ratio:1; border:1px solid #bd8849; border-radius:50%; background:rgba(8,5,10,.82); box-shadow:0 0 18px #000b, inset 0 0 16px #ffb84a22; pointer-events:none; }
     @media(pointer:coarse) { #radar { top:calc(env(safe-area-inset-top,0px) + 82px); right:10px; width:clamp(92px,25vw,128px); } #joystick { width:clamp(112px,30vw,140px); height:clamp(112px,30vw,140px); left:max(14px,env(safe-area-inset-left,0px) + 10px); bottom:calc(env(safe-area-inset-bottom,0px) + 22px); } #joyknob { width:46%; height:46%; } #keys { right:max(12px,env(safe-area-inset-right,0px) + 10px); bottom:calc(env(safe-area-inset-bottom,0px) + 20px); width:min(36vw,158px); grid-template-columns:repeat(2,minmax(60px,1fr)); } .k { width:clamp(60px,18vw,74px); height:clamp(60px,18vw,74px); } #combos { bottom:calc(env(safe-area-inset-bottom,0px) + 174px); max-width:40vw; } }
     @media(pointer:coarse) and (orientation:landscape) { #radar { top:calc(env(safe-area-inset-top,0px) + 64px); width:clamp(76px,16vh,104px); right:12px; } #joystick { width:100px; height:100px; bottom:calc(env(safe-area-inset-bottom,0px) + 12px); } #keys { width:142px; grid-template-columns:repeat(2,66px); bottom:calc(env(safe-area-inset-bottom,0px) + 12px); gap:6px; } .k { width:66px; height:66px; } #combos { display:none; } #hud { right:120px; } #lv { max-width:42%; } }
+  
+    /* Correcciones de anclaje y zonas libres del minimapa */
+    #pbtn, #mute {
+      box-sizing: border-box;
+      width: 40px;
+      height: 36px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      top: max(12px, env(safe-area-inset-top, 0px) + 12px);
+    }
+    @media (pointer:fine) and (min-width:800px) {
+      #pbtn { left: auto; right: 24px; }
+      #mute { left: auto; right: 72px; }
+      #radar {
+        top: auto;
+        right: auto;
+        bottom: 90px;
+        left: 24px;
+        width: clamp(112px, 12vw, 156px);
+      }
+    }
+    @media (pointer:coarse) {
+      #pbtn { left: max(12px, env(safe-area-inset-left, 0px) + 10px); right: auto; }
+      #mute { left: max(58px, env(safe-area-inset-left, 0px) + 54px); right: auto; }
+      #radar {
+        top: calc(env(safe-area-inset-top, 0px) + 108px);
+        right: max(10px, env(safe-area-inset-right, 0px) + 10px);
+        bottom: auto;
+        left: auto;
+        width: clamp(84px, 22vw, 112px);
+      }
+    }
+    @media (pointer:coarse) and (orientation:landscape) {
+      #radar {
+        top: calc(env(safe-area-inset-top, 0px) + 108px);
+        right: max(10px, env(safe-area-inset-right, 0px) + 10px);
+        width: clamp(76px, 16vh, 96px);
+      }
+    }
   </style>
 </head>
 
