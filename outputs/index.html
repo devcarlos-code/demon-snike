@@ -938,6 +938,28 @@
       .showcase-caption{padding:10px 0 12px}.showcase-caption>b{font-size:21px}.showcase-stats div{padding:10px 5px}.home-drawers{margin-top:2px}
     }
     @media(max-width:430px){.home-mark{width:38px;height:38px;font-size:21px}.brand-copy b{font-size:9px}.home-hero h1{font-size:clamp(39px,10.5vw,52px)!important}.home-actions #go{min-width:0;width:100%}.home-showcase{padding:13px}.showcase-art{min-height:170px}.showcase-bottom{font-size:7px}}
+
+    /* Páginas independientes de armería y mercado */
+    #title.home-page{display:grid;grid-template-rows:1fr;padding:clamp(16px,3vw,42px);overflow-y:auto}
+    .home-view{min-height:100%;display:flex;flex-direction:column}
+    .home-view .home-layout{flex:1}
+    .section-page{display:none;grid-column:1/-1;grid-row:1/-1;min-height:100%;width:min(1380px,100%);margin:0 auto;flex-direction:column;gap:clamp(20px,3vh,34px)}
+    .section-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;padding:0 0 18px;border-bottom:1px solid #70434a66}
+    .section-back{justify-self:start;padding:11px 14px!important;border:1px solid #65404b!important;border-radius:8px!important;background:#160e15!important;color:#e8c9bb!important;font:700 10px Arial,sans-serif!important;letter-spacing:.12em!important}
+    .section-back:hover{border-color:#e0a36f!important}
+    .section-brand{display:flex;align-items:center;gap:12px}.section-brand>span{display:grid;place-items:center;width:42px;height:42px;border:1px solid #a64c3d;border-radius:12px;background:#29141d;color:#e9b17e;font-size:22px}
+    .section-brand div{display:grid;gap:5px}.section-brand small{font:700 8px Arial,sans-serif;letter-spacing:.2em;color:#d17e63}.section-brand b{font:700 11px Arial,sans-serif;letter-spacing:.13em;color:#f0ded0}
+    .section-wallet{justify-self:end;padding:10px 13px;border:1px solid #65404b;border-radius:8px;background:#160e15;font:700 9px Arial,sans-serif;letter-spacing:.12em;color:#a99096;white-space:nowrap}.section-wallet b{margin-left:7px;color:#f0c18b}
+    .section-content{width:min(100%,1120px);margin:0 auto 30px}
+    .section-intro{margin:clamp(8px,2vh,20px) 0 22px}.section-intro h2{margin:10px 0 8px;font-size:clamp(34px,5vw,58px);letter-spacing:.1em;color:#f0ded0;text-shadow:0 0 28px #b83b3425}.section-intro p{max-width:650px;margin:0;color:#bca7aa;font:14px/1.65 Arial,sans-serif}
+    .section-panel{border:1px solid #70434a88;border-radius:15px;background:linear-gradient(150deg,#21121b,#100b12 72%);box-shadow:0 20px 60px #0006;overflow:hidden}
+    .section-panel-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid #70434a55}.section-panel-heading div{display:grid;gap:6px}.section-panel-heading b{font:700 11px Arial,sans-serif;letter-spacing:.16em;color:#f0d9ca}.section-panel-heading small{font:11px Arial,sans-serif;color:#a58d91}.section-tag{padding:7px 10px;border:1px solid #845b4d;border-radius:6px;color:#e7b781;font:700 9px Arial,sans-serif;letter-spacing:.1em}
+    .skill-panel .home-disclosure-body{padding:12px 20px 20px!important}.skill-panel .loadout-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.skill-panel .loadout-slot{padding:16px;background:#130d14;border-color:#67434b}.skill-panel .loadout-actions{margin-top:6px}
+    .section-footnote{margin-top:14px;color:#8f7b82;font:11px Arial,sans-serif;line-height:1.5}
+    .shop-banner{display:flex;align-items:center;gap:15px;margin-bottom:18px;padding:17px 19px;border:1px solid #80513e;border-radius:12px;background:linear-gradient(110deg,#351b20,#1b111a)}.shop-banner>span{font-size:27px;color:#edbd83}.shop-banner div{display:grid;gap:6px;flex:1}.shop-banner b{font:700 11px Arial,sans-serif;letter-spacing:.14em;color:#f0d9ca}.shop-banner small{font:11px/1.5 Arial,sans-serif;color:#b49da2}.shop-banner strong{font:700 24px Georgia,serif;color:#f0c18b;text-align:center}.shop-banner strong small{display:block;font:700 8px Arial,sans-serif;letter-spacing:.1em}
+    .section-shop-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.section-shop-list .shop-card{min-height:132px;padding:16px;border-radius:12px;background:linear-gradient(145deg,#21141d,#100b12);border:1px solid #67434b;box-shadow:0 8px 22px #0004}.section-shop-list .shop-card:hover{border-color:#d18d68;transform:translateY(-2px)}.section-shop-list .shop-skill-info p{line-height:1.5}
+    @media(max-width:760px){#title.home-page{padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 18px)}.section-header{grid-template-columns:1fr auto;gap:10px}.section-brand{grid-column:1/-1;grid-row:1}.section-back{grid-column:1;grid-row:2}.section-wallet{grid-column:2;grid-row:2}.section-content{margin-bottom:14px}.section-shop-list{grid-template-columns:1fr}.section-intro h2{font-size:36px}.skill-panel .loadout-grid{grid-template-columns:1fr}.section-panel-heading{padding:14px}.skill-panel .home-disclosure-body{padding:10px 12px 14px!important}}
+    @media(max-width:420px){.section-wallet{font-size:8px;padding:9px}.section-brand b{font-size:9px}.section-brand>span{width:36px;height:36px}.shop-banner{padding:13px;gap:10px}.shop-banner small{font-size:10px}}
   </style>
 </head>
 
@@ -969,6 +991,7 @@
     <p class="sub">Pulsa P o Esc para continuar</p><button id="rs">CONTINUAR</button><button id="pauseHome" class="secondary">MENÚ PRINCIPAL</button>
   </div>
   <div id="title" class="home-page">
+    <div class="home-view" id="homeView">
     <header class="home-header">
       <div class="brand"><span class="home-mark" aria-hidden="true">☠</span><span class="brand-copy"><small>DEMON-SNIKE</small><b>ARENA DE SERPIENTES</b></span></div>
       <div class="home-topline"><span>SUPERVIVENCIA · ACCIÓN · EVOLUCIÓN</span><button id="installApp" class="secondary">↓ INSTALAR</button></div>
@@ -978,23 +1001,10 @@
         <div class="home-kicker"><i></i> SOBREVIVE A LA HORDA</div>
         <h1 id="home-title">ARENA DE<br><span>SERPIENTES</span></h1>
         <p class="sub">Eres un demonio hambriento. <strong>Devora las hordas, evoluciona tus poderes</strong> y enfréntate al Rey Serpiente.</p>
-        <div class="home-actions"><button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button><button class="home-drawer-link" type="button" data-open-drawer="skillsDrawer">✦ HABILIDADES</button><button class="home-drawer-link shop-entry" type="button" data-open-drawer="shopDrawer">TIENDA <span class="home-coin-pill">◈ <b id="homeCoins">0</b></span></button></div>
+        <div class="home-actions"><button id="go" type="button"><span>NUEVA PARTIDA</span><small>ENTER ↵</small></button><button class="home-drawer-link" type="button" data-page="skillsPage">✦ HABILIDADES <span class="home-nav-arrow">↗</span></button><button class="home-drawer-link shop-entry" type="button" data-page="shopPage">TIENDA <span class="home-coin-pill">◈ <b id="homeCoins">0</b></span><span class="home-nav-arrow">↗</span></button></div>
         <div class="home-drawers">
-          <details id="skillsDrawer" class="home-disclosure skills-disclosure">
-            <summary><span class="disclosure-copy"><b>HABILIDADES</b><small>Edita tus cuatro espacios activos</small></span><span id="equippedCount" class="disclosure-count">04/04</span><span class="disclosure-mark" aria-hidden="true"></span></summary>
-            <div class="home-disclosure-body">
-              <p class="armory-note">Elige una habilidad por tecla. Puedes dejar espacios vacíos; las habilidades compradas se pueden intercambiar cuando quieras.</p>
-              <div id="loadoutGrid" class="loadout-grid"></div>
-              <div id="ownedSkillList" class="owned-skill-list"></div>
-            </div>
-          </details>
-          <details id="shopDrawer" class="home-disclosure shop-disclosure">
-            <summary><span class="disclosure-copy"><b>TIENDA</b><small>Habilidades nuevas para tu arsenal</small></span><span class="shop-wallet">◈ <b id="shopBalance">0</b></span><span class="disclosure-mark" aria-hidden="true"></span></summary>
-            <div class="home-disclosure-body">
-              <div class="shop-heading"><b>ARTEFACTOS DE COMBATE</b><small>Gana monedas al derrotar enemigos y limpiar hordas.</small></div>
-              <div id="shopList" class="shop-list"></div>
-            </div>
-          </details>
+
+
           <details class="home-disclosure">
             <summary><span class="disclosure-copy"><b>INFORMACIÓN DE SUPERVIVENCIA</b><small>Estadísticas · controles · combos</small></span><span class="disclosure-mark" aria-hidden="true"></span></summary>
             <div class="home-disclosure-body">
@@ -1030,6 +1040,38 @@
         <div class="showcase-bottom"><span>OBJETIVO PRINCIPAL</span><b>DERROTA AL REY SERPIENTE <i>↗</i></b></div>
       </aside>
     </main>
+    </div>
+    <section class="section-page" id="skillsPage" aria-labelledby="skillsPageTitle">
+      <header class="section-header">
+        <button class="section-back" type="button" data-page="homeView">← VOLVER</button>
+        <div class="section-brand"><span>☠</span><div><small>DEMON-SNIKE / ARSENAL</small><b>GESTIÓN DE HABILIDADES</b></div></div>
+        <div class="section-wallet">ARSENAL <b id="equippedCount">04/04</b></div>
+      </header>
+      <div class="section-content">
+        <div class="section-intro"><div class="home-kicker"><i></i> CONFIGURA TU ESTILO DE COMBATE</div><h2 id="skillsPageTitle">TU ARSENAL</h2><p>Asigna una habilidad a cada espacio. Combina tus poderes para desbloquear diferentes combos durante la partida.</p></div>
+        <div class="section-panel skill-panel">
+          <div class="section-panel-heading"><div><b>ESPACIOS ACTIVOS</b><small>Cuatro habilidades disponibles durante el combate</small></div><span class="section-tag">LOADOUT 04</span></div>
+          <div class="home-disclosure-body">
+              <p class="armory-note">Elige una habilidad por tecla. Puedes dejar espacios vacíos; las habilidades compradas se pueden intercambiar cuando quieras.</p>
+              <div id="loadoutGrid" class="loadout-grid"></div>
+              <div id="ownedSkillList" class="owned-skill-list"></div>
+            </div>
+        </div>
+        <div class="section-footnote">Las habilidades que todavía no hayas desbloqueado aparecen en la tienda.</div>
+      </div>
+    </section>
+    <section class="section-page" id="shopPage" aria-labelledby="shopPageTitle">
+      <header class="section-header">
+        <button class="section-back" type="button" data-page="homeView">← VOLVER</button>
+        <div class="section-brand"><span>◈</span><div><small>DEMON-SNIKE / MERCADO</small><b>ARTEFACTOS DE COMBATE</b></div></div>
+        <div class="section-wallet">TUS MONEDAS <b>◈ <span id="shopBalance">0</span></b></div>
+      </header>
+      <div class="section-content shop-content">
+        <div class="section-intro"><div class="home-kicker"><i></i> FORJA TU PODER</div><h2 id="shopPageTitle">LA TIENDA</h2><p>Desbloquea nuevas habilidades, amplía tus posibilidades y prepara una combinación única para la arena.</p></div>
+        <div class="shop-banner"><span>✦</span><div><b>CATÁLOGO DE HABILIDADES</b><small>Gana monedas derrotando enemigos y superando oleadas. Cada artefacto tiene su propio coste y tiempo de recarga.</small></div><strong>18 <small>ARTÍCULOS</small></strong></div>
+        <div id="shopList" class="shop-list section-shop-list"></div>
+      </div>
+    </section>
   </div>
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
@@ -1525,7 +1567,7 @@
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});document.querySelectorAll('[data-open-drawer]').forEach(b=>b.addEventListener('click',()=>{const panel=$(b.dataset.openDrawer);if(panel){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'center'})}}));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',startGame);$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});function showHomePage(pageId){document.querySelectorAll('#title .home-view,#title .section-page').forEach(v=>v.style.display=v.id===pageId?(pageId==='homeView'?'contents':'flex'):'none');const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout()}document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showHomePage(b.dataset.page)));$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { if (state === 'play') togglePause() });
     document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') togglePause() });
