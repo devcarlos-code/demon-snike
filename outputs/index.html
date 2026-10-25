@@ -560,7 +560,7 @@
     @media (pointer:fine) and (min-width:800px) {
       #pbtn { left: auto; right: 24px; }
       #mute { left: auto; right: 72px; }
-      #radar { top:118px; right:24px; bottom:auto; left:auto; width:clamp(112px,12vw,156px); }
+      #radar { top:clamp(190px,28vh,250px); right:24px; bottom:auto; left:auto; width:clamp(104px,10vw,136px); }
       #combos { left:24px; right:auto; bottom:24px; max-width:min(42vw,520px); justify-content:flex-start; }
     }
     @media (pointer:coarse) {
@@ -1111,9 +1111,9 @@
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const mobileMQ=matchMedia('(pointer: coarse)');
     const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4);
-    const FX_PART_LIMIT=lowEndDevice?150:420;
+    const FX_PART_LIMIT=lowEndDevice?110:(mobile?150:220);
     let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0,mobile=mobileMQ.matches;
-    function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1.15:(mobile?1.4:1.75)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
+    function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1.05:(mobile?1.25:1.3)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
     addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
     const BOSS_ARCHETYPES=[
@@ -1432,7 +1432,7 @@
       parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.l -= dt }); parts = parts.filter(p => p.l > 0);
       tents.forEach(q => q.t += dt); tents = tents.filter(q => q.t < .7);
       pops.forEach(p => { p.y -= 38 * dt; p.t -= dt }); pops = pops.filter(p => p.t > 0);
-      if (parts.length > 800) parts.splice(0, parts.length - 800);
+      if (parts.length > FX_PART_LIMIT) parts.splice(0, parts.length - FX_PART_LIMIT);
       emb.forEach(e => { e.y -= e.v * dt / H; if (e.y < -.03) { e.y = 1.03; e.x = Math.random() } });
       if(state==='title'){updateCamera();const h=pl.P[0],d=Math.hypot(ptr.x-h.x,ptr.y-h.y); pl.move(ptr.x, ptr.y, d < 14 ? 0 : Math.min(280 * sc, d * 5), 7, dt); return }
       if(state!=='play')return;
@@ -1557,7 +1557,10 @@
       pops.forEach(p => { ctx.globalAlpha = Math.min(1, p.t / p.m * 2.2); ctx.font = '700 ' + (p.big ? 24 : 15) + 'px Cinzel,Georgia,serif'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeText(p.s, p.x, p.y); ctx.fillStyle = p.c; ctx.fillText(p.s, p.x, p.y) });
       ctx.globalAlpha = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'
     }
-    function drawRadar() {
+    let radarLastDraw=0;
+    function drawRadar(now=performance.now()) {
+      if(now-radarLastDraw<120)return;
+      radarLastDraw=now;
       const r=$('radar'),g=r.getContext('2d'),w=r.width,h=r.height,pad=12,iw=w-pad*2,ih=h-pad*2;
       g.clearRect(0,0,w,h);g.save();g.beginPath();g.arc(w/2,h/2,Math.min(iw,ih)/2,0,TAU);g.clip();
       g.fillStyle='rgba(10,7,13,.92)';g.fillRect(0,0,w,h);g.strokeStyle='rgba(219,166,96,.22)';g.lineWidth=1;
@@ -1582,7 +1585,7 @@
       drawTents(t);en.forEach(e=>e.drawBone());drawShots();drawDemon(t);if(mobile){const q=pl.P[0],a=joy.active?Math.atan2(joy.dy,joy.dx):pl.A[0],dist=Math.min(W,H)*.28,ax=q.x+Math.cos(a)*dist,ay=q.y+Math.sin(a)*dist,r=14*sc;ctx.save();ctx.globalAlpha=.88;ctx.strokeStyle='#f4cd78';ctx.fillStyle='#fff0bd';ctx.lineWidth=2;ctx.shadowColor='#ffb840';ctx.shadowBlur=lowEndDevice?3:8;ctx.beginPath();ctx.arc(ax,ay,r,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(ax,ay,3*sc,0,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(ax-r*1.5,ay);ctx.lineTo(ax-r*.65,ay);ctx.moveTo(ax+r*.65,ay);ctx.lineTo(ax+r*1.5,ay);ctx.moveTo(ax,ay-r*1.5);ctx.lineTo(ax,ay-r*.65);ctx.moveTo(ax,ay+r*.65);ctx.lineTo(ax,ay+r*1.5);ctx.stroke();if(joy.active){ctx.globalAlpha=.22;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(ax,ay);ctx.stroke()}ctx.restore()}
       if(dash>0||comet>0||breath>0){const h=pl.P[0],a=pl.A[0];ctx.save();ctx.translate(h.x,h.y);ctx.rotate(a);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=lowEndDevice?.28:.48;ctx.strokeStyle=breath>0?'#ff9a36':'#a94cff';ctx.lineWidth=lowEndDevice?3:5;ctx.beginPath();if(breath>0){ctx.moveTo(8,-5);ctx.lineTo(150*sc,-52*sc);ctx.lineTo(190*sc,0);ctx.lineTo(150*sc,52*sc);ctx.lineTo(8,5)}else{ctx.moveTo(-12,-pl.R[0]*2);ctx.lineTo(-42*sc,-pl.R[0]*3);ctx.moveTo(-12,pl.R[0]*2);ctx.lineTo(-42*sc,pl.R[0]*3)}ctx.stroke();ctx.restore()}
       if (nova) { ctx.save(); ctx.shadowColor = '#ff7a2a'; ctx.shadowBlur = 30; ctx.strokeStyle = 'rgba(255,170,90,.85)'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, nova.r, 0, TAU); ctx.stroke(); ctx.strokeStyle = 'rgba(160,75,255,.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(pl.P[0].x, pl.P[0].y, Math.max(0, nova.r - 14), 0, TAU); ctx.stroke(); ctx.restore() }
-      drawParts();drawPops();ctx.restore();drawRadar();ctx.globalAlpha=1; ctx.globalCompositeOperation = 'source-over';
+      drawParts();drawPops();ctx.restore();drawRadar(t);ctx.globalAlpha=1; ctx.globalCompositeOperation = 'source-over';
       const bs = en.find(e => e.boss); if (bs) { const w = Math.min(W * .5, 420), x = (W - w) / 2; ctx.fillStyle = '#200'; ctx.fillRect(x, 50, w, 8); ctx.fillStyle=bs.bossGlow||'#ff6a5a';ctx.fillRect(x,50,w*Math.max(0,bs.hp/bs.max),8);ctx.strokeStyle=bs.bossGlow||'#ff6a5a'; ctx.strokeRect(x, 50, w, 8); ctx.fillStyle=bs.bossGlow||'#ffb0a5';ctx.font='700 11px Cinzel,Georgia,serif';ctx.textAlign='center';ctx.fillText(bs.bossName||'JEFE DE LA ARENA',W/2,44); ctx.textAlign = 'left' }
       if (hp < maxHp * .35 && state === 'play') { const v = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .75); v.addColorStop(0, 'rgba(150,0,10,0)'); v.addColorStop(1, 'rgba(150,0,10,' + (.3 + .2 * Math.sin(t / 180)) + ')'); ctx.fillStyle = v; ctx.fillRect(-30, -30, W + 60, H + 60) }
       if (rf > 0) { ctx.fillStyle = 'rgba(190,0,10,' + rf * .8 + ')'; ctx.fillRect(-30, -30, W + 60, H + 60) }
