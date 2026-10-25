@@ -1457,7 +1457,7 @@
       else if(mobile){ptr.x=h.x+Math.cos(pl.h)*Math.min(W,H)*.5/camZoom;ptr.y=h.y+Math.sin(pl.h)*Math.min(W,H)*.5/camZoom}
       const d=Math.hypot(ptr.x-h.x,ptr.y-h.y);
       for(const k in cd) cd[k] = Math.max(0, cd[k] - dt); inv = Math.max(0, inv - dt); pm = Math.max(0, pm - dt * 3); streakT -= dt; if (streakT <= 0) streak = 0;
-      let spd = moveMag ? 280 * sc * U.spd * moveMag : (d < 18 ? 0 : Math.min(280 * sc * U.spd, d * 3.2)), turn = moveMag ? 9 : 5.8;
+      let spd = moveMag ? 280 * sc * U.spd * moveMag : (d < 18 ? 0 : Math.min(280 * sc * U.spd, d * 3.2)), turn = (moveMag ? 9 : 5.8) * (U.turn||1);
       if (dash > 0) {
         dash -= dt; spd = 1000 * sc; turn = 0; pm = Math.max(pm, .7);
         en.forEach(e => { if (!dashHit.has(e) && !e.dead && dst(h, e.P[0]) < 30 * pl.sc + e.R[0] * e.sc) { dashHit.add(e); const a = pl.A[0]; hurt(e, (e.k === 'armor' ? 12 : 42) * U.dA, Math.cos(a) * 500, Math.sin(a) * 500); shake = Math.max(shake, 5) } })
