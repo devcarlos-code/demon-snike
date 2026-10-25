@@ -881,6 +881,63 @@
     .home-coin-pill b{font-size:11px}
     .home-disclosure{scroll-margin-top:24px}
     @media(max-width:600px){.home-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.home-actions #go{grid-column:1/-1}.home-actions .home-drawer-link{min-width:0;padding:10px 8px!important;font-size:10px!important}.home-layout{align-content:start}}
+    /* ---- Menú principal: presentación premium ---- */
+    #title.home-page{isolation:isolate;grid-template-rows:auto 1fr;background:radial-gradient(ellipse at 76% 44%,rgba(131,31,43,.2),transparent 36%),radial-gradient(ellipse at 8% 92%,rgba(104,44,145,.13),transparent 38%),linear-gradient(118deg,#10090f 0%,#09070c 52%,#10080d 100%)}
+    #title.home-page::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.19;background-image:linear-gradient(rgba(255,220,180,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,220,180,.055) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(90deg,black,transparent 90%)}
+    .home-header{position:relative;border-bottom-color:rgba(190,111,83,.28);padding-bottom:18px}
+    .brand{gap:14px;font-family:Arial,sans-serif}
+    .home-mark{display:grid;place-items:center;width:44px;height:44px;margin:0;border:1px solid #a64c3d;border-radius:13px;background:linear-gradient(145deg,#35151c,#120b12);font-size:24px;box-shadow:0 0 28px #b6423025,inset 0 1px #ffffff22}
+    .brand-copy{display:grid;gap:5px}.brand-copy small{font-size:9px;color:#e8795e;letter-spacing:.28em}.brand-copy b{font-size:11px;letter-spacing:.15em;color:#eadbd1}
+    .home-topline{display:flex;align-items:center;gap:18px;font:600 9px Arial,sans-serif;letter-spacing:.2em;color:#9d8588}
+    .home-topline button{font-size:10px!important;padding:9px 13px!important}
+    .home-layout{position:relative;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:clamp(24px,5vw,76px);width:min(1380px,100%);min-height:0}
+    .home-hero{gap:clamp(13px,2.1vh,22px);padding:18px 0}
+    .home-kicker{display:flex;align-items:center;gap:10px;color:#e47b60;font:700 10px Arial,sans-serif;letter-spacing:.25em}
+    .home-kicker i{display:inline-block;width:24px;height:1px;background:#e47b60;box-shadow:0 0 10px #e47b60}
+    .home-hero h1{font-size:clamp(48px,7.2vw,92px)!important;line-height:.98!important;letter-spacing:.045em!important;text-shadow:0 12px 48px #000,0 0 34px #b83b3425!important}
+    .home-hero h1 span{color:#f0c18b;background:linear-gradient(100deg,#f6d6a3,#d77a58 65%,#a94a50);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .home-hero .sub{font:15px/1.75 Arial,sans-serif;color:#c1adb0;letter-spacing:.01em;max-width:490px}
+    .home-hero .sub strong{color:#f0d4c2;font-weight:700}
+    .home-actions{gap:10px;align-items:center}
+    .home-actions #go{position:relative;display:flex;align-items:center;justify-content:space-between;gap:28px;min-width:240px;padding:15px 19px!important;border:1px solid #e1ad69!important;border-radius:9px!important;background:linear-gradient(105deg,#a94a36,#6c292d 58%,#321820)!important;box-shadow:0 10px 32px #a342302c,inset 0 1px #ffffff45!important;transition:transform .2s,box-shadow .2s}
+    .home-actions #go:hover{transform:translateY(-3px);box-shadow:0 14px 38px #c35a3d55!important}
+    .home-actions #go span{font:700 11px Arial,sans-serif;letter-spacing:.16em}.home-actions #go small{font:10px Arial,sans-serif;color:#f5d5bd;opacity:.78}
+    .home-actions .home-drawer-link{padding:13px 15px!important;border:1px solid #63404a!important;border-radius:8px!important;background:rgba(22,13,20,.82)!important;color:#e6c9c2!important;font:700 10px Arial,sans-serif!important;letter-spacing:.12em!important;transition:.2s}
+    .home-actions .home-drawer-link:hover{border-color:#d18d68!important;background:#29151d!important}
+    .home-drawers{display:grid;gap:8px;width:min(100%,610px);margin-top:5px}
+    .home-disclosure{border:1px solid rgba(137,75,75,.42)!important;border-radius:9px!important;background:linear-gradient(105deg,rgba(27,15,23,.9),rgba(13,10,16,.86))!important;overflow:hidden;transition:border-color .2s,background .2s}
+    .home-disclosure[open]{border-color:#9e6558!important;background:rgba(25,14,21,.98)!important}
+    .home-disclosure summary{min-height:52px;padding:10px 14px!important;font-family:Arial,sans-serif}
+    .disclosure-copy b{font-size:10px!important;letter-spacing:.14em!important;color:#ead4c8}.disclosure-copy small{font-size:10px!important;color:#a58d91!important}
+    .disclosure-count,.shop-wallet{font:700 10px Arial,sans-serif!important;color:#edbd83!important}
+    .home-disclosure-body{padding:4px 14px 15px!important}
+    .home-showcase{align-self:center;position:relative;display:flex;flex-direction:column;min-height:520px;padding:22px 24px 18px;border:1px solid rgba(174,105,82,.42);border-radius:18px;background:linear-gradient(155deg,rgba(37,17,26,.9),rgba(12,9,16,.96) 68%);box-shadow:0 28px 90px #0009,inset 0 1px #ffffff12;overflow:hidden}
+    .home-showcase::before{content:"";position:absolute;width:310px;height:310px;right:-150px;top:-170px;border-radius:50%;background:#a7433a22;filter:blur(22px);pointer-events:none}
+    .showcase-top,.showcase-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;font:700 9px Arial,sans-serif;letter-spacing:.15em}
+    .showcase-live{display:flex;align-items:center;gap:8px;color:#d5b7a6}.showcase-live i{width:6px;height:6px;border-radius:50%;background:#d78a5c;box-shadow:0 0 10px #e58c58}.showcase-code{color:#806d73}
+    .showcase-art{position:relative;display:grid;place-items:center;min-height:270px;margin:8px 0 0;overflow:hidden}
+    .art-orbit{position:absolute;border:1px solid rgba(207,143,103,.32);border-radius:50%;transform:rotate(-24deg)}
+    .orbit-one{width:230px;height:230px;box-shadow:0 0 34px #b84e3c14,inset 0 0 28px #b84e3c0c}.orbit-two{width:290px;height:150px;border-color:#a75c703d;transform:rotate(42deg)}.orbit-three{width:190px;height:290px;border-style:dashed;border-color:#d49a6530;transform:rotate(58deg)}
+    .art-core{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:132px;height:132px;border:1px solid #d99c6c;border-radius:50%;background:radial-gradient(circle at 40% 30%,#713b3b,#28151f 58%,#100b13 80%);box-shadow:0 0 0 10px #b65b3410,0 0 55px #c65c3b35,inset 0 0 28px #f2bb7b26}
+    .art-core span{font-size:48px;color:#f0c18b;text-shadow:0 0 22px #e77c55}.art-core small{font:700 8px/1.4 Arial,sans-serif;letter-spacing:.3em;text-align:center;color:#d9b49c}
+    .art-sigil{position:absolute;z-index:3;color:#e6ad7d;text-shadow:0 0 14px #d87858}.sigil-a{top:23%;left:20%;font-size:20px}.sigil-b{right:17%;top:45%;font-size:32px;transform:rotate(-35deg)}.sigil-c{bottom:17%;left:29%;font-size:18px}
+    .showcase-caption{position:relative;padding:14px 0 17px;border-top:1px solid #70434a66}.showcase-caption>span{font:700 9px Arial,sans-serif;letter-spacing:.23em;color:#dc8a69}
+    .showcase-caption>b{display:block;margin-top:8px;font-size:clamp(21px,2.3vw,30px);letter-spacing:.1em;color:#f0ded0}.showcase-caption p{max-width:390px;margin:9px 0 0;font:12px/1.65 Arial,sans-serif;color:#a99399}
+    .showcase-stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #70434a66;border-bottom:1px solid #70434a66}
+    .showcase-stats div{display:grid;gap:5px;padding:14px 8px;text-align:center}.showcase-stats div+div{border-left:1px solid #70434a66}
+    .showcase-stats b{font:700 22px Georgia,serif;color:#edbd83}.showcase-stats span{font:700 8px Arial,sans-serif;letter-spacing:.13em;color:#9c858c}
+    .showcase-bottom{margin-top:auto;padding-top:16px;color:#8d777e;font-size:8px}.showcase-bottom b{color:#e4b18a;text-align:right}.showcase-bottom i{font-style:normal;margin-left:5px}
+    @media(max-width:900px){.home-layout{grid-template-columns:minmax(0,1fr) minmax(260px,.8fr);gap:22px}.home-showcase{min-height:470px;padding:18px}.showcase-art{min-height:220px}.home-hero h1{font-size:clamp(42px,6.4vw,68px)!important}.home-actions{flex-wrap:wrap}.home-actions #go{min-width:210px}}
+    @media(pointer:coarse){
+      #title.home-page{grid-template-rows:auto 1fr;gap:16px}.home-header{padding-bottom:12px}.home-topline>span{display:none}
+      .home-layout{display:flex;flex-direction:column;align-items:stretch;gap:18px}.home-hero{padding:8px 0 0;gap:13px}
+      .home-hero h1{font-size:clamp(43px,11vw,66px)!important}.home-hero .sub{font-size:13px;line-height:1.6}
+      .home-showcase{min-height:0;padding:16px;border-radius:13px}.showcase-art{min-height:190px}
+      .orbit-one{width:170px;height:170px}.orbit-two{width:220px;height:110px}.orbit-three{width:145px;height:220px}
+      .art-core{width:104px;height:104px}.art-core span{font-size:38px}
+      .showcase-caption{padding:10px 0 12px}.showcase-caption>b{font-size:21px}.showcase-stats div{padding:10px 5px}.home-drawers{margin-top:2px}
+    }
+    @media(max-width:430px){.home-mark{width:38px;height:38px;font-size:21px}.brand-copy b{font-size:9px}.home-hero h1{font-size:clamp(39px,10.5vw,52px)!important}.home-actions #go{min-width:0;width:100%}.home-showcase{padding:13px}.showcase-art{min-height:170px}.showcase-bottom{font-size:7px}}
   </style>
 </head>
 
@@ -959,6 +1016,19 @@
           </details>
         </div>
       </section>
+      <aside class="home-showcase" aria-label="Resumen de la arena">
+        <div class="showcase-top"><span class="showcase-live"><i></i> SISTEMA ACTIVO</span><span class="showcase-code">DS-018 / ARENA</span></div>
+        <div class="showcase-art" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-orbit orbit-three"></div>
+          <div class="art-core"><span>☠</span><small>DEMON<br>CORE</small></div>
+          <div class="art-sigil sigil-a">✦</div><div class="art-sigil sigil-b">⌁</div><div class="art-sigil sigil-c">✧</div>
+        </div>
+        <div class="showcase-caption"><span>EL DESAFÍO COMIENZA</span><b>DOMINA LA ARENA.</b><p>Cada oleada te acerca al Rey Serpiente. Cada elección define tu forma de combatir.</p></div>
+        <div class="showcase-stats">
+          <div><b>18</b><span>HABILIDADES</span></div><div><b>06</b><span>COMBOS</span></div><div><b>∞</b><span>EVOLUCIONES</span></div>
+        </div>
+        <div class="showcase-bottom"><span>OBJETIVO PRINCIPAL</span><b>DERROTA AL REY SERPIENTE <i>↗</i></b></div>
+      </aside>
     </main>
   </div>
   <script>
