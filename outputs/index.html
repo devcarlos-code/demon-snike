@@ -1545,7 +1545,28 @@
     function shoot(h,a,v,d,owner=null){if(shots.length>=MAX_ACTIVE_SHOTS)return;once('sh',80,SFX.shoot);shots.push({x:h.x,y:h.y,vx:Math.cos(a)*v*sc,vy:Math.sin(a)*v*sc,d,l:5,owner})}
 
     let aiStepDt=1/60;
-    function chooseTarget(e){const h=e.P[0];e.targetTimer=(e.targetTimer||0)-aiStepDt;if(e.targetTimer>0&&Number.isFinite(e.targetX)&&Number.isFinite(e.targetY))return {x:e.targetX,y:e.targetY};const p=pl.P[0];let best=p,bd=dst(h,p)*.9;for(let i=0;i<en.length;i++){const o=en[i];if(o===e||o.dead)continue;const q=o.P[0],dx=h.x-q.x,dy=h.y-q.y,d2=dx*dx+dy*dy,limit=bd/(o.boss?.7:1);if(d2<limit*limit){const d=Math.sqrt(d2)*(o.boss?.7:1);if(d<bd){best=q;bd=d}}}e.targetX=best.x;e.targetY=best.y;e.targetTimer=e.boss?.16:.24+rnd(0,.12);return {x:e.targetX,y:e.targetY}}
+    function chooseTarget(e){
+       const h=e.P[0];
+       e.targetTimer=(e.targetTimer||0)-aiStepDt;
+       if(e.targetTimer>0&&Number.isFinite(e.targetX)&&Number.isFinite(e.targetY))return {x:e.targetX,y:e.targetY};
+       const player=pl.P[0],ownPower=Math.max(1,e.hp||e.max||1),ownSize=e.n||1;
+       let best=player,bestScore=dst(h,player)*.92,bestType='player';
+       for(let i=0;i<en.length;i++){
+         const o=en[i];if(o===e||o.dead||!o.P?.[0])continue;
+         const q=o.P[0],dx=h.x-q.x,dy=h.y-q.y,d2=dx*dx+dy*dy;
+         if(d2>bestScore*bestScore*2.5)continue;
+         const power=Math.max(1,o.hp||o.max||1),size=o.n||1;
+         let factor=1;
+         if(o.boss)factor=e.boss?.82:2.15;
+         else if(power<ownPower*.72&&size<=ownSize*1.25)factor=.72;
+         else if(power>ownPower*1.35||size>ownSize*1.45)factor=1.48;
+         const score=Math.sqrt(d2)*factor;
+         if(score<bestScore){best=o;bestScore=score;bestType='enemy'}
+       }
+       e.targetX=best.x;e.targetY=best.y;e.targetType=bestType;
+       e.targetTimer=e.boss?.15:.26+rnd(0,.14);
+       return {x:e.targetX,y:e.targetY}
+     }
      function ai(e, dt) {
       if (e.dead) return;
       const p=pl.P[0],h=e.P[0],target=chooseTarget(e),dx=target.x-h.x,dy=target.y-h.y,d=Math.hypot(dx,dy)||1,k=e.k,sp0= e.v * sc * (e.boss && e.pp === 3 ? 1.5 : 1);
