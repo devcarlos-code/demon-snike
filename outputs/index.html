@@ -1406,7 +1406,9 @@
       {id:'meteor_swarm',name:'Lluvia de meteoros',icon:'☄️',tier:'LEGENDARIA',price:240000,cooldown:18,effect:'meteor_swarm',description:'Invoca una cadena de impactos explosivos en la arena.'},
       {id:'mirror_skin',name:'Piel de espejo',icon:'🔮',tier:'LEGENDARIA',price:270000,cooldown:22,effect:'mirror_skin',description:'Refuerza tu cuerpo, bloquea impactos y te vuelve invulnerable durante unos instantes.'},
       {id:'soul_reaper',name:'Segador de almas',icon:'💀',tier:'MÍTICA',price:320000,cooldown:20,effect:'soul_reaper',description:'Ejecuta a enemigos debilitados y causa un daño masivo a los jefes.'},
-      {id:'eclipse',name:'Eclipse absoluto',icon:'🌑',tier:'MÍTICA',price:380000,cooldown:28,effect:'eclipse',description:'Libera una onda oscura global que inflige daño masivo, quema y paraliza a toda la horda.'}
+      {id:'eclipse',name:'Eclipse absoluto',icon:'🌑',tier:'MÍTICA',price:380000,cooldown:28,effect:'eclipse',description:'Libera una onda oscura global que inflige daño masivo, quema y paraliza a toda la horda.'},
+      {id:'dragon_beam',name:'Rayo del dragón',icon:'🐉',tier:'ÉPICA',price:195000,cooldown:9.5,effect:'dragon_beam',description:'Concentra energía y dispara un rayo frontal que atraviesa a los enemigos, los quema y los empuja.'},
+      {id:'rune_prison',name:'Prisión rúnica',icon:'🔷',tier:'ÉPICA',price:225000,cooldown:13,effect:'rune_prison',description:'Marca hasta tres enemigos cercanos con sellos rúnicos, los encierra y los inmoviliza mientras reciben daño.'}
     ];
     const skillById=id=>SKILL_CATALOG.find(x=>x.id===id)||null;
     const cd = { a: 0, s: 0, d: 0, f: 0 }, MAXCD = { a: .7, s: 2.8, d: 3.8, f: 0 };
@@ -1715,6 +1717,15 @@
         case 'mirror_skin': {cdset(k);guard=18;guardFlash=1;inv=Math.max(inv,2.4);en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<240*sc){hurt(e,110*U.dD*skillTierPower(k),0,0,true);e.stun=Math.max(e.stun,.8)}});fx('PIEL DE ESPEJO');return true}
         case 'soul_reaper': {const targets=en.filter(e=>!e.dead).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0])).slice(0,5);if(!targets.length)return false;cdset(k);targets.forEach(e=>{const damage=e.boss?e.max*.22:(e.hp<=e.max*.35?e.hp*1.2:Math.min(e.hp*.88,900));hurt(e,damage*U.dA*(e.boss?1:skillTierPower(k)),0,0,true);e.burn=Math.max(e.burn,4)});fx('SEGADOR DE ALMAS');return true}
         case 'eclipse': {let count=0;en.forEach(e=>{if(!e.dead){hurt(e,(e.boss?e.max*.24:420)*U.dA*(e.boss?1:skillTierPower(k)),0,0,true);e.burn=Math.max(e.burn,6);e.stun=Math.max(e.stun,e.boss?1.5:2.5);count++}});if(!count)return false;cdset(k);shake=24;wf=.7;fx('ECLIPSE ABSOLUTO');return true}
+        case 'dragon_beam': {
+          const a=pl.A[0],range=900*sc;let hit=0;
+          for(let i=0;i<en.length;i++){const e=en[i];if(!e||e.dead)continue;const q=e.P[0],dx=q.x-h.x,dy=q.y-h.y,along=dx*Math.cos(a)+dy*Math.sin(a),side=Math.abs(-dx*Math.sin(a)+dy*Math.cos(a));if(along>0&&along<range&&side<42*sc+e.R[0]*e.sc){hurt(e,175*U.dA*skillTierPower(k),Math.cos(a)*360,Math.sin(a)*360,true);e.burn=Math.max(e.burn,3.5);hit++}}
+          if(!hit)return false;cdset(k);shake=Math.max(shake,8);SFX.nova();fx('RAYO DEL DRAGÓN');return true;
+        }
+        case 'rune_prison': {
+          const chosen=[];for(let i=0;i<en.length;i++){const e=en[i];if(!e||e.dead)continue;const q=e.P[0],dx=q.x-h.x,dy=q.y-h.y,d2=dx*dx+dy*dy;if(d2>640*sc*640*sc)continue;if(chosen.length<3)chosen.push({e,d2});else{let far=0;for(let j=1;j<chosen.length;j++)if(chosen[j].d2>chosen[far].d2)far=j;if(d2<chosen[far].d2)chosen[far]={e,d2}}}
+          if(!chosen.length)return false;cdset(k);for(let i=0;i<chosen.length;i++){const e=chosen[i].e;hurt(e,145*U.dD*skillTierPower(k),0,0,true);e.stun=Math.max(e.stun,e.boss?.8:2.2);e.vx*=.25;e.vy*=.25}shake=Math.max(shake,6);SFX.tent();fx('PRISIÓN RÚNICA');return true;
+        }
         default:return false;
       }
     }
@@ -1863,16 +1874,16 @@
       ctx.save();ctx.globalCompositeOperation='lighter';
       for(let i=0;i<skillFx.length;i++){
         const q=skillFx[i],u=Math.min(1,q.t/q.d),fade=1-u,r=(70+u*230)*sc;
-        const palette={dash:'#b77aff',breath:'#ff762d',shadows:'#9a5cff',nova:'#ffc16b',soul_lance:'#8cecff',iron_ward:'#a9eaff',ember_ring:'#ff6a25',void_chain:'#a77bff',void_rift:'#b46aff',cataclysm:'#ff9c48',frost_bloom:'#8beaff',venom_storm:'#8bff83',blood_siphon:'#ff456f',gravity_well:'#b57aff',meteor_swarm:'#ffad58',mirror_skin:'#9deaff',soul_reaper:'#c7a2ff',eclipse:'#8d5bff'};
+        const palette={dash:'#b77aff',breath:'#ff762d',shadows:'#9a5cff',nova:'#ffc16b',soul_lance:'#8cecff',iron_ward:'#a9eaff',ember_ring:'#ff6a25',void_chain:'#a77bff',void_rift:'#b46aff',cataclysm:'#ff9c48',frost_bloom:'#8beaff',venom_storm:'#8bff83',blood_siphon:'#ff456f',gravity_well:'#b57aff',meteor_swarm:'#ffad58',dragon_beam:'#ffb34d',rune_prison:'#7edcff',mirror_skin:'#9deaff',soul_reaper:'#c7a2ff',eclipse:'#8d5bff'};
         const c=palette[q.type]||'#fff';ctx.globalAlpha=fade;ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=(q.type==='void_chain'?4:3)*sc;ctx.shadowColor=c;ctx.shadowBlur=lowEndDevice?0:12;
-        if(q.type==='breath'||q.type==='soul_lance'||q.type==='dash'){
+        if(q.type==='breath'||q.type==='soul_lance'||q.type==='dash'||q.type==='dragon_beam'){
           ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.angle);ctx.beginPath();ctx.moveTo(0,-12*sc);ctx.lineTo(r*2.1,-r*.42);ctx.lineTo(r*2.55,0);ctx.lineTo(r*2.1,r*.42);ctx.lineTo(0,12*sc);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(r*2.25,0);ctx.stroke();ctx.restore();
-        }else if(q.type==='void_chain'||q.type==='shadows'){
+        }else if(q.type==='void_chain'||q.type==='shadows'||q.type==='rune_prison'){
           ctx.beginPath();for(let n=0;n<5;n++){const a=now/180+n*TAU/5,rr=r*(.45+.12*Math.sin(now/90+n));const x=q.x+Math.cos(a)*rr,y=q.y+Math.sin(a)*rr;if(!n)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.closePath();ctx.stroke();for(let n=0;n<4;n++){const a=now/160+n*TAU/4;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+Math.cos(a)*r,q.y+Math.sin(a)*r);ctx.stroke()}
         }else if(q.type==='cataclysm'||q.type==='meteor_swarm'){
           ctx.beginPath();ctx.arc(q.x,q.y,r*.8,0,TAU);ctx.stroke();for(let n=0;n<4;n++){const a=now/130+n*TAU/4,rr=r*(.65+u*.5);ctx.beginPath();ctx.moveTo(q.x+Math.cos(a)*rr,q.y+Math.sin(a)*rr);ctx.lineTo(q.x+Math.cos(a)*(rr+42*sc),q.y+Math.sin(a)*(rr+42*sc));ctx.stroke()}
         }else{
-          const rings=q.type==='void_rift'||q.type==='gravity_well'?4:2;for(let n=0;n<rings;n++){ctx.beginPath();ctx.arc(q.x,q.y,r*(.45+n*.24),now/260+n*1.5,now/260+n*1.5+Math.PI*1.65);ctx.stroke()}
+          const rings=q.type==='void_rift'||q.type==='gravity_well'||q.type==='rune_prison'?4:2;for(let n=0;n<rings;n++){ctx.beginPath();ctx.arc(q.x,q.y,r*(.45+n*.24),now/260+n*1.5,now/260+n*1.5+Math.PI*1.65);ctx.stroke()}
           if(q.type==='frost_bloom'){for(let n=0;n<6;n++){const a=n*TAU/6;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+Math.cos(a)*r,q.y+Math.sin(a)*r);ctx.stroke()}}
           if(q.type==='iron_ward'||q.type==='mirror_skin'){ctx.beginPath();ctx.arc(q.x,q.y,r*.65,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(q.x,q.y,r*.8,0,TAU);ctx.stroke()}
           if(q.type==='eclipse'){ctx.fillStyle='rgba(30,5,55,.32)';ctx.beginPath();ctx.arc(q.x,q.y,r,0,TAU);ctx.fill();ctx.stroke()}
