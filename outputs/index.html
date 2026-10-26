@@ -128,6 +128,8 @@
 
     #keys {
       position: fixed;
+      z-index: 7;
+      pointer-events: none;
       left: 0;
       right: 0;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
@@ -136,7 +138,7 @@
       justify-content: center
     }
 
-    .k{position:relative;overflow:hidden;width:72px;height:72px;display:grid;place-content:center;gap:2px;touch-action:none;user-select:none;-webkit-user-select:none;background:radial-gradient(circle at 30% 20%,#51402b 0,#211811 45%,#0d0a0b 78%);border:2px solid #bb8b3b;color:#ffe2a0;font:inherit;border-radius:50%;cursor:pointer;padding:4px;box-shadow:inset 0 2px 2px rgba(255,226,160,.45),inset 0 -4px 8px #000,0 0 12px rgba(190,132,47,.22)}
+    .k{pointer-events:auto;position:relative;overflow:hidden;width:72px;height:72px;display:grid;place-content:center;gap:2px;touch-action:none;user-select:none;-webkit-user-select:none;background:radial-gradient(circle at 30% 20%,#51402b 0,#211811 45%,#0d0a0b 78%);border:2px solid #bb8b3b;color:#ffe2a0;font:inherit;border-radius:50%;cursor:pointer;padding:4px;box-shadow:inset 0 2px 2px rgba(255,226,160,.45),inset 0 -4px 8px #000,0 0 12px rgba(190,132,47,.22)}
 
     .k b{position:relative;z-index:3;display:block;font-size:23px;line-height:1;text-shadow:0 0 10px #ffbf57}
 
@@ -372,7 +374,8 @@
     }
 
     #pbtn {
-      left: 14px
+      left: 14px;
+      z-index: 6
     }
 
     #mute {
