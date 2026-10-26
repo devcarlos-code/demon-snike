@@ -1357,7 +1357,7 @@
         for (let i = 1; i < this.n; i++) { const an = Math.atan2(P[i - 1].y - P[i].y, P[i - 1].x - P[i].x), df2 = Math.max(-.3, Math.min(.3, wrap(an - this.A[i - 1]))); this.A[i] = this.A[i - 1] + df2; P[i].x = P[i - 1].x - Math.cos(this.A[i]) * this.SP[i] * this.sc; P[i].y = P[i - 1].y - Math.sin(this.A[i]) * this.SP[i] * this.sc }
         this.legs.forEach(l => {
           const w = this.want(l, spd / 60 * 5); if (!l.f) { l.f = { ...w }; l.a = { ...w }; l.b = { ...w } }
-          if (l.t >= 1) { const d = Math.hypot(w.x - l.f.x, w.y - l.f.y), busy = this.legs.some(o => o.g !== l.g && o.t < 1); if (d > 20 * this.sc && (!busy || d > 42 * this.sc)) { l.a = { ...l.f }; l.b = { x: w.x, y: w.y }; l.t = 0 } }
+          if (l.t >= 1) { const d = Math.hypot(w.x - l.f.x, w.y - l.f.y); let busy=false; for(let j=0;j<this.legs.length;j++){const o=this.legs[j];if(o!==l&&o.g!==l.g&&o.t<1){busy=true;break}} if (d > 20 * this.sc && (!busy || d > 42 * this.sc)) { l.a = { ...l.f }; l.b = { x: w.x, y: w.y }; l.t = 0 } }
           else { l.t = Math.min(1, l.t + dt / (.13 / (1 + spd / 60 * .06))); const q = l.t * l.t * (3 - 2 * l.t); l.f.x = l.a.x + (l.b.x - l.a.x) * q; l.f.y = l.a.y + (l.b.y - l.a.y) * q }
         });
       }
@@ -1717,7 +1717,7 @@
       });
       shake = Math.max(shake, 2);
     }
-    function updateCamera(){camX=Math.max(0,Math.min(WORLD_W-W,pl.P[0].x-W/2));camY=Math.max(0,Math.min(WORLD_H-H,pl.P[0].y-H/2))}
+    let cameraReady=false;function updateCamera(dt=1/60){const tx=Math.max(0,Math.min(WORLD_W-W,pl.P[0].x-W/2)),ty=Math.max(0,Math.min(WORLD_H-H,pl.P[0].y-H/2));if(!cameraReady){camX=tx;camY=ty;cameraReady=true;return}const k=1-Math.exp(-dt*13);camX+=(tx-camX)*k;camY+=(ty-camY)*k}
      function step(dt) {
       if (state === 'pause') return;
       shake = Math.max(0, shake - dt * 30); wf = Math.max(0, wf - dt * 1.5); rf = Math.max(0, rf - dt * 1.5); guard=Math.max(0,guard-dt);guardFlash=Math.max(0,guardFlash-dt);
