@@ -1308,8 +1308,9 @@
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const mobileMQ=matchMedia('(pointer: coarse)');
+    const hasTouchInput=()=>mobileMQ.matches||navigator.maxTouchPoints>0||('ontouchstart' in window);
     const lowEndDevice=(navigator.deviceMemory&&navigator.deviceMemory<=6)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=6);
-    let mobile=mobileMQ.matches;
+    let mobile=hasTouchInput();
     let gameMode='survival';
     let campaignStartLevel=1;
     let campaignUnlocked=1,campaignCompleted=false;
@@ -1319,7 +1320,7 @@
     const FX_PART_LIMIT=lowEndDevice?32:(mobile?48:72),MAX_FLOATING_TEXT=64;
     let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0;
     function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1:(mobile?1.15:1.15)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
-    addEventListener('resize', resize); mobileMQ.addEventListener?.('change',e=>{mobile=e.matches;resize()}); resize();
+    addEventListener('resize', resize); mobileMQ.addEventListener?.('change',()=>{mobile=hasTouchInput();resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
     const BOSS_ARCHETYPES=[
       {name:'EL REY CARMESÍ',color:'#ff625e',glow:'#ff3d36',style:'fan',intro:'Un cazador brutal que concentra ráfagas directas'},
@@ -1828,7 +1829,11 @@
       CH.forEach(el=>{const pair=el.dataset.pair;if(!pair)return;const keys=pair.split('');el.classList.toggle('on',keys.every(key=>!!skillForSlot(key))&&keys.every(key=>cd[key]<=0))});
     }
     const setP=e=>{const r=cv.getBoundingClientRect();ptr.x=e.clientX-r.left+camX;ptr.y=e.clientY-r.top+camY};if(!mobile){addEventListener('pointermove',setP);cv.addEventListener('pointerdown',e=>{setP(e);initAudio()})}const je=$('joystick'),jk=$('joyknob');function ju(e){const r=je.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,m=Math.hypot(dx,dy)||1,k=Math.min(1,m/(r.width*.36));joy.dx=dx/m*k;joy.dy=dy/m*k;jk.style.left=(50+joy.dx*36)+'%';jk.style.top=(50+joy.dy*36)+'%'}je.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;je.setPointerCapture(e.pointerId);ju(e);initAudio()});je.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)ju(e)});const jeEnd=e=>{if(e.pointerId===joy.id){joy.active=false;joy.dx=joy.dy=0;jk.style.left=jk.style.top='50%'}};je.addEventListener('pointerup',jeEnd);je.addEventListener('pointercancel',jeEnd);
-    document.querySelectorAll('.k').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); atk(b.dataset.k) }));
+    document.querySelectorAll('.k').forEach(b => {
+      b.style.touchAction='none';
+      b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if(e.button!==undefined&&e.button!==0)return; initAudio(); atk(b.dataset.k); });
+      b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();b.blur()});
+    });
     addEventListener('keydown', e => {
       const moveKey=e.key.toLowerCase();
       if(['arrowup','arrowdown','arrowleft','arrowright'].includes(moveKey)){moveKeys.add(moveKey);if(!mobile)e.preventDefault()}
@@ -1843,7 +1848,7 @@
     $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});function showHomePage(pageId){const allowed=['homeView','shopPage','skillsPage','campaignPage'];if(!allowed.includes(pageId)){toast('SECCIÓN NO DISPONIBLE');return false}const views=document.querySelectorAll('#title .home-view,#title .section-page');views.forEach(v=>{const active=v.id===pageId;v.style.display=active?(pageId==='homeView'?'contents':'flex'):'none';v.setAttribute('aria-hidden',String(!active))});const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout();if(pageId==='campaignPage')renderCampaign();return true}document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-page]');if(b){e.preventDefault();showHomePage(b.dataset.page)}});$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { moveKeys.clear() });
-    document.addEventListener('visibilitychange', () => { if (!mobile && document.hidden && state === 'play') togglePause() });
+    document.addEventListener('visibilitychange', () => { if (!hasTouchInput() && !mobile && document.hidden && state === 'play') togglePause() });
     document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button'); if (b) b.blur() });
     const KB = [...document.querySelectorAll('.k')], CH = [...document.querySelectorAll('#combos span')];
     KB.forEach(b => { b._n = b.lastElementChild.textContent; b._r = true });
