@@ -1571,8 +1571,11 @@
        const h=e.P[0];
        e.targetTimer=(e.targetTimer||0)-aiStepDt;
        if(e.targetTimer>0&&Number.isFinite(e.targetX)&&Number.isFinite(e.targetY))return {x:e.targetX,y:e.targetY};
-       const player=pl.P[0],ownPower=Math.max(1,e.hp||e.max||1),ownSize=e.n||1;
-       let best=player,bestScore=dst(h,player)*.92,bestType='player';
+       const ownPower=Math.max(1,e.hp||e.max||1),ownSize=e.n||1,spreadRadius=150*sc,spread2=spreadRadius*spreadRadius;
+       // Penaliza objetivos ya rodeados: reparte la presión y fomenta peleas entre rivales.
+       const crowdAt=(q,exclude)=>{let count=0;for(let j=0;j<en.length;j++){const ally=en[j];if(ally===e||ally===exclude||ally.dead||!ally.P?.[0])continue;const dx=ally.P[0].x-q.x,dy=ally.P[0].y-q.y;if(dx*dx+dy*dy<spread2)count++}return Math.min(1.8,count*.22)};
+       const player=pl.P[0],playerDx=h.x-player.x,playerDy=h.y-player.y;
+       let best=player,bestScore=Math.hypot(playerDx,playerDy)*.92*(1+crowdAt(player,null)),bestType='player';
        for(let i=0;i<en.length;i++){
          const o=en[i];if(o===e||o.dead||!o.P?.[0])continue;
          const q=o.P[0],dx=h.x-q.x,dy=h.y-q.y,d2=dx*dx+dy*dy;
@@ -1582,7 +1585,7 @@
          if(o.boss)factor=e.boss?.82:2.15;
          else if(power<ownPower*.72&&size<=ownSize*1.25)factor=.72;
          else if(power>ownPower*1.35||size>ownSize*1.45)factor=1.48;
-         const score=Math.sqrt(d2)*factor;
+         const score=Math.sqrt(d2)*factor*(1+crowdAt(q,o));
          if(score<bestScore){best=o;bestScore=score;bestType='enemy'}
        }
        e.targetX=best.x;e.targetY=best.y;e.targetType=bestType;
