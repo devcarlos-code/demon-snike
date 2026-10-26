@@ -1321,6 +1321,7 @@
     let gameMode='survival';
     let campaignStartLevel=1;
     let campaignUnlocked=1,campaignCompleted=false,campaignResults={};let campaignLevelTime=0,campaignLevelKills=0,campaignResultShown=false;
+    let growthStacks=0,cobra={phase:0,t:0,target:null,angle:0,hit:false},cameraZoom=1;
     const MAX_ACTIVE_ENEMIES=lowEndDevice?10:(mobile?14:20);
     const MAX_ACTIVE_SHOTS=lowEndDevice?70:(mobile?100:140);
     const MAX_ACTIVE_POOLS=14;
@@ -1422,16 +1423,18 @@
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
     let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
     // Supervivencia usa una única ranura guardada; campaña conserva sus partidas individuales.
+    sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');
     const survivalSessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
     if(survivalSessions.length>1){const keep=survivalSessions[0];sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')!=='survival'||x.id===keep.id);if(activeSessionId&&survivalSessions.some(x=>x.id===activeSessionId)&&activeSessionId!==keep.id)activeSessionId=keep.id;}
     if(saveData.checkpoint&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Partida guardada',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
     function runSnapshot(){return {U:{...U},maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
     function persist(checkpoint=true){
        try{
-         const cp=checkpoint&&['play','pause','upg'].includes(state)?runSnapshot():null;
+         if(gameMode==='campaign'){sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');activeSessionId=null;saveData.checkpoint=null;checkpoint=false}
+         const cp=checkpoint&&['play','pause','upg'].includes(state)&&gameMode!=='campaign'?runSnapshot():null;
          if(cp&&activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=cp;session.mode=cp.mode;session.level=cp.level;session.score=cp.score;session.updatedAt=Date.now()}}
          const checkpointStoredInSession=!!(cp&&activeSessionId&&sessions.some(x=>x.id===activeSessionId&&x.checkpoint===cp));
-         const buildSave=()=>({version:2,best,coins,campaignUnlocked,ownedSkills:[...ownedSkills],skillLoadout:[...skillLoadout],shopBonusClaimed,stats:{...stats},sessions,activeSessionId,campaignCompleted,campaignResults,checkpoint:checkpointStoredInSession?null:cp,savedAt:Date.now()});
+         const buildSave=()=>({version:2,best,coins,campaignUnlocked,ownedSkills:[...ownedSkills],skillLoadout:[...skillLoadout],shopBonusClaimed,stats:{...stats},sessions:sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival'),activeSessionId,campaignCompleted,campaignResults,checkpoint:checkpointStoredInSession?null:cp,savedAt:Date.now()});
          saveData=buildSave();
          try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData))}
          catch(storageError){
@@ -1537,6 +1540,7 @@
       try{
         gameMode=mode;
         campaignStartLevel=mode==='campaign'?Math.max(1,Math.min(campaignUnlocked,Number(level)||1)):1;
+        if(mode==='campaign'){activeSessionId=null;saveData.checkpoint=null}
         initAudio();
         newGame(false);
         $('title').style.display='none';
@@ -1549,16 +1553,16 @@
       }
     }
     function continueSavedGame(id){const session=sessions.find(x=>x.id===id);if(!session)return;gameMode=session.mode||session.checkpoint?.mode||'survival';campaignStartLevel=gameMode==='campaign'?Math.max(1,Math.min(campaignUnlocked,session.checkpoint?.level||session.level||1)):1;activeSessionId=session.id;saveData.checkpoint=session.checkpoint||null;$('title').style.display='none';initAudio();try{if(session.checkpoint)newGame(true);else newGame(false,session.id);tryFullscreen()}catch(error){state='title';$('title').style.display='grid';toast('NO SE PUDO ABRIR LA PARTIDA · '+(error?.message||'REINTENTA'));console.error('Error al continuar partida:',error)}}
-    function goHome(){if(state==='play'||state==='pause'||state==='upg')persist(true);state='title';$('title').style.display='grid';$('over').style.display='none';$('pz').style.display='none';$('upg').style.display='none';refreshHome()}
+    function goHome(){if(state==='play'||state==='pause'||state==='upg')persist(gameMode!=='campaign');state='title';$('title').style.display='grid';$('over').style.display='none';$('pz').style.display='none';$('upg').style.display='none';refreshHome()}
     function restart() { if (state === 'over' && performance.now() - overAt > 700) { $('over').querySelector('h1').textContent='FIN DE PARTIDA';newGame(false)} }
     function togglePause(){
       if(state==='play'){persist(true);state='pause'; $('pz').style.display = 'flex'; if (AC && AC.suspend) AC.suspend() }
       else if (state === 'pause') { state = 'play'; $('pz').style.display = 'none'; if (AC && AC.resume) AC.resume() }
     }
     function newGame(resume=false,sessionId=null){
-      if(gameMode==='campaign'&&!resume){campaignLevelTime=0;campaignLevelKills=0;campaignResultShown=false}
+      if(!resume){growthStacks=0;cobra={phase:0,t:0,target:null,angle:0,hit:false};if(gameMode==='campaign'){campaignLevelTime=0;campaignLevelKills=0;campaignResultShown=false}}
       const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];bossDue=false;bossSpawned=false;lvl=cp?cp.level:(gameMode==='campaign'?campaignStartLevel-1:0);score=cp?cp.score:0;U=cp&&cp.U?{...U0,...cp.U}:{...U0};maxHp=cp?Math.max(100,Number(cp.maxHp)||100):100;hp=cp?Math.min(maxHp,cp.hp):maxHp; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
-      rf=wf=shake=0;pops=[];streak=streakT=0;slow=1;lastK=null;fury=cp?cp.fury:0;makePlayer();if(resume&&cp&&cp.player){pl=Object.assign(new Snake(cp.player.P[0].x,cp.player.P[0].y,{n:cp.player.n,hp:cp.player.max,col:'#fff',v:0,s:1.2},'p'),cp.player);const sameBuild=!Array.isArray(cp.loadout)||SLOT_KEYS.every((key,i)=>cp.loadout[i]===skillLoadout[i]);guard=sameBuild?(cp.guard||0):0;cd.a=sameBuild?(cp.cooldowns?.a||0):0;cd.s=sameBuild?(cp.cooldowns?.s||0):0;cd.d=sameBuild?(cp.cooldowns?.d||0):0;cd.f=sameBuild?(cp.cooldowns?.f||0):0}state='play'; $('over').style.display='none';$('pz').style.display='none';$('title').style.display='none';if(!resume){saveData.checkpoint=null;if(sessionId){activeSessionId=sessionId;const existing=sessions.find(x=>x.id===sessionId);if(existing){existing.checkpoint=null;existing.ended=false;existing.updatedAt=Date.now()}}else{stats.runs++;if(gameMode==='survival'){let survivalSlot=sessions.find(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');if(survivalSlot){activeSessionId=survivalSlot.id;survivalSlot.name='Supervivencia';survivalSlot.mode='survival';survivalSlot.createdAt=survivalSlot.createdAt||Date.now();survivalSlot.updatedAt=Date.now();survivalSlot.level=1;survivalSlot.score=0;survivalSlot.checkpoint=null;survivalSlot.ended=false}else{activeSessionId='survival-'+Date.now().toString(36);sessions.unshift({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),level:1,score:0,checkpoint:null,ended:false})}}else{activeSessionId='run-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);sessions.unshift({id:activeSessionId,name:'Partida '+new Date().toLocaleString(),mode:gameMode,createdAt:Date.now(),updatedAt:Date.now(),level:1,score:0,checkpoint:null,ended:false})}}}if(resume&&cp&&Array.isArray(cp.enemies)&&Array.isArray(cp.spawnQ)){en=cp.enemies.map(raw=>Object.assign(new Snake(raw.P[0].x,raw.P[0].y,{...CF[raw.k],hp:raw.max},raw.k),raw));spawnQ=cp.spawnQ}else{if(resume&&cp)lvl=Math.max(0,cp.level-1);nextLevel()}persist(true);
+      rf=wf=shake=0;pops=[];streak=streakT=0;slow=1;lastK=null;fury=cp?cp.fury:0;makePlayer();if(resume&&cp&&cp.player){pl=Object.assign(new Snake(cp.player.P[0].x,cp.player.P[0].y,{n:cp.player.n,hp:cp.player.max,col:'#fff',v:0,s:1.2},'p'),cp.player);const sameBuild=!Array.isArray(cp.loadout)||SLOT_KEYS.every((key,i)=>cp.loadout[i]===skillLoadout[i]);guard=sameBuild?(cp.guard||0):0;cd.a=sameBuild?(cp.cooldowns?.a||0):0;cd.s=sameBuild?(cp.cooldowns?.s||0):0;cd.d=sameBuild?(cp.cooldowns?.d||0):0;cd.f=sameBuild?(cp.cooldowns?.f||0):0}state='play'; $('over').style.display='none';$('pz').style.display='none';$('title').style.display='none';if(!resume){saveData.checkpoint=null;if(sessionId){activeSessionId=sessionId;const existing=sessions.find(x=>x.id===sessionId);if(existing){existing.checkpoint=null;existing.ended=false;existing.updatedAt=Date.now()}}else{stats.runs++;if(gameMode==='survival'){let survivalSlot=sessions.find(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');if(survivalSlot){activeSessionId=survivalSlot.id;survivalSlot.name='Supervivencia';survivalSlot.mode='survival';survivalSlot.createdAt=survivalSlot.createdAt||Date.now();survivalSlot.updatedAt=Date.now();survivalSlot.level=1;survivalSlot.score=0;survivalSlot.checkpoint=null;survivalSlot.ended=false}else{activeSessionId='survival-'+Date.now().toString(36);sessions.unshift({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),level:1,score:0,checkpoint:null,ended:false})}}}}if(resume&&cp&&Array.isArray(cp.enemies)&&Array.isArray(cp.spawnQ)){en=cp.enemies.map(raw=>Object.assign(new Snake(raw.P[0].x,raw.P[0].y,{...CF[raw.k],hp:raw.max},raw.k),raw));spawnQ=cp.spawnQ}else{if(resume&&cp)lvl=Math.max(0,cp.level-1);nextLevel()}persist(true);
     }
     function hurt(e, d, kx, ky, quiet) {
       if (e.dead) return; e.hp -= d; e.flash = .1; e.vx += kx || 0; e.vy += ky || 0; fury = Math.min(100, fury + d * .05 * U.fury);
@@ -1755,7 +1759,7 @@
       });
       shake = Math.max(shake, 2);
     }
-    let cameraReady=false;function updateCamera(dt=1/60){const tx=Math.max(0,Math.min(WORLD_W-W,pl.P[0].x-W/2)),ty=Math.max(0,Math.min(WORLD_H-H,pl.P[0].y-H/2));if(!cameraReady){camX=tx;camY=ty;cameraReady=true;return}const k=1-Math.exp(-dt*13);camX+=(tx-camX)*k;camY+=(ty-camY)*k}
+    let cameraReady=false;function updateCamera(dt=1/60){const desiredZoom=Math.max(.72,1-Math.max(0,pl.sc-1)*.22-Math.max(0,growthStacks-2)*.025);cameraZoom+=(desiredZoom-cameraZoom)*(1-Math.exp(-dt*2.8));const viewW=W/cameraZoom,viewH=H/cameraZoom,tx=Math.max(0,Math.min(WORLD_W-viewW,pl.P[0].x-viewW/2)),ty=Math.max(0,Math.min(WORLD_H-viewH,pl.P[0].y-viewH/2));if(!cameraReady){camX=tx;camY=ty;cameraReady=true;return}const k=1-Math.exp(-dt*13);camX+=(tx-camX)*k;camY+=(ty-camY)*k}
      function step(dt) {
       if (state === 'pause') return;
       if(state==='play'&&gameMode==='campaign')campaignLevelTime+=dt;
@@ -1768,6 +1772,7 @@
       emb.forEach(e => { e.y -= e.v * dt / H; if (e.y < -.03) { e.y = 1.03; e.x = Math.random() } });
       if(state==='title'){updateCamera();const h=pl.P[0],d=Math.hypot(ptr.x-h.x,ptr.y-h.y); pl.move(ptr.x, ptr.y, d < 14 ? 0 : Math.min(280 * sc, d * 5), 7, dt); return }
       if(state!=='play')return;
+      if(cobra.phase){cobra.t-=dt;if(cobra.t<=0){if(cobra.phase===1){cobra.phase=2;cobra.t=.18;cobra.hit=false;shake=Math.max(shake,4)}else if(cobra.phase===2){const target=cobra.target;if(target&&!target.dead&&dst(pl.P[0],target.P[0])<150*pl.sc+target.R[0]*target.sc){hurt(target,target.boss?Math.max(180,target.hp*.22):99999,Math.cos(cobra.angle)*700,Math.sin(cobra.angle)*700);if(target.dead){growPlayer(target.boss?7:4,target.boss?.09:.045);pop(pl.P[0].x,pl.P[0].y-35,'¡DEVORADO!','#ffb46b',true)}}cobra.phase=3;cobra.t=.22}else{cobra.phase=0;cobra.target=null}}}
       saveTick-=dt;if(saveTick<=0){saveTick=3;persist(true)}
       updateCamera();const h=pl.P[0];let moveMag=0;
       if(joy.active){moveMag=Math.min(1,Math.hypot(joy.dx,joy.dy));const a=Math.atan2(joy.dy,joy.dx);ptr.x=h.x+Math.cos(a)*Math.max(1,Math.min(W,H)*.55);ptr.y=h.y+Math.sin(a)*Math.max(1,Math.min(W,H)*.55)}
@@ -1776,6 +1781,8 @@
       const d=Math.hypot(ptr.x-h.x,ptr.y-h.y);
       for(const k in cd) cd[k] = Math.max(0, cd[k] - dt); inv = Math.max(0, inv - dt); pm = Math.max(0, pm - dt * 3); streakT -= dt; if (streakT <= 0) streak = 0;
       let spd = moveMag ? 280 * sc * U.spd * moveMag : (d < 18 ? 0 : Math.min(280 * sc * U.spd, d * 3.2)), turn = moveMag ? 9 : 5.8;
+      if(growthStacks>=3&&cobra.phase===0){let target=null,bestDist=Infinity;const head=pl.P[0],ang=pl.A[0];for(let i=0;i<en.length;i++){const e=en[i];if(e.dead||e.boss)continue;const dx=e.P[0].x-head.x,dy=e.P[0].y-head.y,dd=Math.hypot(dx,dy);if(dd<Math.min(260*sc,130*pl.sc)&&dd<bestDist&&(dx*Math.cos(ang)+dy*Math.sin(ang))/Math.max(1,dd)>.62){target=e;bestDist=dd}}if(target){cobra={phase:1,t:.34,target,angle:Math.atan2(target.P[0].y-head.y,target.P[0].x-head.x),hit:false};shake=Math.max(shake,2)}}
+      if(cobra.phase===1){spd=105*sc;turn=1.2;ptr.x=pl.P[0].x-Math.cos(cobra.angle)*115*pl.sc;ptr.y=pl.P[0].y-Math.sin(cobra.angle)*115*pl.sc;pm=Math.max(pm,.25)}else if(cobra.phase===2){spd=1450*sc;turn=0;ptr.x=pl.P[0].x+Math.cos(cobra.angle)*230*pl.sc;ptr.y=pl.P[0].y+Math.sin(cobra.angle)*230*pl.sc;pm=1}
       if (dash > 0) {
         dash -= dt; spd = 1000 * sc; turn = 0; pm = Math.max(pm, .7);
         en.forEach(e => { if (!dashHit.has(e) && !e.dead && dst(h, e.P[0]) < 30 * pl.sc + e.R[0] * e.sc) { dashHit.add(e); const a = pl.A[0]; hurt(e, (e.k === 'armor' ? 12 : 42) * U.dA, Math.cos(a) * 500, Math.sin(a) * 500); shake = Math.max(shake, 5) } })
@@ -1831,9 +1838,11 @@
       const evo=Math.min(1,Math.max(0,(n-24)/90));
       if(evo>.04){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.18+evo*.22;ctx.strokeStyle=fury>70?'#ffb347':'#b34cff';ctx.lineWidth=(lowEndDevice?1.2:2)*s;const step=lowEndDevice?Math.max(12,Math.floor(n/9)):Math.max(8,Math.floor(n/14));for(let i=step;i<n-5;i+=step){const q=P[i],rr=pl.R[i]*s*(1.45+evo*.25);ctx.beginPath();ctx.arc(q.x,q.y,rr,0,TAU);ctx.stroke()}ctx.restore()}
       ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(A[0]); ctx.scale(s, s);
+      const cobraOpen=cobra.phase===2?Math.sin(Math.min(1,cobra.t/.16)*Math.PI)*1.35:cobra.phase===1?.12:0;
+      if(growthStacks>=3){ctx.save();ctx.globalAlpha=.35+Math.min(.4,growthStacks*.05);ctx.strokeStyle='#d34b35';ctx.lineWidth=3+Math.min(3,pl.sc);ctx.beginPath();ctx.moveTo(-7,-10);ctx.quadraticCurveTo(-38,-34,-48,-8);ctx.moveTo(-7,10);ctx.quadraticCurveTo(-38,34,-48,8);ctx.stroke();ctx.restore()}
       if(evo>.12){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35+evo*.4;ctx.strokeStyle=fury>70?'#ffc15c':'#a95cff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-5,-7);ctx.lineTo(-15-evo*9,-18-evo*8);ctx.lineTo(-1,-10);ctx.moveTo(-5,7);ctx.lineTo(-15-evo*9,18+evo*8);ctx.lineTo(-1,10);ctx.stroke();ctx.restore()}
       [-1, 1].forEach(sd => { ctx.beginPath(); ctx.moveTo(-1, sd * 8); ctx.quadraticCurveTo(-12, sd * 24, -34, sd * 14); ctx.strokeStyle = '#14070a'; ctx.lineWidth = 7; ctx.stroke(); ctx.strokeStyle = '#d9c7b0'; ctx.lineWidth = 3.4; ctx.stroke() });
-      if (pm > .05) { ctx.fillStyle = '#3a0000'; ctx.beginPath(); ctx.ellipse(10, 0, 10, Math.min(9, 1 + pm * 9), 0, 0, TAU); ctx.fill() }
+      if (pm > .05||cobraOpen>.05) { const jaw=Math.max(pm,cobraOpen);ctx.fillStyle = '#3a0000'; ctx.beginPath(); ctx.ellipse(10, 0, 12, Math.min(15, 1 + jaw * 10), 0, 0, TAU); ctx.fill();if(cobraOpen>.3){ctx.strokeStyle='#f4b2a0';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(1,-4-jaw*5);ctx.lineTo(17,-4-jaw*5);ctx.stroke()} }
       [-1, 1].forEach(sd => {
         ctx.save(); ctx.translate(2, 0); ctx.rotate(sd * pm * .5); ctx.beginPath(); ctx.moveTo(-7, 0); ctx.lineTo(-7, sd * 10.5); ctx.quadraticCurveTo(11, sd * 11, 18, 0); ctx.closePath(); ctx.fillStyle = '#22050a'; ctx.fill(); ctx.strokeStyle = '#b0242d'; ctx.lineWidth = 1.3; ctx.stroke();
         ctx.fillStyle = '#d9c7b0';[5, 9, 12, 15].forEach((k, j) => { const hh = j % 2 ? 4.5 : 7; ctx.beginPath(); ctx.moveTo(k - 1.6, 0); ctx.lineTo(k + 1.6, 0); ctx.lineTo(k, -sd * hh); ctx.fill() }); ctx.restore()
@@ -1936,7 +1945,7 @@
     function draw(t) {
       if (state !== _ps) { _ps = state; document.body.dataset.s = state }
       const sk = RM ? shake * .25 : shake; ctx.setTransform(dpr, 0, 0, dpr, (Math.random() - .5) * sk * dpr, (Math.random() - .5) * sk * dpr); ctx.fillStyle = '#07050a'; ctx.fillRect(-30, -30, W + 60, H + 60);
-      ctx.drawImage(bgc,0,0,W,H);drawEmbers(t);ctx.save();ctx.translate(-camX,-camY);
+      ctx.drawImage(bgc,0,0,W,H);drawEmbers(t);ctx.save();ctx.translate(W/2,H/2);ctx.scale(cameraZoom,cameraZoom);ctx.translate(-W/2-camX,-H/2-camY);
       drawTelegraphs(t);
       ctx.globalCompositeOperation = 'lighter'; pools.forEach(p => { ctx.fillStyle = 'rgba(255,110,30,' + Math.min(1, p.t) * .5 + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, 30 * sc * (.8 + .2 * Math.sin(t / 80 + p.y)), 0, TAU); ctx.fill() }); ctx.globalCompositeOperation = 'source-over';
       if (bh) {
@@ -1992,7 +2001,7 @@
       {id:'area',name:'🌌 Dominio expansivo',desc:'Aumenta el radio de las habilidades de área un 16% por elección.',apply:()=>U.area=(U.area||1)*1.16},
       {id:'cool',name:'⏳ Flujo abisal',desc:'Reduce los enfriamientos un 9% por elección.',apply:()=>U.cd=Math.max(.48,U.cd*.91)},
       {id:'vital',name:'❤ Corazón colosal',desc:'+22 de vida máxima y recupera 35 al instante.',apply:()=>{maxHp+=22;hp=Math.min(maxHp,hp+35)}},
-      {id:'growth',name:'🐍 Evolución titánica',desc:'Añade 5 segmentos y aumenta el tamaño de la serpiente.',apply:()=>growPlayer(5,.045)},
+      {id:'growth',name:'🐍 Evolución titánica',desc:'Añade segmentos y aumenta el tamaño. Al conseguirla 3 veces despiertas la mordida cobra.',apply:()=>{growthStacks++;growPlayer(7,.075);if(growthStacks===3)toast('INSTINTO COBRA DESBLOQUEADO · ¡DEVORA!')}},
       {id:'speed',name:'⚡ Instinto depredador',desc:'Aumenta la velocidad de movimiento un 9% por elección.',apply:()=>U.spd=Math.min(1.65,U.spd*1.09)},
       {id:'fury',name:'🔥 Furia acumulada',desc:'Generas un 18% más de furia al dañar enemigos.',apply:()=>U.fury=Math.min(2.4,U.fury*1.18)},
       {id:'dash',name:'⚡ Ruptura de cometa',desc:'Embestida: +24% de daño y +12% de alcance.',skill:'dash',apply:()=>{U.dA*=1.24;U.area=(U.area||1)*1.12}},
