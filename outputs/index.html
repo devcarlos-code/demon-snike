@@ -136,7 +136,7 @@
       justify-content: center
     }
 
-    .k{position:relative;overflow:hidden;width:72px;height:72px;display:grid;place-content:center;gap:2px;background:radial-gradient(circle at 30% 20%,#51402b 0,#211811 45%,#0d0a0b 78%);border:2px solid #bb8b3b;color:#ffe2a0;font:inherit;border-radius:50%;cursor:pointer;padding:4px;box-shadow:inset 0 2px 2px rgba(255,226,160,.45),inset 0 -4px 8px #000,0 0 12px rgba(190,132,47,.22)}
+    .k{position:relative;overflow:hidden;width:72px;height:72px;display:grid;place-content:center;gap:2px;touch-action:none;user-select:none;-webkit-user-select:none;background:radial-gradient(circle at 30% 20%,#51402b 0,#211811 45%,#0d0a0b 78%);border:2px solid #bb8b3b;color:#ffe2a0;font:inherit;border-radius:50%;cursor:pointer;padding:4px;box-shadow:inset 0 2px 2px rgba(255,226,160,.45),inset 0 -4px 8px #000,0 0 12px rgba(190,132,47,.22)}
 
     .k b{position:relative;z-index:3;display:block;font-size:23px;line-height:1;text-shadow:0 0 10px #ffbf57}
 
@@ -1828,7 +1828,7 @@
       CH.forEach(el=>{const pair=el.dataset.pair;if(!pair)return;const keys=pair.split('');el.classList.toggle('on',keys.every(key=>!!skillForSlot(key))&&keys.every(key=>cd[key]<=0))});
     }
     const setP=e=>{const r=cv.getBoundingClientRect();ptr.x=e.clientX-r.left+camX;ptr.y=e.clientY-r.top+camY};if(!mobile){addEventListener('pointermove',setP);cv.addEventListener('pointerdown',e=>{setP(e);initAudio()})}const je=$('joystick'),jk=$('joyknob');function ju(e){const r=je.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,m=Math.hypot(dx,dy)||1,k=Math.min(1,m/(r.width*.36));joy.dx=dx/m*k;joy.dy=dy/m*k;jk.style.left=(50+joy.dx*36)+'%';jk.style.top=(50+joy.dy*36)+'%'}je.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;je.setPointerCapture(e.pointerId);ju(e);initAudio()});je.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)ju(e)});const jeEnd=e=>{if(e.pointerId===joy.id){joy.active=false;joy.dx=joy.dy=0;jk.style.left=jk.style.top='50%'}};je.addEventListener('pointerup',jeEnd);je.addEventListener('pointercancel',jeEnd);
-    document.querySelectorAll('.k').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); atk(b.dataset.k) }));
+    document.querySelectorAll('.k').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); atk(b.dataset.k) }));
     addEventListener('keydown', e => {
       const moveKey=e.key.toLowerCase();
       if(['arrowup','arrowdown','arrowleft','arrowright'].includes(moveKey)){moveKeys.add(moveKey);if(!mobile)e.preventDefault()}
@@ -1842,7 +1842,7 @@
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
     $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});function showHomePage(pageId){const allowed=['homeView','shopPage','skillsPage','campaignPage'];if(!allowed.includes(pageId)){toast('SECCIÓN NO DISPONIBLE');return false}const views=document.querySelectorAll('#title .home-view,#title .section-page');views.forEach(v=>{const active=v.id===pageId;v.style.display=active?(pageId==='homeView'?'contents':'flex'):'none';v.setAttribute('aria-hidden',String(!active))});const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout();if(pageId==='campaignPage')renderCampaign();return true}document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-page]');if(b){e.preventDefault();showHomePage(b.dataset.page)}});$('sessionList').addEventListener('click',e=>{const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
-    addEventListener('blur', () => { if (!mobile && state === 'play') togglePause() });
+    addEventListener('blur', () => { moveKeys.clear() });
     document.addEventListener('visibilitychange', () => { if (!mobile && document.hidden && state === 'play') togglePause() });
     document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button'); if (b) b.blur() });
     const KB = [...document.querySelectorAll('.k')], CH = [...document.querySelectorAll('#combos span')];
