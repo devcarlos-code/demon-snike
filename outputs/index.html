@@ -1790,6 +1790,8 @@ body{background:
     const cd = { a: 0, s: 0, d: 0, f: 0 }, MAXCD = { a: .7, s: 2.8, d: 3.8, f: 0 };
     const U0={dA:1,dS:1,dD:1,cd:1,spd:1,def:1,fury:1,life:0,combo:1,tn:4};
     const SAVE_KEY='arena_serpientes_save_v2';
+    const firebaseConfig={apiKey:"AIzaSyDPnzfJxFjr0JQpOPIpVbw1glVWain1TdA",authDomain:"demon-snike.firebaseapp.com",projectId:"demon-snike",storageBucket:"demon-snike.firebasestorage.app",messagingSenderId:"49811188590",appId:"1:49811188590:web:f589b18e25311c15296f7f",measurementId:"G-JEW4LNN0M2"};
+    let cloudAuth=null,cloudDb=null,cloudUser=null,cloudSyncBusy=false,cloudSaveTimer=null;
     function loadSave(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');return x&&x.version===2?x:{}}catch(e){return {}}}
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
@@ -1820,12 +1822,53 @@ body{background:
            if(!saved)return false;
            toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
          }
-         try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
+         queueCloudSave(saveData);try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
          try{refreshHome()}catch(homeRefreshError){}
          return true
        }catch(e){return false}
      }
-    function renderProfile(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('profileStatus','INVITADO');put('profileBest',Math.max(best,score).toLocaleString('es'));put('profileBosses',Number(stats.bosses||0).toLocaleString('es'));put('profileCoins',coins.toLocaleString('es'));put('profileFragments',skillFragments.toLocaleString('es'));const cloud=$('cloudSaveStatus');if(cloud)cloud.textContent='Sin autenticación en la nube: guardado local activo.'}
+    function setCloudStatus(message){const el=$('cloudSaveStatus');if(el)el.textContent=message}
+    function readLocalCloudSave(){try{const value=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');return value&&value.version===2?value:null}catch(e){return null}}
+    function cloudSaveRef(){return cloudDb&&cloudUser?cloudDb.collection('users').doc(cloudUser.uid).collection('saves').doc('main'):null}
+    async function writeCloudSave(snapshot){const ref=cloudSaveRef();if(!ref||!snapshot)return;await ref.set({save:snapshot,savedAt:Number(snapshot.savedAt)||Date.now(),email:cloudUser.email||null,displayName:cloudUser.displayName||null,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setCloudStatus('Sincronizado con Google · '+new Date().toLocaleTimeString('es'))}
+    function queueCloudSave(snapshot){if(!cloudUser||!cloudDb||cloudSyncBusy)return;clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(async()=>{try{const latest=readLocalCloudSave()||snapshot;await writeCloudSave(latest)}catch(e){console.warn('Demon-Snike cloud save:',e);setCloudStatus('Guardado local activo; no se pudo sincronizar. Revisa las reglas de Firestore.')}},1200)}
+    async function syncCloudSave(){
+      if(!cloudUser||!cloudDb||cloudSyncBusy)return;
+      cloudSyncBusy=true;setCloudStatus('Comprobando tu progreso en la nube…');
+      try{
+        const ref=cloudSaveRef(),doc=await ref.get(),cloud=doc.exists?doc.data():null;
+        let local=readLocalCloudSave();
+        if(!cloud||!cloud.save||cloud.save.version!==2){
+          if(!local){persist(false);local=readLocalCloudSave()}
+          if(local)await writeCloudSave(local);
+          else setCloudStatus('Cuenta conectada. El progreso se guardará en este dispositivo y en la nube.');
+          return;
+        }
+        const cloudSave=cloud.save,cloudAt=Number(cloud.savedAt||cloudSave.savedAt)||0,localAt=Number(local&&local.savedAt)||0;
+        if(!local){
+          const old=localStorage.getItem(SAVE_KEY);if(old)localStorage.setItem(SAVE_KEY+'_backup_'+Date.now(),old);
+          localStorage.setItem(SAVE_KEY,JSON.stringify(cloudSave));setCloudStatus('Progreso de la nube restaurado.');location.reload();return;
+        }
+        if(cloudAt>localAt){
+          const restore=confirm('Hay un progreso de Demon Snike más reciente en la nube. ¿Quieres restaurarlo en este dispositivo? Si eliges Cancelar, conservaremos y subiremos el progreso local.');
+          if(restore){localStorage.setItem(SAVE_KEY+'_backup_'+Date.now(),JSON.stringify(local));localStorage.setItem(SAVE_KEY,JSON.stringify(cloudSave));location.reload();return}
+          await writeCloudSave(local);
+        }else{
+          await writeCloudSave(local);
+        }
+      }catch(e){console.error('Demon-Snike cloud sync:',e);setCloudStatus('Google conectado, pero la sincronización falló. Revisa las reglas de Firestore.')}
+      finally{cloudSyncBusy=false}
+    }
+    async function setupCloudAuth(){
+      if(!window.firebase||!firebase.initializeApp){setCloudStatus('Firebase no se cargó. El guardado local sigue activo.');return}
+      try{
+        if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+        cloudAuth=firebase.auth();cloudDb=firebase.firestore();
+        await cloudAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        cloudAuth.onAuthStateChanged(async user=>{cloudUser=user||null;renderProfile();if(cloudUser)await syncCloudSave();else setCloudStatus('Sin sesión de Google · guardado local activo.')});
+      }catch(e){console.error('Demon-Snike Firebase init:',e);setCloudStatus('No se pudo iniciar Firebase. El guardado local sigue activo.')}
+    }
+    function renderProfile(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('profileStatus',cloudUser?'CONECTADO':'INVITADO');put('profileBest',Math.max(best,score).toLocaleString('es'));put('profileBosses',Number(stats.bosses||0).toLocaleString('es'));put('profileCoins',coins.toLocaleString('es'));put('profileFragments',skillFragments.toLocaleString('es'));const button=$('connectGoogle');if(button)button.textContent=cloudUser?'CERRAR SESIÓN DE GOOGLE':'INICIAR SESIÓN CON GOOGLE';if(!cloudUser)setCloudStatus('Sin sesión de Google · guardado local activo.')}
      function renderCampaign(){
       const grid=$('campaignGrid');if(!grid)return;
       const cleared=campaignCompleted?100:campaignUnlocked-1;
