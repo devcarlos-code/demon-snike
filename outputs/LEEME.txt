@@ -1,6 +1,26 @@
-ARENA DE SERPIENTES — INSTALACIÓN
+DEMON-SNIKE / ARENA DE SERPIENTES — NOTAS DEL PROYECTO
 
-Para jugar como página: abre index.html o Arena de Serpientes.html.
-Para instalarla como app sin conexión, publica la carpeta outputs en un sitio con HTTPS y abre la dirección en el navegador. Después elige “Instalar app” desde el menú del navegador. La instalación local desde file:// no permite activar el service worker ni la instalación PWA.
+ARCHIVO PRINCIPAL
+- El juego publicado se ejecuta desde outputs/index.html.
+- La página raíz del repositorio redirige a outputs/.
+- outputs/service-worker.js administra la caché de la PWA. Su versión se incrementa al publicar cambios del juego.
+- outputs/manifest.webmanifest y outputs/icon.svg configuran la instalación como aplicación.
 
-Las partidas y mejoras se guardan en el almacenamiento local del navegador. Usa el mismo navegador y perfil para continuar las sesiones guardadas.
+CONTROLES
+- PC: ratón/teclas y botones de habilidades.
+- Móvil: joystick táctil y botones de habilidades.
+- La interfaz adapta los controles y las opciones de mejora al tamaño de pantalla.
+
+GUARDADO Y CUENTAS
+- El guardado sigue usando localStorage en este momento para proteger el progreso existente.
+- El perfil y la navegación ya están en la interfaz, pero el inicio de sesión con Google y el guardado en la nube todavía no están activados.
+- Para activar la nube hace falta conectar un proyecto Supabase, configurar Google OAuth y aplicar una política de base de datos que aísle el progreso de cada usuario.
+- No borres el almacenamiento del navegador hasta que la sincronización de la cuenta esté probada y se haya migrado el progreso.
+
+PRUEBAS
+- work/game-script-check.js contiene el JavaScript extraído del juego publicado para comprobar sintaxis con Node.js.
+- Los archivos work/patch-*.ps1 son parches históricos que apuntaban a un archivo fuente antiguo no incluido en la carpeta publicada; no se ejecutan en producción.
+
+PUBLICACIÓN
+- Publica la carpeta outputs con HTTPS para que el service worker y la instalación PWA funcionen.
+- Después de actualizar archivos, el service worker cambia de versión para forzar una caché nueva.
