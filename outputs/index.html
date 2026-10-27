@@ -1487,41 +1487,26 @@ body{background:
 @media(max-width:430px){#cards{grid-template-columns:1fr!important;max-width:420px}#cards button{min-height:76px!important}}
 @media(prefers-reduced-motion:reduce){#cards button{transition:none!important}.k[data-tier="MÍTICA"]{animation:none!important}}
 
-/* Reparación del mapa de campaña: cuadrícula estable y compacta */
-#campaignPage .campaign-map-wrap{
-  background:linear-gradient(145deg,#17131a,#0d0b10 72%)!important;
-  border:1px solid #694653!important;
-}
+/* Reparación robusta del mapa: flex-wrap evita que los nodos se apilen */
+#campaignPage .campaign-map-wrap{background:linear-gradient(145deg,#17131a,#0d0b10 72%)!important;border:1px solid #694653!important}
 #campaignPage #campaignGrid.campaign-grid{
-  display:grid!important;
-  grid-template-columns:repeat(10,minmax(0,1fr))!important;
-  grid-auto-flow:row!important;
-  grid-auto-rows:auto!important;
-  align-items:stretch!important;
-  justify-items:stretch!important;
-  gap:9px!important;
-  width:100%!important;
-  min-width:0!important;
+ display:flex!important;flex-flow:row wrap!important;align-content:flex-start!important;align-items:stretch!important;justify-content:flex-start!important;
+ gap:9px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
 }
 #campaignPage #campaignGrid .campaign-node{
-  display:flex!important;
-  position:relative!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  aspect-ratio:1/1!important;
-  margin:0!important;
-  box-sizing:border-box!important;
+ display:flex!important;flex:0 0 calc((100% - 81px)/10)!important;width:calc((100% - 81px)/10)!important;max-width:calc((100% - 81px)/10)!important;min-width:0!important;
+ aspect-ratio:1/1!important;height:auto!important;margin:0!important;box-sizing:border-box!important;position:relative!important;
 }
 @media(max-width:900px){
-  #campaignPage #campaignGrid.campaign-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important}
+ #campaignPage #campaignGrid.campaign-grid{gap:8px!important}
+ #campaignPage #campaignGrid .campaign-node{flex-basis:calc((100% - 32px)/5)!important;width:calc((100% - 32px)/5)!important;max-width:calc((100% - 32px)/5)!important}
 }
 @media(max-width:480px){
-  #campaignPage #campaignGrid.campaign-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
-  #campaignPage .campaign-map-heading span{font-size:8px}
-  #campaignPage .campaign-node small{font-size:7px}
+ #campaignPage #campaignGrid.campaign-grid{gap:6px!important}
+ #campaignPage #campaignGrid .campaign-node{flex-basis:calc((100% - 18px)/4)!important;width:calc((100% - 18px)/4)!important;max-width:calc((100% - 18px)/4)!important}
+ #campaignPage .campaign-map-heading span{font-size:8px}
+ #campaignPage .campaign-node small{font-size:7px}
 }
-
 </style>
 </head>
 
