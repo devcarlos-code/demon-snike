@@ -1487,11 +1487,17 @@ body{background:
 @media(max-width:430px){#cards{grid-template-columns:1fr!important;max-width:420px}#cards button{min-height:76px!important}}
 @media(prefers-reduced-motion:reduce){#cards button{transition:none!important}.k[data-tier="MÍTICA"]{animation:none!important}}
 
-/* Mapa de campaña: reglas explícitas por tamaño, sin flex sizing */
-#campaignPage #campaignGrid.campaign-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-flow:row!important;gap:8px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important}
-#campaignPage #campaignGrid .campaign-node{grid-column:auto!important;width:100%!important;max-width:none!important;min-width:0!important;aspect-ratio:1/1!important;height:auto!important;margin:0!important;box-sizing:border-box!important}
-@media(min-width:1100px){#campaignPage #campaignGrid.campaign-grid{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
-@media(max-width:480px){#campaignPage #campaignGrid.campaign-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}#campaignPage .campaign-map-heading span{font-size:8px}#campaignPage .campaign-node small{font-size:7px}}
+/* Campaign map rows: each row owns its five-column layout */
+#campaignPage .campaign-map-wrap{width:100%;box-sizing:border-box;min-width:0}
+#campaignPage #campaignGrid.campaign-rows{display:block!important;width:100%!important;min-width:0!important}
+#campaignPage #campaignGrid .campaign-row{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;width:100%!important;min-width:0!important;margin:0 0 8px!important;box-sizing:border-box!important}
+#campaignPage #campaignGrid .campaign-row>.campaign-node{display:flex!important;grid-column:auto!important;grid-row:auto!important;flex:none!important;width:100%!important;min-width:0!important;max-width:none!important;aspect-ratio:1/1!important;height:auto!important;margin:0!important;box-sizing:border-box!important}
+@media(max-width:480px){
+ #campaignPage #campaignGrid .campaign-row{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+ #campaignPage #campaignGrid .campaign-row>.campaign-node{font-size:10px}
+ #campaignPage .campaign-map-heading span{font-size:8px}
+ #campaignPage .campaign-node small{font-size:7px}
+}
 </style>
 </head>
 
@@ -1772,11 +1778,51 @@ body{background:
      }
     function renderProfile(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('profileStatus','INVITADO');put('profileBest',Math.max(best,score).toLocaleString('es'));put('profileBosses',Number(stats.bosses||0).toLocaleString('es'));put('profileCoins',coins.toLocaleString('es'));put('profileFragments',skillFragments.toLocaleString('es'));const cloud=$('cloudSaveStatus');if(cloud)cloud.textContent='Sin autenticación en la nube: guardado local activo.'}
      function renderCampaign(){
-      const grid=$('campaignGrid');if(!grid)return;const cleared=campaignCompleted?100:campaignUnlocked-1;
-      $('campaignProgress').textContent=String(cleared).padStart(2,'0')+'/100';$('campaignNextLevel').textContent=campaignCompleted?'COMPLETA':String(campaignUnlocked).padStart(2,'0');$('campaignCleared').textContent=String(cleared).padStart(2,'0')+' / 100';
-      grid.style.setProperty('display','grid','important');grid.style.setProperty('grid-template-columns','repeat(5,minmax(0,1fr))','important');grid.style.setProperty('grid-auto-flow','row','important');grid.style.setProperty('gap','8px','important');grid.style.setProperty('width','100%','important');grid.style.setProperty('align-items','stretch','important');grid.innerHTML=Array.from({length:100},(_,i)=>{const n=i+1,done=campaignCompleted||n<campaignUnlocked,open=!campaignCompleted&&n===campaignUnlocked,boss=n%5===0,result=campaignResults[n],stars=result?.stars||0;return '<button type="button" style="grid-column:auto!important;width:100%!important;min-width:0!important;max-width:none!important;aspect-ratio:1/1!important;box-sizing:border-box!important;margin:0!important" class="campaign-node '+(done?'is-done ':open?'is-open ':'is-locked ')+(boss?'is-boss':'')+'" data-campaign-level="'+n+'" '+(n>campaignUnlocked?'disabled':'')+' aria-label="Nivel '+n+(done?', completado':open?', disponible':', bloqueado')+'"><span>'+(done?'✓':boss?'♛':String(n).padStart(2,'0'))+'</span><small>'+(done?'LISTO':boss?'JEFE':open?'JUGAR':'CERRADO')+'</small>'+(result?'<em class="campaign-node-stars" aria-label="'+stars+' de 3 estrellas">'+('★'.repeat(stars))+('<i>'.repeat(3-stars))+'</em>':'')+'</button>'}).join('');
+      const grid=$('campaignGrid');if(!grid)return;
+      const cleared=campaignCompleted?100:campaignUnlocked-1;
+      $('campaignProgress').textContent=String(cleared).padStart(2,'0')+'/100';
+      $('campaignNextLevel').textContent=campaignCompleted?'COMPLETA':String(campaignUnlocked).padStart(2,'0');
+      $('campaignCleared').textContent=String(cleared).padStart(2,'0')+' / 100';
+      grid.innerHTML='';
+      grid.className='campaign-grid campaign-rows';
+      grid.style.cssText='display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important';
+      for(let rowIndex=0;rowIndex<20;rowIndex++){
+       const row=document.createElement('div');
+       row.className='campaign-row';
+       row.style.cssText='display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;width:100%!important;min-width:0!important;margin:0 0 8px!important;box-sizing:border-box!important';
+       for(let col=0;col<5;col++){
+        const n=rowIndex*5+col+1;
+        const done=campaignCompleted||n<campaignUnlocked;
+        const open=!campaignCompleted&&n===campaignUnlocked;
+        const boss=n%5===0;
+        const result=campaignResults[n];
+        const stars=result?.stars||0;
+        const button=document.createElement('button');
+        button.type='button';
+        button.className='campaign-node '+(done?'is-done ':open?'is-open ':'is-locked ')+(boss?'is-boss':'');
+        button.dataset.campaignLevel=String(n);
+        button.disabled=n>campaignUnlocked;
+        button.setAttribute('aria-label','Nivel '+n+(done?', completado':open?', disponible':', bloqueado'));
+        button.style.cssText='display:flex!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;min-width:0!important;max-width:none!important;aspect-ratio:1/1!important;height:auto!important;margin:0!important;box-sizing:border-box!important';
+        const label=document.createElement('span');
+        label.textContent=done?'✓':boss?'♛':String(n).padStart(2,'0');
+        const status=document.createElement('small');
+        status.textContent=done?'LISTO':boss?'JEFE':open?'JUGAR':'CERRADO';
+        button.append(label,status);
+        if(result){
+         const starNode=document.createElement('em');
+         starNode.className='campaign-node-stars';
+         starNode.setAttribute('aria-label',stars+' de 3 estrellas');
+         starNode.textContent='★'.repeat(stars);
+         for(let i=stars;i<3;i++){const empty=document.createElement('i');starNode.append(empty);}
+         button.append(starNode);
+        }
+        row.append(button);
+       }
+       grid.append(row);
+      }
       $('campaignHint').textContent=campaignCompleted?'¡Campaña conquistada! Puedes repetir cualquiera de los 100 niveles.':campaignUnlocked===1?'Completa el nivel 1 para abrir el camino.':'Has llegado al nivel '+campaignUnlocked+'. Supera el desafío para desbloquear el siguiente.';
-    }
+     }
     function campaignStarRating(level,seconds){const limit=90+level*5;return seconds<=limit?3:seconds<=limit*1.25?2:seconds<=limit*1.6?1:0}
     function formatCampaignTime(seconds){const total=Math.max(0,Math.floor(seconds)),m=Math.floor(total/60),ss=total%60;return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0')}
     function showCampaignResult(){if(campaignResultShown)return;campaignResultShown=true;const elapsed=campaignLevelTime,stars=campaignStarRating(lvl,elapsed),previous=campaignResults[lvl],firstClear=!previous;const coinReward=firstClear?(260+lvl*42+(lvl%5===0?1200:0)+stars*90):0,fragmentReward=firstClear?(2+Math.floor(lvl/4)+(lvl%5===0?5:0)+stars):0;coins+=coinReward;skillFragments+=fragmentReward;campaignResults[lvl]={stars:Math.max(stars,previous?.stars||0),time:Math.min(elapsed,previous?.time??Infinity),kills:Math.max(campaignLevelKills,previous?.kills||0),rewarded:true};if(lvl>=100){campaignCompleted=true;campaignUnlocked=100}state='campaignResult';overAt=performance.now();$('campaignResultTitle').textContent=lvl>=100?'¡CAMPAÑA CONQUISTADA!':'NIVEL '+String(lvl).padStart(2,'0')+' SUPERADO';$('campaignResultSub').textContent=stars===3?'EJECUCIÓN PERFECTA · RANGO S':stars===2?'EXCELENTE RENDIMIENTO · RANGO A':stars===1?'MISIÓN COMPLETADA · RANGO B':'MISIÓN COMPLETADA · SIGUE MEJORANDO';$('campaignResultKills').textContent=String(campaignLevelKills);$('campaignResultTime').textContent=formatCampaignTime(elapsed);const rewardBox=$('campaignReward');if(rewardBox)rewardBox.innerHTML='<b>RECOMPENSA '+(firstClear?'OBTENIDA':'YA RECLAMADA')+'</b><span>◈ '+coinReward.toLocaleString('es')+' monedas</span><span>◆ '+fragmentReward+' fragmentos de habilidad</span>';$('campaignResultStars').innerHTML=Array.from({length:3},(_,i)=>'<span class="'+(i<stars?'':'empty')+'">'+(i<stars?'★':'☆')+'</span>').join('');$('campaignNextBtn').textContent=lvl>=100?'VOLVER A LA CAMPAÑA':'SIGUIENTE NIVEL ↗';$('campaignResult').style.display='flex';persist(false);SFX.up()}
