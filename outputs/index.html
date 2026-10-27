@@ -1749,9 +1749,20 @@ body{background:
         const selected=skillLoadout[i]||'',options='<option value="">— ESPACIO VACÍO —</option>'+ownedSkills.map(id=>{const skill=skillById(id);return skill?'<option value="'+skill.id+'"'+(selected===id?' selected':'')+'>'+skill.icon+' '+skill.name+' · '+skill.tier+'</option>':''}).join('');
         return '<label class="loadout-slot"><span><b>ESPACIO '+key.toUpperCase()+'</b><small>TECLA '+key.toUpperCase()+'</small></span><select data-skill-slot="'+i+'" aria-label="Habilidad del espacio '+key.toUpperCase()+'">'+options+'</select></label>'
       }).join('')+'<div class="loadout-actions"><button id="resetLoadout" type="button">RESTABLECER HABILIDADES INICIALES</button><small>'+used+' de 4 espacios ocupados</small></div>';
-      function renderMasteries(){const list=$('masteryList'),balance=$('fragmentBalance');if(balance)balance.textContent=skillFragments.toLocaleString('es');if(!list)return;list.innerHTML=ownedSkills.map(id=>{const skill=skillById(id);if(!skill)return '';const level=Math.max(0,Math.min(5,Number(skillMasteries[id])||0)),cost=5+level*4;return '<article class="mastery-card"><div class="mastery-icon">'+skill.icon+'</div><div class="mastery-copy"><b>'+skill.name+'</b><small>MAESTRÍA '+level+'/5 · '+(level>=5?'NIVEL MÁXIMO':'RECARGA '+Math.round((1-Math.pow(.96,level))*100)+'% MÁS RÁPIDA')+'</small></div><button type="button" data-upgrade-skill="'+id+'" '+(level>=5||skillFragments<cost?'disabled':'')+'>'+(level>=5?'MÁXIMO':'MEJORAR · ◆ '+cost)+'</button></article>'}).join('')||'<p class="mastery-empty">Desbloquea habilidades para comenzar a forjarlas.</p>';}
-function upgradeSkill(id){const skill=skillById(id),level=Math.max(0,Math.min(5,Number(skillMasteries[id])||0)),cost=5+level*4;if(!skill||!ownedSkills.includes(id)||level>=5||skillFragments<cost){toast('NECESITAS '+cost+' FRAGMENTOS');return false}const before=skillFragments;skillFragments-=cost;skillMasteries[id]=level+1;if(!persist(false)){skillFragments=before;skillMasteries[id]=level;toast('NO SE PUDO GUARDAR LA MEJORA');return false}renderMasteries();refreshSkillButtons();toast(skill.name.toUpperCase()+' · MAESTRÍA '+(level+1));SFX.up();return true}
-const owned=$('ownedSkillList');if(owned)owned.innerHTML='<span>DESBLOQUEADAS</span> '+ownedSkills.map(id=>{const skill=skillById(id);return skill?'<b>'+skill.icon+' '+skill.name+'</b>':''}).join('');renderMasteries();
+    }
+    function renderMasteries(){
+      const list=$('masteryList'),balance=$('fragmentBalance'),owned=$('ownedSkillList');
+      if(balance)balance.textContent=skillFragments.toLocaleString('es');
+      if(owned)owned.innerHTML='<span>DESBLOQUEADAS</span> '+ownedSkills.map(id=>{const skill=skillById(id);return skill?'<b>'+skill.icon+' '+skill.name+'</b>':''}).join('');
+      if(!list)return;
+      list.innerHTML=ownedSkills.map(id=>{const skill=skillById(id);if(!skill)return '';const level=Math.max(0,Math.min(5,Number(skillMasteries[id])||0)),cost=5+level*4;return '<article class="mastery-card"><div class="mastery-icon">'+skill.icon+'</div><div class="mastery-copy"><b>'+skill.name+'</b><small>MAESTRÍA '+level+'/5 · '+(level>=5?'NIVEL MÁXIMO':'RECARGA '+Math.round((1-Math.pow(.96,level))*100)+'% MÁS RÁPIDA')+'</small></div><button type="button" data-upgrade-skill="'+id+'" '+(level>=5||skillFragments<cost?'disabled':'')+'>'+(level>=5?'MÁXIMO':'MEJORAR · ◆ '+cost)+'</button></article>'}).join('')||'<p class="mastery-empty">Desbloquea habilidades para comenzar a forjarlas.</p>';
+    }
+    function upgradeSkill(id){
+      const skill=skillById(id),level=Math.max(0,Math.min(5,Number(skillMasteries[id])||0)),cost=5+level*4;
+      if(!skill||!ownedSkills.includes(id)||level>=5||skillFragments<cost){toast('NECESITAS '+cost+' FRAGMENTOS');return false}
+      const before=skillFragments;skillFragments-=cost;skillMasteries[id]=level+1;
+      if(!persist(false)){skillFragments=before;skillMasteries[id]=level;toast('NO SE PUDO GUARDAR LA MEJORA');return false}
+      renderMasteries();refreshSkillButtons();toast(skill.name.toUpperCase()+' · MAESTRÍA '+(level+1));SFX.up();return true
     }
     function renderShop(){
       const list=$('shopList'),balance=$('shopBalance');if(balance)balance.textContent=coins.toLocaleString('es');if(!list)return;
