@@ -1452,6 +1452,12 @@ body{background:
 #title .home-header,#title .home-layout,#title .home-footer,#title .section-content{pointer-events:auto!important}
 #title button,#title summary,#title select{pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important}
 #title button::before,#title button::after,#title .home-showcase::before,#title .home-showcase::after,#title .home-disclosure::before,#title .home-disclosure::after,#title .section-panel::before,#title .section-panel::after{pointer-events:none!important}
+
+#runtimeError{display:none;position:fixed;z-index:2147483647;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px;background:rgba(0,0,0,.96);color:#fff;font:14px Arial,sans-serif;text-align:center}
+#runtimeError b{font:700 22px Cinzel,Georgia,serif;letter-spacing:.16em}
+#runtimeError p{max-width:760px;color:#ffb7b7;overflow-wrap:anywhere;line-height:1.5}
+#runtimeError small{color:#bbb}
+#runtimeError button{padding:12px 24px;border:1px solid #fff8;border-radius:12px;background:linear-gradient(145deg,#ffffff35,#ffffff0b);color:#fff;cursor:pointer}
 </style>
 </head>
 
@@ -2320,7 +2326,7 @@ const owned=$('ownedSkillList');if(owned)owned.innerHTML='<span>DESBLOQUEADAS</s
     const installButton=$('installApp');let installPrompt=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;installButton.style.display='inline-block'});installButton.addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null}else toast('En el menú del navegador: “Añadir a pantalla de inicio” o “Instalar app”')});addEventListener('appinstalled',()=>{installButton.style.display='none';toast('APP INSTALADA')});if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./service-worker.js').catch(()=>{});installButton.style.display='inline-block';
     $('mute').addEventListener('click', () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; $('mute').setAttribute('aria-label',muted?'Activar sonido':'Silenciar sonido'); $('mute').title=muted?'Activar sonido':'Silenciar sonido'; if (master) master.gain.value = muted ? 0 : .6; initAudio() });
     let prev = performance.now();
-    function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; try { slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now) } catch(error) { console.error('Error del juego:',error);state='pause';$('pz').style.display='flex';const msg=$('pz').querySelector('p');if(msg)msg.textContent='Error: '+(error?.message||'fallo desconocido')+'. La partida quedó en pausa para proteger el progreso.' } requestAnimationFrame(loop) }
+    function showRuntimeError(error,source='JUEGO'){const message=(error&&error.message)||String(error||'Error desconocido');console.error('Demon-Snike '+source+':',error);let panel=$('runtimeError');if(!panel){panel=document.createElement('div');panel.id='runtimeError';panel.innerHTML='<b>ERROR DEL MOTOR</b><p></p><small>La partida se pausó para proteger tu progreso.</small><button type="button">VOLVER AL MENÚ</button>';document.body.appendChild(panel);panel.querySelector('button').addEventListener('click',()=>{panel.style.display='none';goHome()})}panel.querySelector('p').textContent=source+': '+message;panel.style.display='flex';state='pause'}window.addEventListener('error',e=>showRuntimeError(e.error||e.message,'JAVASCRIPT'));window.addEventListener('unhandledrejection',e=>showRuntimeError(e.reason,'PROMESA'));function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; try { slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now) } catch(error) { showRuntimeError(error,'RENDER / ACTUALIZACIÓN') } requestAnimationFrame(loop) }
     makePlayer();refreshHome();requestAnimationFrame(loop);
   </script>
 </body>
