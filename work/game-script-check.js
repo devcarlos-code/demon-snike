@@ -574,8 +574,7 @@
         ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fillStyle = 'hsl(' + (350 + u * 8) + ',75%,' + (12 - 7 * u) + '%)'; ctx.fill(); ctx.strokeStyle = 'hsla(355,85%,' + (42 - 22 * u) + '%,.95)'; ctx.lineWidth = 1.4; ctx.stroke()
       }
       ctx.save(); ctx.shadowColor = '#ff3b1f'; ctx.shadowBlur = lowEndDevice?4:12 + fury / 8; ctx.strokeStyle = 'rgba(255,' + (70 + fury / 2) + ',30,' + (.55 + .3 * Math.sin(t / 220)) + ')'; ctx.lineWidth = 2.4;
-      ctx.beginPath(); const glowStep=lowEndDevice?3:2; for (let i = 3; i < n - 4; i+=glowStep) { const pulse=1+Math.sin(t*.008-i*.24)*(lowEndDevice?.018:.045); const gx=h.x+(P[i].x-h.x)*pulse,gy=h.y+(P[i].y-h.y)*pulse; i===3?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy) } ctx.stroke(); ctx.restore();
-      const h = P[0];
+      const h = P[0]; ctx.beginPath(); const glowStep=lowEndDevice?3:2; for (let i = 3; i < n - 4; i+=glowStep) { const pulse=1+Math.sin(t*.008-i*.24)*(lowEndDevice?.018:.045); const gx=h.x+(P[i].x-h.x)*pulse,gy=h.y+(P[i].y-h.y)*pulse; i===3?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy) } ctx.stroke(); ctx.restore();
       // Marcas de evolución: se activan gradualmente al crecer la serpiente.
       const evo=Math.min(1,Math.max(0,(n-24)/90));
       if(evo>.04){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.18+evo*.22;ctx.strokeStyle=fury>70?'#ffb347':'#b34cff';ctx.lineWidth=(lowEndDevice?1.2:2)*s;const step=lowEndDevice?Math.max(12,Math.floor(n/9)):Math.max(8,Math.floor(n/14));for(let i=step;i<n-5;i+=step){const q=P[i],rr=pl.R[i]*s*(1.45+evo*.25);ctx.beginPath();ctx.arc(q.x,q.y,rr,0,TAU);ctx.stroke()}ctx.restore()}
