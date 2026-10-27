@@ -1638,17 +1638,17 @@ body{background:
       <header class="section-header">
         <button class="section-back" type="button" data-page="homeView">← VOLVER</button>
         <div class="section-brand"><span>♙</span><div><small>DEMON-SNIKE / CUENTA</small><b>PERFIL DEL JUGADOR</b></div></div>
-        <div class="section-wallet">ESTADO <b id="profileStatus">INVITADO</b></div>
+        <div class="section-wallet">PROGRESO <b>LOCAL</b></div>
       </header>
       <div class="section-content">
-        <div class="section-intro"><div class="home-kicker"><i></i> TU HISTORIA EN LA ARENA</div><h2 id="profilePageTitle">TU PERFIL</h2><p>Consulta tus estadísticas y prepara tu progreso para sincronizarlo entre dispositivos cuando la cuenta en la nube esté configurada.</p></div>
+        <div class="section-intro"><div class="home-kicker"><i></i> TU HISTORIA EN LA ARENA</div><h2 id="profilePageTitle">TU PERFIL</h2><p>Consulta tus estadísticas y progreso. Todo se guarda automáticamente en este dispositivo.</p></div>
         <div class="profile-grid">
           <article class="profile-card"><span>☠</span><small>RÉCORD</small><b id="profileBest">0</b></article>
           <article class="profile-card"><span>♛</span><small>JEFES DERROTADOS</small><b id="profileBosses">0</b></article>
           <article class="profile-card"><span>◈</span><small>MONEDAS</small><b id="profileCoins">0</b></article>
           <article class="profile-card"><span>◆</span><small>FRAGMENTOS</small><b id="profileFragments">0</b></article>
         </div>
-        <div class="section-panel profile-connect"><div class="section-panel-heading"><div><b>GUARDADO EN LA NUBE</b><small id="cloudSaveStatus">El progreso actual se guarda localmente en este dispositivo.</small></div><span class="section-tag">GOOGLE</span></div><div class="profile-connect-body"><p>Inicia sesión con Google para sincronizar tu progreso entre dispositivos. Tu guardado local se conserva como respaldo.</p><button type="button" id="connectGoogle">INICIAR SESIÓN CON GOOGLE</button></div></div>
+        <div class="section-footnote">Guardado local activo · Tus monedas, habilidades y progreso de campaña se conservan en este dispositivo.</div>
       </div>
     </section>
     <section class="section-page" id="skillsPage" aria-labelledby="skillsPageTitle">
@@ -1683,9 +1683,6 @@ body{background:
       </div>
     </section>
   </div>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -1793,19 +1790,16 @@ body{background:
     const cd = { a: 0, s: 0, d: 0, f: 0 }, MAXCD = { a: .7, s: 2.8, d: 3.8, f: 0 };
     const U0={dA:1,dS:1,dD:1,cd:1,spd:1,def:1,fury:1,life:0,combo:1,tn:4};
     const SAVE_KEY='arena_serpientes_save_v2';
-    const firebaseConfig={apiKey:"AIzaSyDPnzfJxFjr0JQpOPIpVbw1glVWain1TdA",authDomain:"demon-snike.firebaseapp.com",projectId:"demon-snike",storageBucket:"demon-snike.firebasestorage.app",messagingSenderId:"49811188590",appId:"1:49811188590:web:f589b18e25311c15296f7f",measurementId:"G-JEW4LNN0M2"};
-    let cloudAuth=null,cloudDb=null,cloudUser=null,cloudSyncBusy=false,cloudSaveTimer=null;
     function loadSave(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');return x&&x.version===2?x:{}}catch(e){return {}}}
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
     let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
-    // Supervivencia usa una única ranura guardada; campaña conserva sus partidas individuales.
-    sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');
-    const survivalSessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
-    if(survivalSessions.length>1){const keep=survivalSessions[0];sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')!=='survival'||x.id===keep.id);if(activeSessionId&&survivalSessions.some(x=>x.id===activeSessionId)&&activeSessionId!==keep.id)activeSessionId=keep.id;}
-    if(saveData.checkpoint&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Partida guardada',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
-    function runSnapshot(){return {U:{...U},maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
+    // Una sola ranura local de supervivencia. La campaña solo guarda progreso y resultados.
+    sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)).slice(0,1);
+    if(saveData.checkpoint&&saveData.checkpoint.mode!=='campaign'&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
+    if(!sessions.some(x=>x.id===activeSessionId))activeSessionId=sessions[0]?.id||null;
+        function runSnapshot(){return {U:{...U},maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
     function persist(checkpoint=true){
        try{
          if(gameMode==='campaign'){sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');activeSessionId=null;saveData.checkpoint=null;checkpoint=false}
@@ -1825,61 +1819,13 @@ body{background:
            if(!saved)return false;
            toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
          }
-         queueCloudSave(saveData);try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
+         try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
          try{refreshHome()}catch(homeRefreshError){}
          return true
        }catch(e){return false}
      }
-    function setCloudStatus(message){const el=$('cloudSaveStatus');if(el)el.textContent=message}
-    function readLocalCloudSave(){try{const value=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');return value&&value.version===2?value:null}catch(e){return null}}
-    function cloudSaveRef(){return cloudDb&&cloudUser?cloudDb.collection('users').doc(cloudUser.uid).collection('saves').doc('main'):null}
-    async function writeCloudSave(snapshot){const ref=cloudSaveRef();if(!ref||!snapshot)return;await ref.set({save:snapshot,savedAt:Number(snapshot.savedAt)||Date.now(),email:cloudUser.email||null,displayName:cloudUser.displayName||null,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setCloudStatus('Sincronizado con Google · '+new Date().toLocaleTimeString('es'))}
-    function queueCloudSave(snapshot){if(!cloudUser||!cloudDb||cloudSyncBusy)return;clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(async()=>{try{const latest=readLocalCloudSave()||snapshot;await writeCloudSave(latest)}catch(e){console.warn('Demon-Snike cloud save:',e);setCloudStatus('Guardado local activo; no se pudo sincronizar. Revisa las reglas de Firestore.')}},1200)}
-    async function syncCloudSave(){
-      if(!cloudUser||!cloudDb||cloudSyncBusy)return;
-      cloudSyncBusy=true;setCloudStatus('Comprobando tu progreso en la nube…');
-      try{
-        const ref=cloudSaveRef(),doc=await ref.get(),cloud=doc.exists?doc.data():null;
-        let local=readLocalCloudSave();
-        if(!cloud||!cloud.save||cloud.save.version!==2){
-          if(!local){persist(false);local=readLocalCloudSave()}
-          if(local)await writeCloudSave(local);
-          else setCloudStatus('Cuenta conectada. El progreso se guardará en este dispositivo y en la nube.');
-          return;
-        }
-        const cloudSave=cloud.save,cloudAt=Number(cloud.savedAt||cloudSave.savedAt)||0,localAt=Number(local&&local.savedAt)||0;
-        if(!local){
-          const old=localStorage.getItem(SAVE_KEY);if(old)localStorage.setItem(SAVE_KEY+'_backup_'+Date.now(),old);
-          localStorage.setItem(SAVE_KEY,JSON.stringify(cloudSave));setCloudStatus('Progreso de la nube restaurado.');location.reload();return;
-        }
-        if(cloudAt>localAt){
-          const restore=confirm('Hay un progreso de Demon Snike más reciente en la nube. ¿Quieres restaurarlo en este dispositivo? Si eliges Cancelar, conservaremos y subiremos el progreso local.');
-          if(restore){localStorage.setItem(SAVE_KEY+'_backup_'+Date.now(),JSON.stringify(local));localStorage.setItem(SAVE_KEY,JSON.stringify(cloudSave));location.reload();return}
-          await writeCloudSave(local);
-        }else{
-          await writeCloudSave(local);
-        }
-      }catch(e){console.error('Demon-Snike cloud sync:',e);setCloudStatus('Google conectado, pero la sincronización falló. Revisa las reglas de Firestore.')}
-      finally{cloudSyncBusy=false}
-    }
-    async function setupCloudAuth(){
-      if(!window.firebase||!firebase.initializeApp){setCloudStatus('Firebase no se cargó. El guardado local sigue activo.');return}
-      try{
-        if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-        cloudAuth=firebase.auth();cloudDb=firebase.firestore();
-        await cloudAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        cloudAuth.onAuthStateChanged(async user=>{cloudUser=user||null;renderProfile();if(cloudUser)await syncCloudSave();else setCloudStatus('Sin sesión de Google · guardado local activo.')});
-        // Procesa explícitamente el resultado del acceso por redirección, especialmente en móviles.
-        cloudAuth.getRedirectResult().then(result=>{
-          if(result&&result.user){cloudUser=result.user;renderProfile();setCloudStatus('Google conectado. Sincronizando progreso…');syncCloudSave()}
-        }).catch(e=>{
-          console.error('Demon-Snike redirect result:',e);
-          setCloudStatus('No se completó el acceso con Google: '+(e.code||e.message||'error'));
-        });
-      }catch(e){console.error('Demon-Snike Firebase init:',e);setCloudStatus('No se pudo iniciar Firebase. El guardado local sigue activo.')}
-    }
-    function renderProfile(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('profileStatus',cloudUser?'CONECTADO':'INVITADO');put('profileBest',Math.max(best,score).toLocaleString('es'));put('profileBosses',Number(stats.bosses||0).toLocaleString('es'));put('profileCoins',coins.toLocaleString('es'));put('profileFragments',skillFragments.toLocaleString('es'));const button=$('connectGoogle');if(button)button.textContent=cloudUser?'CERRAR SESIÓN DE GOOGLE':'INICIAR SESIÓN CON GOOGLE';if(!cloudUser)setCloudStatus('Sin sesión de Google · guardado local activo.')}
-     function renderCampaign(){
+     function renderProfile(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('profileBest',Math.max(best,score).toLocaleString('es'));put('profileBosses',Number(stats.bosses||0).toLocaleString('es'));put('profileCoins',coins.toLocaleString('es'));put('profileFragments',skillFragments.toLocaleString('es'))}
+function renderCampaign(){
       const grid=$('campaignGrid');if(!grid)return;
       const cleared=campaignCompleted?100:campaignUnlocked-1;
       $('campaignProgress').textContent=String(cleared).padStart(2,'0')+'/100';
@@ -2511,7 +2457,7 @@ body{background:
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});$('masteryList').addEventListener('click',e=>{const b=e.target.closest('button[data-upgrade-skill]');if(b&&!b.disabled)upgradeSkill(b.dataset.upgradeSkill)});function showHomePage(pageId){const allowed=['homeView','shopPage','skillsPage','campaignPage','profilePage'];if(!allowed.includes(pageId)){toast('SECCIÓN NO DISPONIBLE');return false}const home=$('homeView');if(home){home.style.display=pageId==='homeView'?'flex':'none';home.setAttribute('aria-hidden',String(pageId!=='homeView'))}document.querySelectorAll('#title .section-page').forEach(v=>{const active=v.id===pageId;v.style.display=active?'flex':'none';v.setAttribute('aria-hidden',String(!active))});const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout();if(pageId==='campaignPage')renderCampaign();if(pageId==='profilePage')renderProfile();document.querySelectorAll('.top-nav [data-page]').forEach(b=>b.classList.toggle('is-active',b.dataset.page===pageId));return true}document.addEventListener('click',e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;if(b.id==='go'){e.preventDefault();e.stopImmediatePropagation();startGame('survival');return}if(b.id==='campaignGo'){e.preventDefault();e.stopImmediatePropagation();showHomePage('campaignPage');return}if(b.matches('button[data-page]')){e.preventDefault();e.stopImmediatePropagation();showHomePage(b.dataset.page)}},true);document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-page]');if(b){e.preventDefault();showHomePage(b.dataset.page)}});$('connectGoogle').addEventListener('click',async()=>{if(!cloudAuth){alert('Firebase todavía no está listo. Comprueba tu conexión e inténtalo de nuevo.');return}if(cloudUser){try{await cloudAuth.signOut();setCloudStatus('Sesión cerrada. Tu progreso local se conserva.');renderProfile()}catch(e){setCloudStatus('No se pudo cerrar la sesión.')}return}try{const provider=new firebase.auth.GoogleAuthProvider();if(mobile){await cloudAuth.signInWithRedirect(provider);return}await cloudAuth.signInWithPopup(provider)}catch(e){if(e&&['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/web-storage-unsupported'].includes(e.code)){try{await cloudAuth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());return}catch(redirectError){e=redirectError}}console.error('Demon-Snike Google sign-in:',e);setCloudStatus('No se pudo iniciar sesión: '+(e.message||e.code||'error'));alert('No se pudo iniciar sesión con Google. Revisa el dominio autorizado y la configuración de Authentication.')}});$('sessionList').addEventListener('click',e=>{const del=e.target.closest('button[data-delete-session]');if(del){const id=del.dataset.deleteSession;if(!id)return;const session=sessions.find(x=>x.id===id);if(!session)return;if(!confirm('¿Eliminar esta sesión y su progreso guardado?'))return;sessions=sessions.filter(x=>x.id!==id);if(activeSessionId===id)activeSessionId=null;persist(false);refreshHome();toast('SESIÓN ELIMINADA');return}const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});$('masteryList').addEventListener('click',e=>{const b=e.target.closest('button[data-upgrade-skill]');if(b&&!b.disabled)upgradeSkill(b.dataset.upgradeSkill)});function showHomePage(pageId){const allowed=['homeView','shopPage','skillsPage','campaignPage','profilePage'];if(!allowed.includes(pageId)){toast('SECCIÓN NO DISPONIBLE');return false}const home=$('homeView');if(home){home.style.display=pageId==='homeView'?'flex':'none';home.setAttribute('aria-hidden',String(pageId!=='homeView'))}document.querySelectorAll('#title .section-page').forEach(v=>{const active=v.id===pageId;v.style.display=active?'flex':'none';v.setAttribute('aria-hidden',String(!active))});const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout();if(pageId==='campaignPage')renderCampaign();if(pageId==='profilePage')renderProfile();document.querySelectorAll('.top-nav [data-page]').forEach(b=>b.classList.toggle('is-active',b.dataset.page===pageId));return true}document.addEventListener('click',e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;if(b.id==='go'){e.preventDefault();e.stopImmediatePropagation();startGame('survival');return}if(b.id==='campaignGo'){e.preventDefault();e.stopImmediatePropagation();showHomePage('campaignPage');return}if(b.matches('button[data-page]')){e.preventDefault();e.stopImmediatePropagation();showHomePage(b.dataset.page)}},true);document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-page]');if(b){e.preventDefault();showHomePage(b.dataset.page)}});$('sessionList').addEventListener('click',e=>{const del=e.target.closest('button[data-delete-session]');if(del){const id=del.dataset.deleteSession;if(!id)return;const session=sessions.find(x=>x.id===id);if(!session)return;if(!confirm('¿Eliminar esta sesión y su progreso guardado?'))return;sessions=sessions.filter(x=>x.id!==id);if(activeSessionId===id)activeSessionId=null;persist(false);refreshHome();toast('SESIÓN ELIMINADA');return}const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { moveKeys.clear() });
     document.addEventListener('visibilitychange', () => { if (!hasTouchInput() && !mobile && document.hidden && state === 'play') togglePause() });
@@ -2578,7 +2524,7 @@ body{background:
     $('mute').addEventListener('click', () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; $('mute').setAttribute('aria-label',muted?'Activar sonido':'Silenciar sonido'); $('mute').title=muted?'Activar sonido':'Silenciar sonido'; if (master) master.gain.value = muted ? 0 : .6; initAudio() });
     let prev = performance.now();
     function showRuntimeError(error,source='JUEGO'){const message=(error&&error.message)||String(error||'Error desconocido');console.error('Demon-Snike '+source+':',error);let panel=$('runtimeError');if(!panel){panel=document.createElement('div');panel.id='runtimeError';panel.innerHTML='<b>ERROR DEL MOTOR</b><p></p><small>La partida se pausó para proteger tu progreso.</small><button type="button">VOLVER AL MENÚ</button>';document.body.appendChild(panel);panel.querySelector('button').addEventListener('click',()=>{panel.style.display='none';goHome()})}panel.querySelector('p').textContent=source+': '+message;panel.style.display='flex';state='pause'}window.addEventListener('error',e=>showRuntimeError(e.error||e.message,'JAVASCRIPT'));window.addEventListener('unhandledrejection',e=>showRuntimeError(e.reason,'PROMESA'));function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; try { slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now) } catch(error) { showRuntimeError(error,'RENDER / ACTUALIZACIÓN') } requestAnimationFrame(loop) }
-    setupCloudAuth();makePlayer();refreshHome();requestAnimationFrame(loop);
+    makePlayer();refreshHome();requestAnimationFrame(loop);
   </script>
 </body>
 
