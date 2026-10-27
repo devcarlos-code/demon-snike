@@ -697,8 +697,9 @@
     function draw(t) {
       if (state !== _ps) { _ps = state; document.body.dataset.s = state }
       const sk = RM ? shake * .25 : shake; ctx.setTransform(dpr, 0, 0, dpr, (Math.random() - .5) * sk * dpr, (Math.random() - .5) * sk * dpr); ctx.fillStyle = '#07050a'; ctx.fillRect(-30, -30, W + 60, H + 60);
-      ctx.drawImage(bgc,0,0,W,H);drawEmbers(t);ctx.save();ctx.translate(W/2,H/2);ctx.scale(cameraZoom,cameraZoom);ctx.translate(-W/2-camX,-H/2-camY);
+      ctx.drawImage(bgc,0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(cameraZoom,cameraZoom);ctx.translate(-W/2-camX,-H/2-camY);
       if(groundPattern){ctx.fillStyle=groundPattern;ctx.fillRect(camX,camY,W/cameraZoom,H/cameraZoom);ctx.save();ctx.strokeStyle='rgba(4,15,8,.18)';ctx.lineWidth=1;const step=96,x0=Math.floor(camX/step)*step,y0=Math.floor(camY/step)*step;for(let x=x0;x<camX+W/cameraZoom+step;x+=step){for(let y=y0;y<camY+H/cameraZoom+step;y+=step){ctx.beginPath();ctx.arc(x+step*.5,y+step*.5,1.5,0,TAU);ctx.stroke()}}ctx.restore()}
+      ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);drawEmbers(t);ctx.restore();
       drawTelegraphs(t);
       ctx.globalCompositeOperation = 'lighter'; pools.forEach(p => { ctx.fillStyle = 'rgba(255,110,30,' + Math.min(1, p.t) * .5 + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, 30 * sc * (.8 + .2 * Math.sin(t / 80 + p.y)), 0, TAU); ctx.fill() }); ctx.globalCompositeOperation = 'source-over';
       if (bh) {
