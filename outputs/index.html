@@ -1475,6 +1475,17 @@ body{background:
 #runtimeError p{max-width:760px;color:#ffb7b7;overflow-wrap:anywhere;line-height:1.5}
 #runtimeError small{color:#bbb}
 #runtimeError button{padding:12px 24px;border:1px solid #fff8;border-radius:12px;background:linear-gradient(145deg,#ffffff35,#ffffff0b);color:#fff;cursor:pointer}
+
+/* Final gameplay layout: remove the full-width frosted strip from the HUD. */
+#hud{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;isolation:isolate;gap:8px!important;align-items:flex-start!important}
+#hud .bars{flex:0 1 34%!important;width:min(34vw,210px);min-width:104px;max-width:210px!important;padding:6px 8px 2px!important;border:1px solid rgba(185,118,91,.48)!important;border-radius:9px!important;background:rgba(9,7,11,.64)!important;box-shadow:0 3px 12px rgba(0,0,0,.22)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
+#hud .bar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;height:7px!important;margin-bottom:4px!important}
+#lv{max-width:min(48%,260px)!important;min-width:0!important;padding:6px 8px!important;border:1px solid rgba(185,118,91,.42)!important;border-radius:9px!important;background:rgba(9,7,11,.64)!important;box-shadow:0 3px 12px rgba(0,0,0,.22)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important;font-size:10px!important;line-height:1.45!important}
+#cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+#cards button{min-height:132px;justify-content:center}
+@media(max-width:760px){#hud{left:8px!important;right:8px!important;top:calc(env(safe-area-inset-top,0px) + 6px)!important}#hud .bars{width:36vw;min-width:96px;max-width:42vw!important;padding:5px 6px 1px!important}#lv{max-width:55%!important;padding:5px 7px!important;font-size:9px!important}#cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}#cards button{min-height:106px;padding:10px!important}}
+@media(max-width:430px){#cards{grid-template-columns:1fr!important;max-width:420px}#cards button{min-height:76px!important}}
+@media(prefers-reduced-motion:reduce){#cards button{transition:none!important}.k[data-tier="MÍTICA"]{animation:none!important}}
 </style>
 </head>
 
@@ -1720,7 +1731,7 @@ body{background:
     const SAVE_KEY='arena_serpientes_save_v2';
     function loadSave(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');return x&&x.version===2?x:{}}catch(e){return {}}}
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
-    let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,(Number(saveData.coins)||0)-(saveData.shopBonusClaimed?700000:0)),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
+    let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
     let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
     // Supervivencia usa una única ranura guardada; campaña conserva sus partidas individuales.
@@ -1813,7 +1824,7 @@ body{background:
     function resetLoadout(){skillLoadout=[...STARTER_LOADOUT];refreshSkillButtons();refreshComboUI();persist(true);toast('ARSENAL INICIAL RESTABLECIDO')}
     let U={...U0},maxHp=100, saveTick=0, comet = 0, poolT = 0, bh = null, pools = [], lastK = null, lastT = 0, upgCur = [];
     const cdset = (k, m = 1) => { cd[k] = cooldownFor(k) * U.cd * m };
-    const mk = (k, x, y) => { const c=CF[k],boss=k==='boss',type=boss?Math.max(0,Math.floor(lvl/5)-1)%BOSS_ARCHETYPES.length:0,arch=BOSS_ARCHETYPES[type],lv=Math.max(1,lvl),scale=1+lv*.055+Math.pow(lv,1.28)*.006;return new Snake(x,y,{...c,col:boss?arch.color:c.col,bossType:type,bossName:boss?arch.name:'',bossGlow:boss?arch.glow:c.col,v:c.v*(boss?1.16:1.06+Math.min(.42,lv*.0035)),hp:c.hp*(boss?2.65:1.12)*scale*(boss?1+lv*.045+Math.pow(lv,1.16)*.006:1)},k)};
+    const mk = (k, x, y) => { const c=CF[k],boss=k==='boss',type=boss?Math.max(0,Math.floor(lvl/5)-1)%BOSS_ARCHETYPES.length:0,arch=BOSS_ARCHETYPES[type],lv=Math.max(1,lvl),scale=1+lv*.055+Math.pow(lv,1.28)*.006;return new Snake(x,y,{...c,col:boss?arch.color:c.col,bossType:type,bossName:boss?arch.name:'',bossGlow:boss?arch.glow:c.col,v:c.v*(boss?1.16:1.06+Math.min(.42,lv*.0035)),hp:c.hp*(boss?2.35:1.12)*scale*(boss?1+lv*.028+Math.pow(lv,1.1)*.004:1)},k)};
     const part = (x, y, vx, vy, l, r, col, add) => { if(parts.length>=FX_PART_LIMIT) return; parts.push({ x, y, vx, vy, l, m: l, r, col, add }); };
     function growPlayer(amount=4,scaleUp=.035){if(!pl)return;const old=pl.n,tail=pl.P[old-1],ang=pl.A[old-1]||pl.h;for(let j=0;j<amount;j++){const i=pl.n,rad=Math.max(2.5,2+6.5*Math.pow(1-i/(old+amount),.9));pl.R.push(rad);pl.SP.push((rad+pl.R[i-1])*.41);pl.P.push({x:tail.x-Math.cos(ang)*pl.SP[i]*pl.sc*(j+1),y:tail.y-Math.sin(ang)*pl.SP[i]*pl.sc*(j+1)});pl.A.push(ang);pl.n++}pl.sc=Math.min(1.75,pl.sc+scaleUp);toast('EVOLUCIÓN · SERPIENTE MÁS GRANDE')}
     const pop=(x,y,s,c,big)=>{if(pops.length>=MAX_FLOATING_TEXT)pops.shift();pops.push({x:Math.max(40,Math.min(WORLD_W-40,x+rnd(-14,14))),y,s,c,big,t:.9,m:.9})};
@@ -1934,11 +1945,11 @@ body{background:
       if(d<420*sc){spd*=1.12;turn=6.2}
       if (e.boss) {
         const np = e.hp / e.max > .68 ? 1 : e.hp / e.max > .34 ? 2 : 3;
-        if (np !== e.pp) { e.pp=np;const arch=BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0];banner('FASE '+np+' · '+arch.name,np===2?'El jefe cambia su patrón de ataque':'Fase crítica · cuidado con sus embestidas');SFX.roar();shake=14;const addType=e.bossType===2?'armor':np===2?'spitter':'dasher';for(let i=0;i<(e.bossType===2?2:1)&&en.length<MAX_ACTIVE_ENEMIES;i++)en.push(mk(addType,h.x+rnd(-90,90),h.y+rnd(-90,90)))}
+        if (np !== e.pp) { e.pp=np;const arch=BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0];banner('FASE '+np+' · '+arch.name,np===2?'El jefe cambia su patrón de ataque':'Fase crítica · cuidado con sus embestidas');SFX.roar();shake=14;const addType=e.bossType===2?'armor':np===2?'spitter':'dasher';for(let i=0;i<1&&en.length<MAX_ACTIVE_ENEMIES;i++)en.push(mk(addType,h.x+rnd(-90,90),h.y+rnd(-90,90)))}
         e.cd2 = (e.cd2 === undefined ? 2 : e.cd2) - dt;
-        if(e.cd2<=0){const aim=Math.atan2(p.y-h.y,p.x-h.x),style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style,phase=e.pp;if(style==='fan'){const n=phase===1?5:phase===2?6:7;for(let j=-(n>>1);j<=n>>1;j++)shoot(h,aim+j*(phase===3?.12:.18),phase===3?400:310,phase===3?21:17,e)}else if(style==='ring'){const n=phase===1?12:phase===2?16:22;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?340:275,phase===3?19:15,e);e.ang+=.18}else if(style==='burst'){const n=phase===1?10:phase===2?14:18;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?350:280,phase===3?19:15,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.12,350,18,e);e.ang+=.13}else if(style==='spiral'){const n=phase===1?10:phase===2?14:18;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?360:285,phase===3?19:15,e);e.ang+=phase===3?.58:.36}else{const n=phase===1?7:phase===2?10:14;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?290:230,phase===3?15:12,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.16,300,phase===3?16:13,e);e.ang+=.27}e.cd2=phase===1?2.25:phase===2?1.75:1.3}
-        if(e.boss&&!e.dead){e.hp=Math.min(e.max,e.hp+e.max*(e.pp===3?.006:e.pp===2?.003:.0015)*dt);e.v=Math.max(e.v,CF.boss.v*(1.08+Math.min(.22,lvl*.0018)));}
-        if(e.pp>=2){e.sp=(e.sp||0)-dt;if(e.sp<=0){const style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style;e.ang+=style==='spiral'?.7:.31;shoot(h,e.ang,style==='spiral'?300:250,style==='spiral'?16:13,e);e.sp=style==='spiral'?.22:.3}}
+        if(e.cd2<=0){const aim=Math.atan2(p.y-h.y,p.x-h.x),style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style,phase=e.pp;if(style==='fan'){const n=phase===1?4:phase===2?5:6;for(let j=-(n>>1);j<=n>>1;j++)shoot(h,aim+j*(phase===3?.14:.2),phase===3?350:280,phase===3?17:14,e)}else if(style==='ring'){const n=phase===1?8:phase===2?11:14;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?300:250,phase===3?15:12,e);e.ang+=.18}else if(style==='burst'){const n=phase===1?8:phase===2?11:14;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?310:255,phase===3?15:12,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.16,300,14,e);e.ang+=.13}else if(style==='spiral'){const n=phase===1?8:phase===2?11:14;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?310:255,phase===3?15:12,e);e.ang+=phase===3?.58:.36}else{const n=phase===1?6:phase===2?8:11;for(let j=0;j<n;j++)shoot(h,j/n*TAU+e.ang,phase===3?260:215,phase===3?13:10,e);for(let j=-1;j<=1;j++)shoot(h,aim+j*.18,260,phase===3?14:11,e);e.ang+=.27}e.cd2=phase===1?2.6:phase===2?2.1:1.7}
+        if(e.boss&&!e.dead){e.hp=Math.min(e.max,e.hp+e.max*(e.pp===3?.004:e.pp===2?.002:.001)*dt);e.v=Math.max(e.v,CF.boss.v*(1.04+Math.min(.14,lvl*.0012)));}
+        if(e.pp>=2){e.sp=(e.sp||0)-dt;if(e.sp<=0){const style=(BOSS_ARCHETYPES[e.bossType]||BOSS_ARCHETYPES[0]).style;e.ang+=style==='spiral'?.7:.31;shoot(h,e.ang,style==='spiral'?250:215,style==='spiral'?12:10,e);e.sp=style==='spiral'?.48:.58}}
       }
       if (k === 'spitter') {
         if (d < 220 * sc) { tx = h.x - dx; ty = h.y - dy } else if (d < 330 * sc) { spd *= .4; tx = h.x - dy; ty = h.y + dx }
@@ -1954,10 +1965,10 @@ body{background:
         const rr = e.R[0] * e.sc + 9 * pl.sc, q = e.P[0];
         let touchesPlayer=false,rr2=rr*rr;
          for(let i=0;i<10&&i<pl.P.length;i++){const z=pl.P[i],dxp=z.x-q.x,dyp=z.y-q.y;if(dxp*dxp+dyp*dyp<rr2){touchesPlayer=true;break}}
-         if(touchesPlayer){hurtP(e.boss?18:e.st===2?17:10);e.bc=1;const a=Math.atan2(dy,dx);pl.vx+=Math.cos(a)*350;pl.vy+=Math.sin(a)*350;e.vx-=Math.cos(a)*200;e.vy-=Math.sin(a)*200}
+         if(touchesPlayer){hurtP(e.boss?15:e.st===2?17:10);e.bc=1;const a=Math.atan2(dy,dx);pl.vx+=Math.cos(a)*350;pl.vy+=Math.sin(a)*350;e.vx-=Math.cos(a)*200;e.vy-=Math.sin(a)*200}
          let other=null;
          for(let i=0;i<en.length;i++){const o=en[i];if(o===e||o.dead)continue;const op=o.P[0],ox=op.x-q.x,oy=op.y-q.y,limit=e.R[0]*e.sc+o.R[0]*o.sc;if(ox*ox+oy*oy<limit*limit){other=o;break}}
-         if(other){const ox=other.P[0].x-q.x,oy=other.P[0].y-q.y,od=Math.hypot(ox,oy)||1;hurt(other,e.boss?22:14,ox/od*220,oy/od*220,true);e.bc=Math.max(e.bc,.65);other.bc=Math.max(other.bc,.65)}
+         if(other){const ox=other.P[0].x-q.x,oy=other.P[0].y-q.y,od=Math.hypot(ox,oy)||1;hurt(other,e.boss?16:14,ox/od*220,oy/od*220,true);e.bc=Math.max(e.bc,.65);other.bc=Math.max(other.bc,.65)}
       }
     }
 
@@ -2329,7 +2340,7 @@ body{background:
       {id:'nova',name:'✦ Supernova eterna',desc:'Nova: +25% de daño y expansión más rápida.',skill:'nova',apply:()=>{U.dA*=1.25;U.area=(U.area||1)*1.14}}
     ];
     SKILL_CATALOG.filter(skill=>!UPG.some(upgrade=>upgrade.skill===skill.id)).forEach(skill=>UPG.push({id:'mastery_'+skill.id,name:skill.icon+' Maestría: '+skill.name,desc:'Mejora el poder de esta habilidad y acelera su recarga.',skill:skill.id,apply:()=>{U.dA*=1.12;U.dS*=1.12;U.dD*=1.12;U.cd=Math.max(.5,U.cd*.97)}}));
-    function showUpgrades(){state='upg';const head=$('upg').querySelector('h2');if(head)head.textContent='ELIGE TU EVOLUCIÓN · NIVEL '+lvl;persist(true);const equipped=skillLoadout.filter(Boolean);const tailored=UPG.filter(u=>!u.skill||equipped.includes(u.skill));const pool=tailored.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}const choices=pool.slice(0,Math.min(4,pool.length));const skillChoices=pool.filter(u=>u.skill&&equipped.includes(u.skill));if(skillChoices.length&&!choices.some(u=>u.skill))choices[choices.length-1]=skillChoices[Math.floor(Math.random()*skillChoices.length)];upgCur=choices.map(u=>UPG.indexOf(u));
+    function showUpgrades(){state='upg';const head=$('upg').querySelector('h2');if(head)head.textContent='ELIGE TU EVOLUCIÓN · NIVEL '+lvl;persist(true);const equipped=skillLoadout.filter(Boolean);const tailored=UPG.filter(u=>!u.skill||equipped.includes(u.skill));const pool=tailored.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}const choices=pool.slice(0,Math.min(mobile?3:4,pool.length));const skillChoices=pool.filter(u=>u.skill&&equipped.includes(u.skill));if(skillChoices.length&&!choices.some(u=>u.skill))choices[choices.length-1]=skillChoices[Math.floor(Math.random()*skillChoices.length)];upgCur=choices.map(u=>UPG.indexOf(u));
       $('cards').innerHTML=upgCur.map((i,n)=>'<button type="button" data-n="'+n+'"><i>MEJORA '+String(n+1).padStart(2,'0')+'</i><b>'+UPG[i].name+'</b><span>'+UPG[i].desc+'</span></button>').join('');
       $('upg').style.display='flex';SFX.up();
     }
