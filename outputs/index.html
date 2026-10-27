@@ -1487,26 +1487,11 @@ body{background:
 @media(max-width:430px){#cards{grid-template-columns:1fr!important;max-width:420px}#cards button{min-height:76px!important}}
 @media(prefers-reduced-motion:reduce){#cards button{transition:none!important}.k[data-tier="MÍTICA"]{animation:none!important}}
 
-/* Reparación robusta del mapa: flex-wrap evita que los nodos se apilen */
-#campaignPage .campaign-map-wrap{background:linear-gradient(145deg,#17131a,#0d0b10 72%)!important;border:1px solid #694653!important}
-#campaignPage #campaignGrid.campaign-grid{
- display:flex!important;flex-flow:row wrap!important;align-content:flex-start!important;align-items:stretch!important;justify-content:flex-start!important;
- gap:9px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
-}
-#campaignPage #campaignGrid .campaign-node{
- display:flex!important;flex:0 0 calc((100% - 81px)/10)!important;width:calc((100% - 81px)/10)!important;max-width:calc((100% - 81px)/10)!important;min-width:0!important;
- aspect-ratio:1/1!important;height:auto!important;margin:0!important;box-sizing:border-box!important;position:relative!important;
-}
-@media(max-width:900px){
- #campaignPage #campaignGrid.campaign-grid{gap:8px!important}
- #campaignPage #campaignGrid .campaign-node{flex-basis:calc((100% - 32px)/5)!important;width:calc((100% - 32px)/5)!important;max-width:calc((100% - 32px)/5)!important}
-}
-@media(max-width:480px){
- #campaignPage #campaignGrid.campaign-grid{gap:6px!important}
- #campaignPage #campaignGrid .campaign-node{flex-basis:calc((100% - 18px)/4)!important;width:calc((100% - 18px)/4)!important;max-width:calc((100% - 18px)/4)!important}
- #campaignPage .campaign-map-heading span{font-size:8px}
- #campaignPage .campaign-node small{font-size:7px}
-}
+/* Mapa de campaña: reglas explícitas por tamaño, sin flex sizing */
+#campaignPage #campaignGrid.campaign-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-flow:row!important;gap:8px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#campaignPage #campaignGrid .campaign-node{grid-column:auto!important;width:100%!important;max-width:none!important;min-width:0!important;aspect-ratio:1/1!important;height:auto!important;margin:0!important;box-sizing:border-box!important}
+@media(min-width:1100px){#campaignPage #campaignGrid.campaign-grid{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
+@media(max-width:480px){#campaignPage #campaignGrid.campaign-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}#campaignPage .campaign-map-heading span{font-size:8px}#campaignPage .campaign-node small{font-size:7px}}
 </style>
 </head>
 
@@ -1789,7 +1774,7 @@ body{background:
      function renderCampaign(){
       const grid=$('campaignGrid');if(!grid)return;const cleared=campaignCompleted?100:campaignUnlocked-1;
       $('campaignProgress').textContent=String(cleared).padStart(2,'0')+'/100';$('campaignNextLevel').textContent=campaignCompleted?'COMPLETA':String(campaignUnlocked).padStart(2,'0');$('campaignCleared').textContent=String(cleared).padStart(2,'0')+' / 100';
-      grid.innerHTML=Array.from({length:100},(_,i)=>{const n=i+1,done=campaignCompleted||n<campaignUnlocked,open=!campaignCompleted&&n===campaignUnlocked,boss=n%5===0,result=campaignResults[n],stars=result?.stars||0;return '<button type="button" class="campaign-node '+(done?'is-done ':open?'is-open ':'is-locked ')+(boss?'is-boss':'')+'" data-campaign-level="'+n+'" '+(n>campaignUnlocked?'disabled':'')+' aria-label="Nivel '+n+(done?', completado':open?', disponible':', bloqueado')+'"><span>'+(done?'✓':boss?'♛':String(n).padStart(2,'0'))+'</span><small>'+(done?'LISTO':boss?'JEFE':open?'JUGAR':'CERRADO')+'</small>'+(result?'<em class="campaign-node-stars" aria-label="'+stars+' de 3 estrellas">'+('★'.repeat(stars))+('<i>'.repeat(3-stars))+'</em>':'')+'</button>'}).join('');
+      grid.style.setProperty('display','grid','important');grid.style.setProperty('grid-template-columns','repeat(5,minmax(0,1fr))','important');grid.style.setProperty('grid-auto-flow','row','important');grid.style.setProperty('gap','8px','important');grid.style.setProperty('width','100%','important');grid.style.setProperty('align-items','stretch','important');grid.innerHTML=Array.from({length:100},(_,i)=>{const n=i+1,done=campaignCompleted||n<campaignUnlocked,open=!campaignCompleted&&n===campaignUnlocked,boss=n%5===0,result=campaignResults[n],stars=result?.stars||0;return '<button type="button" style="grid-column:auto!important;width:100%!important;min-width:0!important;max-width:none!important;aspect-ratio:1/1!important;box-sizing:border-box!important;margin:0!important" class="campaign-node '+(done?'is-done ':open?'is-open ':'is-locked ')+(boss?'is-boss':'')+'" data-campaign-level="'+n+'" '+(n>campaignUnlocked?'disabled':'')+' aria-label="Nivel '+n+(done?', completado':open?', disponible':', bloqueado')+'"><span>'+(done?'✓':boss?'♛':String(n).padStart(2,'0'))+'</span><small>'+(done?'LISTO':boss?'JEFE':open?'JUGAR':'CERRADO')+'</small>'+(result?'<em class="campaign-node-stars" aria-label="'+stars+' de 3 estrellas">'+('★'.repeat(stars))+('<i>'.repeat(3-stars))+'</em>':'')+'</button>'}).join('');
       $('campaignHint').textContent=campaignCompleted?'¡Campaña conquistada! Puedes repetir cualquiera de los 100 niveles.':campaignUnlocked===1?'Completa el nivel 1 para abrir el camino.':'Has llegado al nivel '+campaignUnlocked+'. Supera el desafío para desbloquear el siguiente.';
     }
     function campaignStarRating(level,seconds){const limit=90+level*5;return seconds<=limit?3:seconds<=limit*1.25?2:seconds<=limit*1.6?1:0}
