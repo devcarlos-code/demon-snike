@@ -1869,6 +1869,13 @@ body{background:
         cloudAuth=firebase.auth();cloudDb=firebase.firestore();
         await cloudAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         cloudAuth.onAuthStateChanged(async user=>{cloudUser=user||null;renderProfile();if(cloudUser)await syncCloudSave();else setCloudStatus('Sin sesión de Google · guardado local activo.')});
+        // Procesa explícitamente el resultado del acceso por redirección, especialmente en móviles.
+        cloudAuth.getRedirectResult().then(result=>{
+          if(result&&result.user){cloudUser=result.user;renderProfile();setCloudStatus('Google conectado. Sincronizando progreso…');syncCloudSave()}
+        }).catch(e=>{
+          console.error('Demon-Snike redirect result:',e);
+          setCloudStatus('No se completó el acceso con Google: '+(e.code||e.message||'error'));
+        });
       }catch(e){console.error('Demon-Snike Firebase init:',e);setCloudStatus('No se pudo iniciar Firebase. El guardado local sigue activo.')}
     }
     function renderProfile(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('profileStatus',cloudUser?'CONECTADO':'INVITADO');put('profileBest',Math.max(best,score).toLocaleString('es'));put('profileBosses',Number(stats.bosses||0).toLocaleString('es'));put('profileCoins',coins.toLocaleString('es'));put('profileFragments',skillFragments.toLocaleString('es'));const button=$('connectGoogle');if(button)button.textContent=cloudUser?'CERRAR SESIÓN DE GOOGLE':'INICIAR SESIÓN CON GOOGLE';if(!cloudUser)setCloudStatus('Sin sesión de Google · guardado local activo.')}
