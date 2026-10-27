@@ -13,7 +13,7 @@
     const MAX_ACTIVE_SHOTS=lowEndDevice?70:(mobile?100:140);
     const MAX_ACTIVE_POOLS=14;
     const FX_PART_LIMIT=lowEndDevice?32:(mobile?48:72),MAX_FLOATING_TEXT=64;
-    let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,_ps='title',_ls='',camX=0,camY=0;
+    let W,H,WORLD_W=0,WORLD_H=0,sc=1,dpr=1,bgc=null,groundPattern=null,_ps='title',_ls='',camX=0,camY=0;
     function resize() { dpr = Math.min(devicePixelRatio || 1, lowEndDevice?1:(mobile?1:1.15)); const r = cv.getBoundingClientRect(); W=r.width;H=r.height;WORLD_W=W*4.2;WORLD_H=H*4.2;cv.width = W * dpr; cv.height = H * dpr; sc = Math.max(.65, Math.min(1.15, Math.min(W, H) / 640)); buildBG() }
     addEventListener('resize', resize); mobileMQ.addEventListener?.('change',()=>{mobile=hasTouchInput();resize()}); resize();
     const ptr={x:W/2,y:H/2},joy={active:false,id:null,dx:0,dy:0},moveKeys=new Set();
@@ -619,6 +619,12 @@
     function lsGet() { try { return +localStorage.getItem('arena_serpientes_best') || 0 } catch (e) { return 0 } }
     function buildBG() {
       bgc = document.createElement('canvas'); bgc.width = Math.max(1, W * dpr); bgc.height = Math.max(1, H * dpr); const g = bgc.getContext('2d'); g.scale(dpr, dpr);
+      const turf=document.createElement('canvas');turf.width=turf.height=192;const tg=turf.getContext('2d');
+      const turfBase=tg.createLinearGradient(0,0,192,192);turfBase.addColorStop(0,'#203c25');turfBase.addColorStop(.5,'#1a3420');turfBase.addColorStop(1,'#142b1b');tg.fillStyle=turfBase;tg.fillRect(0,0,192,192);
+      for(let i=0;i<34;i++){const x=Math.random()*192,y=Math.random()*192,r=10+Math.random()*24;tg.fillStyle=i%3===0?'rgba(104,143,69,.075)':'rgba(3,15,8,.075)';tg.beginPath();tg.ellipse(x,y,r,r*(.45+Math.random()*.5),Math.random()*Math.PI,0,TAU);tg.fill()}
+      for(let i=0;i<430;i++){const x=Math.random()*192,y=Math.random()*192;tg.strokeStyle=i%4===0?'rgba(151,180,99,.19)':'rgba(3,17,8,.22)';tg.lineWidth=.6+Math.random()*.7;tg.beginPath();tg.moveTo(x,y);tg.lineTo(x+(Math.random()-.5)*3,y-1-Math.random()*4);tg.stroke()}
+      for(let i=0;i<20;i++){const x=Math.random()*192,y=Math.random()*192;tg.fillStyle='rgba(174,194,117,.10)';tg.beginPath();tg.arc(x,y,.7+Math.random()*1.2,0,TAU);tg.fill()}
+      groundPattern=g.createPattern(turf,'repeat');
       const gr = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .15, W / 2, H / 2, Math.max(W, H) * .7); gr.addColorStop(0, '#1c070b'); gr.addColorStop(1, '#07050a'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       const R = Math.min(W, H) * .36; g.save(); g.translate(W / 2, H / 2); g.strokeStyle = 'rgba(255,59,31,.11)'; g.lineWidth = 2;
       [[1, []], [.82, [2, 10]], [.5, []]].forEach(([m, d]) => { g.setLineDash(d); g.beginPath(); g.arc(0, 0, R * m, 0, TAU); g.stroke() }); g.setLineDash([]);
@@ -692,6 +698,7 @@
       if (state !== _ps) { _ps = state; document.body.dataset.s = state }
       const sk = RM ? shake * .25 : shake; ctx.setTransform(dpr, 0, 0, dpr, (Math.random() - .5) * sk * dpr, (Math.random() - .5) * sk * dpr); ctx.fillStyle = '#07050a'; ctx.fillRect(-30, -30, W + 60, H + 60);
       ctx.drawImage(bgc,0,0,W,H);drawEmbers(t);ctx.save();ctx.translate(W/2,H/2);ctx.scale(cameraZoom,cameraZoom);ctx.translate(-W/2-camX,-H/2-camY);
+      if(groundPattern){ctx.fillStyle=groundPattern;ctx.fillRect(camX,camY,W/cameraZoom,H/cameraZoom);ctx.save();ctx.strokeStyle='rgba(4,15,8,.18)';ctx.lineWidth=1;const step=96,x0=Math.floor(camX/step)*step,y0=Math.floor(camY/step)*step;for(let x=x0;x<camX+W/cameraZoom+step;x+=step){for(let y=y0;y<camY+H/cameraZoom+step;y+=step){ctx.beginPath();ctx.arc(x+step*.5,y+step*.5,1.5,0,TAU);ctx.stroke()}}ctx.restore()}
       drawTelegraphs(t);
       ctx.globalCompositeOperation = 'lighter'; pools.forEach(p => { ctx.fillStyle = 'rgba(255,110,30,' + Math.min(1, p.t) * .5 + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, 30 * sc * (.8 + .2 * Math.sin(t / 80 + p.y)), 0, TAU); ctx.fill() }); ctx.globalCompositeOperation = 'source-over';
       if (bh) {
