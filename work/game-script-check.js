@@ -114,7 +114,7 @@
     sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)).slice(0,1);
     if(saveData.checkpoint&&saveData.checkpoint.mode!=='campaign'&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
     if(!sessions.some(x=>x.id===activeSessionId))activeSessionId=sessions[0]?.id||null;
-        function runSnapshot(){return {U:{...U},maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
+        function runSnapshot(){return {U:{...U},growthStacks, maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
     function persist(checkpoint=true){
        try{
          if(gameMode==='campaign'){sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');activeSessionId=null;saveData.checkpoint=null;checkpoint=false}
@@ -131,8 +131,22 @@
              const remove=ended.shift();sessions=sessions.filter(x=>x.id!==remove.id);saveData=buildSave();
              try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));saved=true}catch(retryError){}
            }
-           if(!saved)return false;
-           toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
+           if(!saved){
+             // Si la instantánea de la partida supera la cuota de localStorage,
+             // conserva primero las mejoras y el estado del jugador en un checkpoint compacto.
+             const compact=cp||saveData.checkpoint||(activeSessionId&&sessions.find(x=>x.id===activeSessionId)?.checkpoint)||null;
+             if(compact){
+               if(Array.isArray(compact.enemies))compact.enemies=compact.enemies.filter(e=>!e.dead).slice(0,14);
+               if(Array.isArray(compact.spawnQ))compact.spawnQ=compact.spawnQ.slice(0,48);
+               if(Array.isArray(compact.parts))compact.parts=[];
+               if(Array.isArray(compact.tents))compact.tents=compact.tents.slice(0,12);
+               if(activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=compact;session.level=compact.level||session.level;session.score=compact.score||session.score;session.updatedAt=Date.now()}}
+               saveData=buildSave();
+               try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));saved=true}catch(compactError){}
+             }
+             if(!saved)return false;
+             toast('PARTIDA GUARDADA · DATOS OPTIMIZADOS');
+           }else toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
          }
          try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
          try{refreshHome()}catch(homeRefreshError){}
@@ -305,7 +319,7 @@ function renderCampaign(){
     }
     function newGame(resume=false,sessionId=null){
       if(!resume){growthStacks=0;cobra={phase:0,t:0,target:null,angle:0,hit:false};if(gameMode==='campaign'){campaignLevelTime=0;campaignLevelKills=0;campaignResultShown=false}}
-      const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];bossDue=false;bossSpawned=false;lvl=cp?cp.level:(gameMode==='campaign'?campaignStartLevel-1:0);score=cp?cp.score:0;U=cp&&cp.U?{...U0,...cp.U}:{...U0};maxHp=cp?Math.max(100,Number(cp.maxHp)||100):100;hp=cp?Math.min(maxHp,cp.hp):maxHp; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
+      const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];bossDue=false;bossSpawned=false;lvl=cp?cp.level:(gameMode==='campaign'?campaignStartLevel-1:0);score=cp?cp.score:0;U=cp&&cp.U?{...U0,...cp.U}:{...U0};growthStacks=cp?Math.max(0,Number(cp.growthStacks)||0):0;maxHp=cp?Math.max(100,Number(cp.maxHp)||100):100;hp=cp?Math.min(maxHp,cp.hp):maxHp; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
       rf=wf=shake=0;pops=[];streak=streakT=0;slow=1;lastK=null;fury=cp?cp.fury:0;makePlayer();if(resume&&cp&&cp.player){pl=Object.assign(new Snake(cp.player.P[0].x,cp.player.P[0].y,{n:cp.player.n,hp:cp.player.max,col:'#fff',v:0,s:1.2},'p'),cp.player);const sameBuild=!Array.isArray(cp.loadout)||SLOT_KEYS.every((key,i)=>cp.loadout[i]===skillLoadout[i]);guard=sameBuild?(cp.guard||0):0;cd.a=sameBuild?(cp.cooldowns?.a||0):0;cd.s=sameBuild?(cp.cooldowns?.s||0):0;cd.d=sameBuild?(cp.cooldowns?.d||0):0;cd.f=sameBuild?(cp.cooldowns?.f||0):0}state='play'; $('over').style.display='none';$('pz').style.display='none';$('title').style.display='none';if(!resume){saveData.checkpoint=null;if(sessionId){activeSessionId=sessionId;const existing=sessions.find(x=>x.id===sessionId);if(existing){existing.checkpoint=null;existing.ended=false;existing.updatedAt=Date.now()}}else{stats.runs++;if(gameMode==='survival'){let survivalSlot=sessions.find(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');if(survivalSlot){activeSessionId=survivalSlot.id;survivalSlot.name='Supervivencia';survivalSlot.mode='survival';survivalSlot.createdAt=survivalSlot.createdAt||Date.now();survivalSlot.updatedAt=Date.now();survivalSlot.level=1;survivalSlot.score=0;survivalSlot.checkpoint=null;survivalSlot.ended=false}else{activeSessionId='survival-'+Date.now().toString(36);sessions.unshift({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),level:1,score:0,checkpoint:null,ended:false})}}}}if(resume&&cp&&Array.isArray(cp.enemies)&&Array.isArray(cp.spawnQ)){en=cp.enemies.map(raw=>Object.assign(new Snake(raw.P[0].x,raw.P[0].y,{...CF[raw.k],hp:raw.max},raw.k),raw));spawnQ=cp.spawnQ}else{if(resume&&cp)lvl=Math.max(0,cp.level-1);nextLevel()}persist(true);
     }
     function hurt(e, d, kx, ky, quiet) {
