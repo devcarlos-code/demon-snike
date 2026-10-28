@@ -731,7 +731,19 @@ function renderCampaign(){
     function draw(t) {
       if (state !== _ps) { _ps = state; document.body.dataset.s = state }
       const sk = RM ? shake * .25 : shake; ctx.setTransform(dpr, 0, 0, dpr, (Math.random() - .5) * sk * dpr, (Math.random() - .5) * sk * dpr); ctx.fillStyle = '#07050a'; ctx.fillRect(-30, -30, W + 60, H + 60);
-      ctx.drawImage(bgc,0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(cameraZoom,cameraZoom);ctx.translate(-W/2-camX,-H/2-camY);
+      ctx.drawImage(bgc,0,0,W,H);
+      // Halo arcano en el perímetro: ilumina el vacío exterior sin cubrir el terreno.
+      ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='screen';
+      const edgePulse=.5+.5*Math.sin(t/850);
+      const edgeGlow=(x,y,r,color,alpha)=>{const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color.replace('A',String(alpha*(.65+.35*edgePulse))));g.addColorStop(1,color.replace('A','0'));ctx.fillStyle=g;ctx.fillRect(Math.max(0,x-r),Math.max(0,y-r),Math.min(W,2*r),Math.min(H,2*r))};
+      edgeGlow(W*.04,H*.48,Math.min(W,H)*.46,'rgba(140,35,255,A)',.23);
+      edgeGlow(W*.96,H*.44,Math.min(W,H)*.42,'rgba(255,45,92,A)',.18);
+      edgeGlow(W*.5,H*.02,Math.min(W,H)*.30,'rgba(68,115,255,A)',.13);
+      // Pequeños glifos orbitan por el borde; se mantienen fuera de la zona de juego.
+      ctx.lineWidth=1;ctx.strokeStyle='rgba(191,126,255,.32)';ctx.shadowColor='#a84dff';ctx.shadowBlur=lowEndDevice?3:8;
+      const orbitR=Math.min(W,H)*.43;
+      for(let i=0;i<(lowEndDevice?8:14);i++){const a=t*.00012+i*TAU/(lowEndDevice?8:14),x=W/2+Math.cos(a)*orbitR,y=H/2+Math.sin(a)*orbitR,rr=3+(i%3)*1.5;ctx.save();ctx.translate(x,y);ctx.rotate(a+t*.0002);ctx.beginPath();ctx.moveTo(0,-rr*1.8);ctx.lineTo(rr,0);ctx.lineTo(0,rr*1.8);ctx.lineTo(-rr,0);ctx.closePath();ctx.stroke();if(i%3===0){ctx.beginPath();ctx.arc(0,0,rr*2.2,0,TAU);ctx.stroke()}ctx.restore()}
+      ctx.restore();ctx.save();ctx.translate(W/2,H/2);ctx.scale(cameraZoom,cameraZoom);ctx.translate(-W/2-camX,-H/2-camY);
       if(groundPattern){ctx.fillStyle=groundPattern;ctx.fillRect(camX,camY,W/cameraZoom,H/cameraZoom);ctx.save();ctx.strokeStyle='rgba(4,15,8,.18)';ctx.lineWidth=1;const step=96,x0=Math.floor(camX/step)*step,y0=Math.floor(camY/step)*step;for(let x=x0;x<camX+W/cameraZoom+step;x+=step){for(let y=y0;y<camY+H/cameraZoom+step;y+=step){ctx.beginPath();ctx.arc(x+step*.5,y+step*.5,1.5,0,TAU);ctx.stroke()}}ctx.restore()}
       ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);drawEmbers(t);ctx.restore();
       drawTelegraphs(t);
