@@ -2436,9 +2436,10 @@ function renderCampaign(){
       g.fillStyle='rgba(10,7,13,.92)';g.fillRect(0,0,w,h);g.strokeStyle='rgba(219,166,96,.22)';g.lineWidth=1;
       for(let n=1;n<=3;n++){g.beginPath();g.arc(w/2,h/2,Math.min(iw,ih)*n/8,0,TAU);g.stroke()}
       g.beginPath();g.moveTo(w/2,pad);g.lineTo(w/2,h-pad);g.moveTo(pad,h/2);g.lineTo(w-pad,h/2);g.stroke();
-      const px=pad+Math.max(0,Math.min(1,pl.P[0].x/WORLD_W))*iw,py=pad+Math.max(0,Math.min(1,pl.P[0].y/WORLD_H))*ih;
-      en.forEach(e=>{if(e.dead)return;const x=pad+Math.max(0,Math.min(1,e.P[0].x/WORLD_W))*iw,y=pad+Math.max(0,Math.min(1,e.P[0].y/WORLD_H))*ih;g.fillStyle=e.boss?'#ff594f':e.k==='spitter'?'#7dffa0':'#ffc66b';g.beginPath();g.arc(x,y,e.boss?4:2.5,0,TAU);g.fill()});
-      spawnQ.forEach(q=>{if(!q.pos)return;g.fillStyle='#d98bff';g.beginPath();g.arc(pad+q.pos.x/WORLD_W*iw,pad+q.pos.y/WORLD_H*ih,2,0,TAU);g.fill()});
+      const radarR=Math.min(iw,ih)/2-4,radarPoint=(x,y)=>{let dx=(Math.max(0,Math.min(WORLD_W,x))/WORLD_W-.5)*2,dy=(Math.max(0,Math.min(WORLD_H,y))/WORLD_H-.5)*2,len=Math.hypot(dx,dy);if(len>1){dx/=len;dy/=len}return{x:w/2+dx*radarR,y:h/2+dy*radarR,edge:len>.94}};
+      const playerPoint=radarPoint(pl.P[0].x,pl.P[0].y),px=playerPoint.x,py=playerPoint.y;
+      en.forEach(e=>{if(e.dead)return;const p=radarPoint(e.P[0].x,e.P[0].y),x=p.x,y=p.y;g.fillStyle=e.boss?'#ff594f':e.k==='spitter'?'#7dffa0':e.k==='armor'?'#8fb4ff':e.k==='split'?'#d98bff':e.k==='dasher'?'#ffc66b':'#fff0c5';g.shadowColor=g.fillStyle;g.shadowBlur=e.boss?7:2;g.beginPath();g.arc(x,y,e.boss?4.5:(p.edge?3.2:2.5),0,TAU);g.fill();if(p.edge){g.strokeStyle=g.fillStyle;g.lineWidth=1;g.beginPath();g.arc(x,y,5,0,TAU);g.stroke()}});
+      spawnQ.forEach(q=>{if(!q.pos)return;const p=radarPoint(q.pos.x,q.pos.y);g.fillStyle='#d98bff';g.beginPath();g.arc(p.x,p.y,2,0,TAU);g.fill()});
       g.fillStyle='#fff2c5';g.shadowColor='#ffe29a';g.shadowBlur=10;g.beginPath();g.arc(px,py,4,0,TAU);g.fill();g.restore();
       g.strokeStyle='rgba(241,194,118,.9)';g.lineWidth=2;g.beginPath();g.arc(w/2,h/2,(Math.min(iw,ih)/2)+1,0,TAU);g.stroke()
     }
