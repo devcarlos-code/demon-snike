@@ -1552,6 +1552,16 @@ body{background:
   .k{width:clamp(44px,10vh,56px)!important;height:clamp(44px,10vh,56px)!important}
 }
 
+
+/* Final responsive overrides for the updated dark-magic upgrade UI */
+#cards button{background:radial-gradient(ellipse at 100% 0%,rgba(126,45,177,.18),transparent 55%),linear-gradient(145deg,#21121f,#100a12 72%);border-color:#8050a0}
+#cards button:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,#d9a7ff,#6d35a8,#f05b73);opacity:.8}
+#cards i{color:#d8a9ff;font-style:normal;letter-spacing:.12em}
+#cards b{color:#fff0ff;text-shadow:0 0 12px #b65aff25}
+#cards span{color:#d5c4dc;line-height:1.45}
+@media(min-width:900px){#cards{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-width:1050px!important}}
+@media(max-width:430px){#cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;max-width:100%!important}#cards button{min-height:112px!important;padding:10px 9px!important}#cards b{font-size:12px!important}#cards span{font-size:10px!important;line-height:1.35!important}#cards i{font-size:8px!important}}
+
 </style>
 </head>
 
