@@ -1831,8 +1831,22 @@ body{background:
              const remove=ended.shift();sessions=sessions.filter(x=>x.id!==remove.id);saveData=buildSave();
              try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));saved=true}catch(retryError){}
            }
-           if(!saved)return false;
-           toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
+           if(!saved){
+             // Si la instantánea de la partida supera la cuota de localStorage,
+             // conserva primero las mejoras y el estado del jugador en un checkpoint compacto.
+             const compact=cp||saveData.checkpoint||(activeSessionId&&sessions.find(x=>x.id===activeSessionId)?.checkpoint)||null;
+             if(compact){
+               if(Array.isArray(compact.enemies))compact.enemies=compact.enemies.filter(e=>!e.dead).slice(0,14);
+               if(Array.isArray(compact.spawnQ))compact.spawnQ=compact.spawnQ.slice(0,48);
+               if(Array.isArray(compact.parts))compact.parts=[];
+               if(Array.isArray(compact.tents))compact.tents=compact.tents.slice(0,12);
+               if(activeSessionId){const session=sessions.find(x=>x.id===activeSessionId);if(session){session.checkpoint=compact;session.level=compact.level||session.level;session.score=compact.score||session.score;session.updatedAt=Date.now()}}
+               saveData=buildSave();
+               try{localStorage.setItem(SAVE_KEY,JSON.stringify(saveData));saved=true}catch(compactError){}
+             }
+             if(!saved)return false;
+             toast('PARTIDA GUARDADA · DATOS OPTIMIZADOS');
+           }else toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
          }
          try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
          try{refreshHome()}catch(homeRefreshError){}
