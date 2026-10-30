@@ -2302,8 +2302,9 @@ function renderCampaign(){
     function drawDemon(t, targetCtx, targetPlayer) {
       const c = targetCtx || ctx, player = targetPlayer || pl;
       if (!player) return;
-            const speciesId = skinPreview ? (player.previewSpeciesId || 'ember') : (player === pl ? selectedSkin : 'ember');
-      const s = player.sc, P = player.P, A = player.A, n = player.n, skinPreview = player.previewSkin === true, skinColor = player.previewSkinColor || player.col || '#d51cff'; c.lineJoin = 'round'; c.lineCap = 'round';
+      const s = player.sc, P = player.P, A = player.A, n = player.n, skinPreview = player.previewSkin === true, skinColor = player.previewSkinColor || player.col || '#d51cff';
+      const speciesId = skinPreview ? (player.previewSpeciesId || 'ember') : (player === pl ? selectedSkin : 'ember');
+      c.lineJoin = 'round'; c.lineCap = 'round';
       c.globalCompositeOperation = 'lighter';
       for (let i = 0; i < n; i += (lowEndDevice?18:10)) { const p = P[i], g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, skinPreview ? skinColor+'38' : 'rgba(170,10,20,.22)'); g.addColorStop(1, skinPreview ? skinColor+'00' : 'rgba(170,10,20,0)'); c.fillStyle = g; c.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
       c.globalCompositeOperation = 'source-over';
