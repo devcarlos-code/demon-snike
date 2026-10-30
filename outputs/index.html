@@ -1627,6 +1627,17 @@ body{background:
       #radar { top:calc(env(safe-area-inset-top,0px) + 8px) !important; width:clamp(76px,16vh,96px) !important; height:auto !important; }
     }
 
+
+    /* HUD móvil compacto: columna izquierda, sin invadir el radar */
+    @media (pointer:coarse) {
+      #hud { position:fixed !important; top:calc(env(safe-area-inset-top,0px) + 8px) !important; left:max(8px,env(safe-area-inset-left,0px) + 8px) !important; right:auto !important; width:128px !important; max-width:128px !important; display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:5px !important; }
+      #hud .bars { flex:none !important; width:108px !important; max-width:108px !important; min-width:0 !important; padding:5px 6px !important; }
+      #hud #lv { position:static !important; flex:none !important; width:128px !important; max-width:128px !important; min-width:0 !important; min-height:0 !important; margin:0 !important; padding:6px 7px !important; box-sizing:border-box !important; text-align:left !important; font-size:8px !important; line-height:1.25 !important; white-space:normal !important; }
+      #hud #lv br { display:block !important; }
+      #hud #lv small,#hud #lv b,#hud #lv .coin-readout { white-space:normal !important; }
+      #radar { top:calc(env(safe-area-inset-top,0px) + 8px) !important; right:max(10px,env(safe-area-inset-right,0px) + 10px) !important; left:auto !important; width:clamp(84px,22vw,112px) !important; height:auto !important; }
+    }
+    @media (pointer:coarse) and (orientation:landscape) { #hud,#hud #lv { width:120px !important; max-width:120px !important; } #hud .bars { width:104px !important; max-width:104px !important; } #radar { width:clamp(76px,16vh,96px) !important; height:auto !important; } }
 </style>
 </head>
 
@@ -2350,7 +2361,7 @@ function renderCampaign(){
       emb.forEach(e => { e.y -= e.v * dt / H; if (e.y < -.03) { e.y = 1.03; e.x = Math.random() } });
       if(state==='title'){updateCamera();const h=pl.P[0],d=Math.hypot(ptr.x-h.x,ptr.y-h.y); pl.move(ptr.x, ptr.y, d < 14 ? 0 : Math.min(280 * sc, d * 5), 7, dt); return }
       if(state!=='play')return;
-      if(cobra.phase===1){cobra.t-=dt;if(cobra.t<=0){cobra.phase=4;cobra.t=0;toast('COBRA LISTA · ELIGE UNA SERPIENTE')}}else if(cobra.phase===2){cobra.t-=dt;if(cobra.target&&!cobra.target.dead){const h=pl.P[0],e=cobra.target.P[0],u=Math.max(0,Math.min(1,1-cobra.t/.58)),ease=u*u*(3-2*u),side=Math.sin(u*Math.PI*3)*(1-u)*20*pl.sc,dx=Math.cos(cobra.angle),dy=Math.sin(cobra.angle),mx=h.x+dx*(62-49*ease)*pl.sc-dy*side,my=h.y+dy*(62-49*ease)*pl.sc+dx*side,pull=Math.min(1,dt*(4+ease*15));e.x+=(mx-e.x)*pull;e.y+=(my-e.y)*pull;cobra.target.devourScale=1-.88*ease;cobra.target.devourAngle=Math.atan2(h.y-e.y,h.x-e.x);cobra.target.devourSpin=(cobra.target.devourSpin||0)+dt*(3+ease*22);cobra.target.devourWobble=Math.sin(cobra.target.devourSpin*1.7)*(1-ease)*.16;}if(cobra.t<=0){if(cobra.phase===2){const target=cobra.target;if(target&&!target.dead&&dst(pl.P[0],target.P[0])<165*pl.sc+target.R[0]*target.sc){hurt(target,target.boss?Math.max(180,target.hp*.22):99999,Math.cos(cobra.angle)*700,Math.sin(cobra.angle)*700);if(target.dead){growPlayer(target.boss?7:4,target.boss?.09:.045);pop(pl.P[0].x,pl.P[0].y-35,'¡DEVORADO!','#ffb46b',true);cobra.phase=3;cobra.t=.42;cobra.swallowed=true}else{cobra.phase=3;cobra.t=.24;cobra.swallowed=false}}else{cobra.phase=3;cobra.t=.2;cobra.swallowed=false}}else{cobra.phase=0;cobra.target=null;cobra.swallowed=false}}}
+      if(cobra.phase===1){cobra.t-=dt;if(cobra.t<=0){cobra.phase=4;cobra.t=0;toast('COBRA LISTA · ELIGE UNA SERPIENTE')}}else if(cobra.phase===2){cobra.t-=dt;if(cobra.target&&!cobra.target.dead){const h=pl.P[0],e=cobra.target.P[0],u=Math.max(0,Math.min(1,1-cobra.t/.58)),ease=u*u*(3-2*u),side=Math.sin(u*Math.PI*3)*(1-u)*20*pl.sc,dx=Math.cos(cobra.angle),dy=Math.sin(cobra.angle),mx=h.x+dx*(62-49*ease)*pl.sc-dy*side,my=h.y+dy*(62-49*ease)*pl.sc+dx*side,pull=Math.min(1,dt*(4+ease*15));e.x+=(mx-e.x)*pull;e.y+=(my-e.y)*pull;cobra.target.devourScale=1-.88*ease;cobra.target.devourAngle=Math.atan2(h.y-e.y,h.x-e.x);cobra.target.devourSpin=(cobra.target.devourSpin||0)+dt*(3+ease*22);cobra.target.devourWobble=Math.sin(cobra.target.devourSpin*1.7)*(1-ease)*.16;}if(cobra.t<=0){const target=cobra.target;if(target&&!target.dead&&dst(pl.P[0],target.P[0])<165*pl.sc+target.R[0]*target.sc){hurt(target,target.boss?Math.max(180,target.hp*.22):99999,Math.cos(cobra.angle)*700,Math.sin(cobra.angle)*700);if(target.dead){growPlayer(target.boss?7:4,target.boss?.09:.045);pop(pl.P[0].x,pl.P[0].y-35,'¡DEVORADO!','#ffb46b',true);cobra.swallowed=true}else cobra.swallowed=false}else cobra.swallowed=false;cobra.phase=3;cobra.t=.42;}}else if(cobra.phase===3){cobra.t-=dt;if(cobra.t<=0){cobra.phase=1;cobra.t=.55;cobra.target=null;cobra.anchorX=pl.P[0].x-Math.cos(cobra.angle)*24*pl.sc;cobra.anchorY=pl.P[0].y-Math.sin(cobra.angle)*24*pl.sc;toast('COBRA LISTA · ELIGE UNA SERPIENTE')}}
       saveTick-=dt;if(saveTick<=0){saveTick=3;persist(true)}
       updateCamera();const h=pl.P[0];let moveMag=0;
       if(joy.active){moveMag=Math.min(1,Math.hypot(joy.dx,joy.dy));const a=Math.atan2(joy.dy,joy.dx);ptr.x=h.x+Math.cos(a)*Math.max(1,Math.min(W,H)*.55);ptr.y=h.y+Math.sin(a)*Math.max(1,Math.min(W,H)*.55)}
