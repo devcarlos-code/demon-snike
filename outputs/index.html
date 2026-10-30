@@ -2318,6 +2318,24 @@ function renderCampaign(){
         if (i >= 2 && i < n - 3) [-1, 1].forEach(sd => { const pa = A[i] + sd * Math.PI / 2, ta = A[i] + sd * (Math.PI / 2 + .8), L = r * 1.1 + 5 * s; c.beginPath(); c.moveTo(p.x + Math.cos(pa - sd * .25) * r, p.y + Math.sin(pa - sd * .25) * r); c.lineTo(p.x + Math.cos(pa) * r + Math.cos(ta) * L, p.y + Math.sin(pa) * r + Math.sin(ta) * L); c.lineTo(p.x + Math.cos(pa + sd * .25) * r, p.y + Math.sin(pa + sd * .25) * r); c.fillStyle = skinPreview ? skinColor : (i % 2 ? '#a89580' : '#d9c7b0'); c.fill() });
         c.beginPath(); c.arc(p.x, p.y, r, 0, TAU); c.fillStyle = skinPreview ? skinColor : 'hsl(' + (350 + u * 8) + ',75%,' + (12 - 7 * u) + '%)'; c.fill(); c.strokeStyle = skinPreview ? skinColor : 'hsla(355,85%,' + (42 - 22 * u) + '%,.95)'; c.lineWidth = 1.4; c.stroke()
       }
+      // Costillas y vértebras: la estructura sigue las articulaciones reales del cuerpo.
+      if (speciesId !== 'ember') {
+        c.save(); c.globalCompositeOperation='source-over'; c.lineCap='round';
+        const boneTone=skinPreview?skinColor:(speciesId==='frost'||speciesId==='glacier'?'#c9f4ff':speciesId==='void'?'#bba4e8':speciesId==='venom'?'#b7d96b':'#d9c7b0');
+        c.strokeStyle=boneTone; c.fillStyle=boneTone; c.globalAlpha=skinPreview?.96:.88;
+        for(let i=4;i<n-4;i+=speciesId==='void'?3:2){
+          const p=P[i],r=player.R[i]*s,ang=A[i],sideGap=speciesId==='void'?1.2:1.0;
+          [-1,1].forEach(sd=>{
+            const side=ang+sd*Math.PI/2, startX=p.x+Math.cos(side)*r*.18,startY=p.y+Math.sin(side)*r*.18;
+            const midX=p.x+Math.cos(side)*(r*1.05+2*s),midY=p.y+Math.sin(side)*(r*1.05+2*s);
+            const endX=p.x+Math.cos(side+sd*.2)*(r*(speciesId==='venom'?2.05:1.65)+3*s),endY=p.y+Math.sin(side+sd*.2)*(r*(speciesId==='venom'?2.05:1.65)+3*s);
+            c.lineWidth=(speciesId==='venom'?2.8:2.1)*s;c.beginPath();c.moveTo(startX,startY);c.quadraticCurveTo(midX+Math.cos(ang)*r*.28,midY+Math.sin(ang)*r*.28,endX,endY);c.stroke();
+            if(speciesId==='venom'){c.beginPath();c.moveTo(midX,midY);c.lineTo(midX+Math.cos(side+sd*.65)*5*s,midY+Math.sin(side+sd*.65)*5*s);c.lineWidth=1.2*s;c.stroke()}
+          });
+          if(speciesId==='venom'&&i%4===0){const tipX=p.x-Math.sin(ang)*(r+8*s),tipY=p.y+Math.cos(ang)*(r+8*s);c.beginPath();c.moveTo(p.x-Math.sin(ang)*r*.45,p.y+Math.cos(ang)*r*.45);c.lineTo(tipX,tipY);c.lineTo(p.x+Math.sin(ang)*r*.45,p.y-Math.cos(ang)*r*.45);c.closePath();c.fill()}
+        }
+        c.restore();
+      }
       // Variantes óseas: comparten el esqueleto base, pero cambian su silueta.
       if (speciesId === 'frost' || speciesId === 'glacier') {
         c.save(); c.globalCompositeOperation = 'source-over'; c.strokeStyle = skinPreview ? skinColor : '#b8eaff'; c.fillStyle = skinPreview ? skinColor : '#b8eaff'; c.lineWidth = 2.2 * s;
@@ -2326,6 +2344,10 @@ function renderCampaign(){
       } else if (speciesId === 'void') {
         c.save(); c.globalCompositeOperation='lighter'; c.strokeStyle=skinPreview?skinColor:'#b8a1ff'; c.globalAlpha=.82; c.lineWidth=2.5*s;
         for(let i=4;i<n-3;i+=4){const p=P[i],r=player.R[i]*s*1.45;c.beginPath();c.ellipse(p.x,p.y,r*1.2,r*.72,A[i],0,TAU);c.stroke();[-1,1].forEach(sd=>{const an=A[i]+sd*Math.PI/2, bx=p.x+Math.cos(an)*r*.7, by=p.y+Math.sin(an)*r*.7;c.beginPath();c.moveTo(bx,by);c.quadraticCurveTo(bx+Math.cos(an)*r*.8,by+Math.sin(an)*r*.8,bx+Math.cos(an)*r*1.55,by+Math.sin(an)*r*1.55);c.stroke()})}
+        c.restore();
+      } else if (speciesId === 'venom') {
+        c.save(); c.globalCompositeOperation='source-over'; c.strokeStyle=skinPreview?skinColor:'#b7d96b'; c.fillStyle=skinPreview?skinColor:'#b7d96b'; c.lineWidth=2.5*s;
+        for(let i=5;i<n-4;i+=3){const p=P[i],r=player.R[i]*s,ang=A[i];[-1,1].forEach(sd=>{const side=ang+sd*Math.PI/2;c.beginPath();c.moveTo(p.x+Math.cos(side)*r*.5,p.y+Math.sin(side)*r*.5);c.lineTo(p.x+Math.cos(side+sd*.18)*(r*1.75+9*s),p.y+Math.sin(side+sd*.18)*(r*1.75+9*s));c.lineTo(p.x+Math.cos(side+sd*.5)*(r*.5),p.y+Math.sin(side+sd*.5)*(r*.5));c.closePath();c.fill();c.stroke()})}
         c.restore();
       }
       c.save(); c.shadowColor = skinPreview ? skinColor : '#ff3b1f'; c.shadowBlur = lowEndDevice?4:12 + fury / 8; c.strokeStyle = skinPreview ? skinColor : 'rgba(255,' + (70 + fury / 2) + ',30,' + (.55 + .3 * Math.sin(t / 220)) + ')'; c.lineWidth = 2.4;
@@ -2340,6 +2362,11 @@ function renderCampaign(){
       } else if (speciesId === 'void') {
         c.save(); c.strokeStyle=skinPreview?skinColor:'#c8aaff'; c.lineWidth=3.2;
         [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*8);c.quadraticCurveTo(-27,sd*2,-35,sd*22);c.quadraticCurveTo(-42,sd*36,-51,sd*28);c.stroke();c.beginPath();c.moveTo(-17,sd*13);c.lineTo(-25,sd*29);c.stroke()});c.restore();
+      }
+      if (speciesId === 'venom') {
+        c.save(); c.strokeStyle=skinPreview?skinColor:'#b7d96b'; c.fillStyle=skinPreview?skinColor:'#b7d96b'; c.lineWidth=3;
+        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-18,sd*14);c.lineTo(-31,sd*10);c.lineTo(-25,sd*21);c.lineTo(-39,sd*27);c.lineTo(-18,sd*25);c.closePath();c.fill();c.stroke()});
+        c.beginPath();c.moveTo(8,-8);c.lineTo(19,-12);c.lineTo(24,0);c.lineTo(19,12);c.lineTo(8,8);c.stroke();c.restore();
       }
       const bitePulse=cobra.phase===2?Math.sin(Math.min(1,cobra.t/.58)*Math.PI):cobra.phase===3?Math.max(0,cobra.t/.42):0;
       const cobraOpen=cobra.phase===2?Math.min(1.9,.35+bitePulse*1.55):cobra.phase===3&&cobra.swallowed?Math.max(0,cobra.t/.42)*1.15:cobra.phase===1?.12:0;
