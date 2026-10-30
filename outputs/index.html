@@ -1615,23 +1615,36 @@ body{background:
         gap:6px !important;
       }
       #hud .bars {
-        flex:0 1 38% !important;
-        width:38% !important;
+        flex:0 0 28% !important;
+        width:28% !important;
         max-width:none !important;
         min-width:0 !important;
       }
       #hud #lv {
         position:static !important;
-        flex:1 1 62% !important;
+        flex:1 1 72% !important;
         width:auto !important;
         max-width:none !important;
         min-width:0 !important;
         margin:0 !important;
-        padding:4px 6px !important;
-        font-size:8px !important;
-        line-height:1.2 !important;
-        text-align:right !important;
-        overflow-wrap:anywhere !important;
+        padding:5px 7px !important;
+        font-size:9px !important;
+        line-height:1.25 !important;
+        text-align:left !important;
+        overflow-wrap:normal !important;
+      }
+      #hud #lv br {
+        display:none !important;
+      }
+      #hud #lv .coin-readout,
+      #hud #lv small,
+      #hud #lv b {
+        display:inline !important;
+        white-space:nowrap !important;
+      }
+      #hud #lv br::after {
+        content:" · ";
+      }
       }
       #radar {
         top:calc(env(safe-area-inset-top,0px) + 8px) !important;
