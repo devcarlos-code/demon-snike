@@ -2306,81 +2306,57 @@ function renderCampaign(){
     function drawDemon(t, targetCtx, targetPlayer) {
       const c = targetCtx || ctx, player = targetPlayer || pl;
       if (!player) return;
-      const P = player.P, A = player.A, n = player.n, skinPreview = player.previewSkin === true, skinColor = player.previewSkinColor || player.col || '#d51cff';
+      const s = player.sc, P = player.P, A = player.A, n = player.n, skinPreview = player.previewSkin === true, skinColor = player.previewSkinColor || player.col || '#d51cff';
       const speciesId = skinPreview ? (player.previewSpeciesId || 'ember') : (player === pl ? selectedSkin : 'ember');
-      const speciesScale=speciesId==='frost'?1.22:speciesId==='ocean'?1.3:speciesId==='venom'?1.25:speciesId==='void'||speciesId==='fallen'?1.28:speciesId==='bloodmoon'?1.24:1;
-      const s=player.sc;
-      const motionProfile=speciesId==='frost'||speciesId==='glacier'?{amp:1.25,wave:.13,speed:.46,drift:.00024,bend:.022,head:.025}:speciesId==='ocean'?{amp:2.25,wave:.075,speed:.3,drift:.00016,bend:.018,head:.018}:speciesId==='venom'||speciesId==='toxic'?{amp:2.7,wave:.19,speed:.76,drift:.00034,bend:.045,head:.038}:speciesId==='void'||speciesId==='fallen'?{amp:1.8,wave:.1,speed:.36,drift:.0002,bend:.038,head:.05}:speciesId==='bloodmoon'?{amp:1.55,wave:.085,speed:.52,drift:.00022,bend:.032,head:.065}:null;
+      const motionProfile=speciesId==='frost'||speciesId==='glacier'?{amp:1.25,wave:.13,speed:.46,drift:.00024,bend:.022,head:.025}:speciesId==='ocean'?{amp:2.25,wave:.075,speed:.3,drift:.00016,bend:.018,head:.018}:speciesId==='venom'||speciesId==='toxic'?{amp:2.7,wave:.19,speed:.76,drift:.00034,bend:.045,head:.038}:speciesId==='void'||speciesId==='bloodmoon'?{amp:1.8,wave:.1,speed:.36,drift:.0002,bend:.038,head:.05}:null;
       const motionPhase=(player.ph||0)*.55;
       const motionOffsetX=i=>motionProfile?-Math.sin(A[i])*Math.sin(motionPhase*motionProfile.speed+t*motionProfile.drift-i*motionProfile.wave)*motionProfile.amp*s*(i/Math.max(1,n-1)):0;
       const motionOffsetY=i=>motionProfile?Math.cos(A[i])*Math.sin(motionPhase*motionProfile.speed-i*motionProfile.wave)*motionProfile.amp*s*(i/Math.max(1,n-1)):0;
       const motionAngle=i=>A[i]+(motionProfile?Math.cos(motionPhase*motionProfile.speed+t*motionProfile.drift-i*motionProfile.wave)*(i===0?motionProfile.head:motionProfile.bend*i/Math.max(1,n-1)):0);
-      c.save();const center=P[0];if(speciesScale!==1){c.translate(center.x,center.y);c.scale(speciesScale,speciesScale);c.translate(-center.x,-center.y)}
       c.lineJoin = 'round'; c.lineCap = 'round';
       c.globalCompositeOperation = 'lighter';
       for (let i = 0; i < n; i += (lowEndDevice?18:10)) { const p = P[i], g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, skinPreview ? skinColor+'38' : 'rgba(170,10,20,.22)'); g.addColorStop(1, skinPreview ? skinColor+'00' : 'rgba(170,10,20,0)'); c.fillStyle = g; c.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
       c.globalCompositeOperation = 'source-over';
       c.globalAlpha = inv > 0 && Math.floor(t / 70) % 2 ? .45 : 1;
       player.legs.forEach(l => {
-        if (!l.f) return; const q=player.ik(l);
-        if(speciesId==='ember'){c.beginPath();c.moveTo(q[0],q[1]);c.lineTo(q[2],q[3]);c.lineTo(q[4],q[5]);c.strokeStyle='#0a0305';c.lineWidth=8*s;c.stroke();c.strokeStyle=skinPreview?skinColor:'#8a0f1a';c.lineWidth=4*s;c.stroke();const d=Math.atan2(q[5]-q[3],q[4]-q[2]);c.strokeStyle=skinPreview?skinColor:'#d9c7b0';c.lineWidth=2;[-.7,-.25,.25,.7].forEach(o=>{c.beginPath();c.moveTo(q[4],q[5]);c.lineTo(q[4]+Math.cos(d+o)*12*s,q[5]+Math.sin(d+o)*12*s);c.stroke()});return}
-        const bone=skinPreview?skinColor:(speciesId==='frost'?'#c9f4ff':speciesId==='ocean'?'#8edff0':speciesId==='venom'?'#b8dc72':speciesId==='void'||speciesId==='fallen'?'#c5b2ed':speciesId==='bloodmoon'?'#e58aa2':'#d9c7b0');
-        c.save();c.lineCap='round';c.lineJoin='round';
-        const width=(speciesId==='venom'?5.2:speciesId==='frost'?3.6:speciesId==='ember'?4:4.5)*s;
-        c.strokeStyle='#09050b';c.lineWidth=width+3*s;c.beginPath();c.moveTo(q[0],q[1]);c.lineTo(q[2],q[3]);c.lineTo(q[4],q[5]);c.stroke();
-        c.strokeStyle=bone;c.lineWidth=width;c.stroke();
-        const d=Math.atan2(q[5]-q[3],q[4]-q[2]),foot=speciesId==='frost'?18:speciesId==='venom'?17:speciesId==='ocean'?20:speciesId==='bloodmoon'?19:speciesId==='void'||speciesId==='fallen'?22:12;
-        if(speciesId==='frost'){for(let k=-1;k<=1;k++){c.beginPath();c.moveTo(q[4],q[5]);c.lineTo(q[4]+Math.cos(d+k*.42)*foot*s,q[5]+Math.sin(d+k*.42)*foot*s);c.lineTo(q[4]+Math.cos(d+k*.42)*foot*.72*s+Math.cos(d+k*.42+1.2)*5*s,q[5]+Math.sin(d+k*.42)*foot*.72*s+Math.sin(d+k*.42+1.2)*5*s);c.closePath();c.fillStyle=bone;c.fill()}}
-        else if(speciesId==='venom'){c.beginPath();c.moveTo(q[4],q[5]);c.lineTo(q[4]+Math.cos(d-.45)*foot*s,q[5]+Math.sin(d-.45)*foot*s);c.lineTo(q[4]+Math.cos(d)*foot*1.35*s,q[5]+Math.sin(d)*foot*1.35*s);c.lineTo(q[4]+Math.cos(d+.45)*foot*s,q[5]+Math.sin(d+.45)*foot*s);c.closePath();c.fillStyle=bone;c.fill();c.strokeStyle='#34451c';c.lineWidth=1.4*s;c.stroke()}
-        else if(speciesId==='ocean'||speciesId==='void'||speciesId==='fallen'||speciesId==='bloodmoon'){for(let k=-1;k<=1;k++){c.beginPath();c.moveTo(q[4],q[5]);c.quadraticCurveTo(q[4]+Math.cos(d+k*.55)*foot*.55*s,q[5]+Math.sin(d+k*.55)*foot*.55*s,q[4]+Math.cos(d+k*.55)*foot*s,q[5]+Math.sin(d+k*.55)*foot*s);c.strokeStyle=bone;c.lineWidth=(speciesId==='ocean'?2.2:3)*s;c.stroke()}}
-        else {[-.7,-.25,.25,.7].forEach(o=>{c.beginPath();c.moveTo(q[4],q[5]);c.lineTo(q[4]+Math.cos(d+o)*foot*s,q[5]+Math.sin(d+o)*foot*s);c.strokeStyle=bone;c.lineWidth=2*s;c.stroke()})}
-        c.restore();
+        if (!l.f) return; const q = player.ik(l); c.beginPath(); c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); c.lineTo(q[4], q[5]); c.strokeStyle = '#0a0305'; c.lineWidth = 8 * s; c.stroke(); c.strokeStyle = skinPreview ? skinColor : '#8a0f1a'; c.lineWidth = 4 * s; c.stroke();
+        const d = Math.atan2(q[5] - q[3], q[4] - q[2]); c.strokeStyle = skinPreview ? skinColor : '#d9c7b0'; c.lineWidth = 2;[-.7, -.25, .25, .7].forEach(o => { c.beginPath(); c.moveTo(q[4], q[5]); c.lineTo(q[4] + Math.cos(d + o) * 12 * s, q[5] + Math.sin(d + o) * 12 * s); c.stroke() })
       });
       for (let i = n - 1; i >= 0; i--) {
         const p = P[i], r = player.R[i] * s, u = i / n, px=p.x+motionOffsetX(i), py=p.y+motionOffsetY(i), ang=motionAngle(i);
-        if (speciesId==='ember' && i >= 2 && i < n - 3) [-1, 1].forEach(sd => { const pa = ang + sd * Math.PI / 2, ta = ang + sd * (Math.PI / 2 + .8), L = r * 1.1 + 5 * s; c.beginPath(); c.moveTo(px + Math.cos(pa - sd * .25) * r, py + Math.sin(pa - sd * .25) * r); c.lineTo(px + Math.cos(pa) * r + Math.cos(ta) * L, py + Math.sin(pa) * r + Math.sin(ta) * L); c.lineTo(px + Math.cos(pa + sd * .25) * r, py + Math.sin(pa + sd * .25) * r); c.fillStyle = skinPreview ? skinColor : (i % 2 ? '#a89580' : '#d9c7b0'); c.fill() });
+        if (i >= 2 && i < n - 3) [-1, 1].forEach(sd => { const pa = ang + sd * Math.PI / 2, ta = ang + sd * (Math.PI / 2 + .8), L = r * 1.1 + 5 * s; c.beginPath(); c.moveTo(px + Math.cos(pa - sd * .25) * r, py + Math.sin(pa - sd * .25) * r); c.lineTo(px + Math.cos(pa) * r + Math.cos(ta) * L, py + Math.sin(pa) * r + Math.sin(ta) * L); c.lineTo(px + Math.cos(pa + sd * .25) * r, py + Math.sin(pa + sd * .25) * r); c.fillStyle = skinPreview ? skinColor : (i % 2 ? '#a89580' : '#d9c7b0'); c.fill() });
         c.beginPath(); c.arc(px, py, r, 0, TAU); c.fillStyle = skinPreview ? skinColor : 'hsl(' + (350 + u * 8) + ',75%,' + (12 - 7 * u) + '%)'; c.fill(); c.strokeStyle = skinPreview ? skinColor : 'hsla(355,85%,' + (42 - 22 * u) + '%,.95)'; c.lineWidth = 1.4; c.stroke()
       }
-      // Anatomía propia por especie: cada silueta se construye desde sus articulaciones reales.
-      if(speciesId!=='ember'){
-        c.save();c.globalCompositeOperation='source-over';c.lineJoin='round';c.lineCap='round';
-        const bone=skinPreview?skinColor:(speciesId==='frost'?'#d8f7ff':speciesId==='ocean'?'#a7e9f5':speciesId==='venom'?'#d1e99a':speciesId==='void'||speciesId==='fallen'?'#d2c2f3':speciesId==='bloodmoon'?'#f3a4b7':'#d9c7b0');
-        const shadow=speciesId==='frost'?'#438da9':speciesId==='ocean'?'#386c9a':speciesId==='venom'?'#52652a':speciesId==='void'||speciesId==='fallen'?'#51406f':'#7e203f';
-        c.strokeStyle=shadow;c.fillStyle=bone;c.globalAlpha=.98;
-        for(let i=4;i<n-4;i+=(lowEndDevice?5:3)){
-          const p=P[i],r=player.R[i]*s,ang=motionAngle(i),x=p.x+motionOffsetX(i),y=p.y+motionOffsetY(i),nx=Math.cos(ang),ny=Math.sin(ang),sx=-ny,sy=nx;
-          if(speciesId==='frost'){
-            // Placas facetadas y cristales dorsales, como una armadura glacial.
-            const h=(r*1.9+9*s)*(i%2?.82:1.12),w=r*.9;
-            c.beginPath();c.moveTo(x-nx*w-sx*r*.35,y-ny*w-sy*r*.35);c.lineTo(x+sx*h*.12,y-sy*h*.12);c.lineTo(x+nx*w-sx*r*.35,y+ny*w-sy*r*.35);c.lineTo(x+sx*h*.82,y+sy*h*.82);c.lineTo(x-sx*h*.16,y+sy*h*.12);c.closePath();c.fill();c.stroke();
-            c.strokeStyle='#f2ffff';c.lineWidth=1.3*s;c.beginPath();c.moveTo(x-sx*r*.45,y-sy*r*.45);c.lineTo(x+sx*h*.55,y+sy*h*.55);c.stroke();c.strokeStyle=shadow;
-            if(i%6===0){c.beginPath();c.moveTo(x+sx*r*.4,y+sy*r*.4);c.lineTo(x+sx*(r+24*s),y+sy*(r+24*s));c.lineTo(x+sx*(r+5*s),y+sy*(r+8*s));c.closePath();c.fill();c.stroke()}
-          }else if(speciesId==='ocean'){
-            // Vértebras separadas y aletas largas que crean una silueta abisal.
-            c.beginPath();c.ellipse(x,y,r*1.16,r*.72,ang,0,TAU);c.fill();c.stroke();
-            c.beginPath();c.moveTo(x-nx*r*.35,y-ny*r*.35);c.quadraticCurveTo(x+sx*(r+9*s),y+sy*(r+9*s),x+sx*(r+29*s),y+sy*(r+29*s));c.quadraticCurveTo(x+sx*(r+16*s),y+sy*(r+16*s),x+nx*r*.5,y+ny*r*.5);c.closePath();c.fill();c.stroke();
-            if(i%6===0){c.beginPath();c.moveTo(x-sx*r*.5,y-sy*r*.5);c.lineTo(x-sx*(r+19*s),y-sy*(r+19*s));c.lineTo(x-sx*(r+5*s),y-sy*(r+5*s));c.closePath();c.fill();c.stroke()}
-          }else if(speciesId==='venom'){
-            // Costillas profundas, gruesas y dobles, con espolones laterales.
-            for(let side of [-1,1]){const a=ang+side*Math.PI/2,ex=x+Math.cos(a)*(r*2.25+7*s),ey=y+Math.sin(a)*(r*2.25+7*s);
-              c.lineWidth=4.2*s;c.beginPath();c.moveTo(x+Math.cos(a)*r*.25,y+Math.sin(a)*r*.25);c.bezierCurveTo(x+Math.cos(a-.3*side)*r*1.25,y+Math.sin(a-.3*side)*r*1.25,ex-Math.cos(ang)*r*.35,ey-Math.sin(ang)*r*.35,ex,ey);c.stroke();
-              c.lineWidth=2.1*s;c.beginPath();c.moveTo(x+Math.cos(a)*r*.45,y+Math.sin(a)*r*.45);c.quadraticCurveTo(x+Math.cos(a)*r*1.35,y+Math.sin(a)*r*1.35,ex-Math.cos(ang)*r*.65,ey-Math.sin(ang)*r*.65);c.stroke();
-              if(i%6===0){c.beginPath();c.moveTo(ex,ey);c.lineTo(ex+Math.cos(a+side*.25)*13*s,ey+Math.sin(a+side*.25)*13*s);c.lineTo(ex+Math.cos(a+side*.5)*4*s,ey+Math.sin(a+side*.5)*4*s);c.closePath();c.fill();c.stroke()}
-            }
-          }else if(speciesId==='void'||speciesId==='fallen'){
-            // Placas fracturadas, espinas asimétricas y apéndices quebrados.
-            const side=i%2?1:-1,h=(r*1.8+12*s);
-            c.beginPath();c.moveTo(x-nx*r*.75,y-ny*r*.75);c.lineTo(x+sx*h*.2*side,y+sy*h*.2*side);c.lineTo(x+sx*h*side,y+sy*h*side);c.lineTo(x+nx*r*.3+sx*h*.25*side,y+ny*r*.3+sy*h*.25*side);c.closePath();c.fill();c.stroke();
-            if(i%4===0){c.beginPath();c.moveTo(x+sx*r*.5,y+sy*r*.5);c.lineTo(x+sx*(r+26*s)*side,y+sy*(r+26*s)*side);c.lineTo(x+sx*(r+8*s)*side,y+sy*(r+8*s)*side);c.closePath();c.fill();c.stroke()}
-            c.beginPath();c.ellipse(x,y,r*1.35,r*.5,ang,0,TAU);c.stroke();
-          }else if(speciesId==='bloodmoon'){
-            // Arcos costales curvos y hoces que apuntan hacia atrás.
-            for(let side of [-1,1]){const a=ang+side*Math.PI/2,ex=x+Math.cos(a)*(r*1.95+8*s),ey=y+Math.sin(a)*(r*1.95+8*s);
-              c.lineWidth=3.3*s;c.beginPath();c.moveTo(x+Math.cos(a)*r*.25,y+Math.sin(a)*r*.25);c.bezierCurveTo(x+Math.cos(a-side*.35)*r*1.45,y+Math.sin(a-side*.35)*r*1.45,ex+nx*8*s,ey+ny*8*s,ex,ey);c.stroke();
-              c.beginPath();c.moveTo(ex,ey);c.quadraticCurveTo(ex-nx*13*s+Math.cos(a)*7*s,ey-ny*13*s+Math.sin(a)*7*s,ex-nx*27*s,ey-ny*27*s);c.stroke()
-            }
-          }
+      // Costillas y vértebras: la estructura sigue las articulaciones reales del cuerpo.
+      if (speciesId !== 'ember') {
+        c.save(); c.globalCompositeOperation='source-over'; c.lineCap='round';
+        const boneTone=skinPreview?skinColor:(speciesId==='frost'||speciesId==='glacier'?'#c9f4ff':speciesId==='void'?'#bba4e8':speciesId==='venom'?'#b7d96b':'#d9c7b0');
+        c.strokeStyle=boneTone; c.fillStyle=boneTone; c.globalAlpha=skinPreview?.96:.88;
+        for(let i=4;i<n-4;i+=speciesId==='void'?3:2){
+          const p=P[i],r=player.R[i]*s,ang=motionAngle(i),px=p.x+motionOffsetX(i),py=p.y+motionOffsetY(i),sideGap=speciesId==='void'?1.2:1.0;
+          [-1,1].forEach(sd=>{
+            const side=ang+sd*Math.PI/2, startX=px+Math.cos(side)*r*.18,startY=py+Math.sin(side)*r*.18;
+            const midX=px+Math.cos(side)*(r*1.05+2*s),midY=py+Math.sin(side)*(r*1.05+2*s);
+            const endX=px+Math.cos(side+sd*.2)*(r*(speciesId==='venom'?2.05:1.65)+3*s)+motionOffsetX(i+1)*.12,endY=py+Math.sin(side+sd*.2)*(r*(speciesId==='venom'?2.05:1.65)+3*s)+motionOffsetY(i+1)*.12;
+            c.lineWidth=(speciesId==='venom'?2.8:2.1)*s;c.beginPath();c.moveTo(startX,startY);c.quadraticCurveTo(midX+Math.cos(ang)*r*.28,midY+Math.sin(ang)*r*.28,endX,endY);c.stroke();
+            if(speciesId==='venom'){c.beginPath();c.moveTo(midX,midY);c.lineTo(midX+Math.cos(side+sd*.65)*5*s,midY+Math.sin(side+sd*.65)*5*s);c.lineWidth=1.2*s;c.stroke()}
+          });
+          if(speciesId==='venom'&&i%4===0){const tipX=px-Math.sin(ang)*(r+8*s),tipY=py+Math.cos(ang)*(r+8*s);c.beginPath();c.moveTo(px-Math.sin(ang)*r*.45,py+Math.cos(ang)*r*.45);c.lineTo(tipX,tipY);c.lineTo(p.x+Math.sin(ang)*r*.45,p.y-Math.cos(ang)*r*.45);c.closePath();c.fill()}
         }
+        c.restore();
+      }
+      // Variantes óseas: comparten el esqueleto base, pero cambian su silueta.
+      if (speciesId === 'frost' || speciesId === 'glacier') {
+        c.save(); c.globalCompositeOperation = 'source-over'; c.strokeStyle = skinPreview ? skinColor : '#b8eaff'; c.fillStyle = skinPreview ? skinColor : '#b8eaff'; c.lineWidth = 2.2 * s;
+        for (let i = 5; i < n - 4; i += 3) { const p=P[i], r=player.R[i]*s, ang=motionAngle(i), px=p.x+motionOffsetX(i), py=p.y+motionOffsetY(i); [-1,1].forEach(sd=>{const side=ang+sd*Math.PI/2, bx=px+Math.cos(side)*r*.72, by=py+Math.sin(side)*r*.72, tipx=bx+Math.cos(side+sd*.22)*(r*1.45+7*s), tipy=by+Math.sin(side+sd*.22)*(r*1.45+7*s); c.beginPath();c.moveTo(px-Math.cos(side)*r*.5,py-Math.sin(side)*r*.5);c.lineTo(tipx,tipy);c.lineTo(p.x+Math.cos(side)*r*.7,p.y+Math.sin(side)*r*.7);c.closePath();c.fill();c.stroke()})}
+        c.restore();
+      } else if (speciesId === 'void') {
+        c.save(); c.globalCompositeOperation='lighter'; c.strokeStyle=skinPreview?skinColor:'#b8a1ff'; c.globalAlpha=.82; c.lineWidth=2.5*s;
+        for(let i=4;i<n-3;i+=4){const p=P[i],r=player.R[i]*s*1.45,px=p.x+motionOffsetX(i),py=p.y+motionOffsetY(i),ang=motionAngle(i);c.beginPath();c.ellipse(px,py,r*1.2,r*.72,ang,0,TAU);c.stroke();[-1,1].forEach(sd=>{const an=ang+sd*Math.PI/2, bx=px+Math.cos(an)*r*.7, by=py+Math.sin(an)*r*.7;c.beginPath();c.moveTo(bx,by);c.quadraticCurveTo(bx+Math.cos(an)*r*.8,by+Math.sin(an)*r*.8,bx+Math.cos(an)*r*1.55,by+Math.sin(an)*r*1.55);c.stroke()})}
+        c.restore();
+      } else if (speciesId === 'venom') {
+        c.save(); c.globalCompositeOperation='source-over'; c.strokeStyle=skinPreview?skinColor:'#b7d96b'; c.fillStyle=skinPreview?skinColor:'#b7d96b'; c.lineWidth=2.5*s;
+        for(let i=5;i<n-4;i+=3){const p=P[i],r=player.R[i]*s,ang=motionAngle(i),px=p.x+motionOffsetX(i),py=p.y+motionOffsetY(i);[-1,1].forEach(sd=>{const side=ang+sd*Math.PI/2;c.beginPath();c.moveTo(px+Math.cos(side)*r*.5,py+Math.sin(side)*r*.5);c.lineTo(px+Math.cos(side+sd*.18)*(r*1.75+9*s),py+Math.sin(side+sd*.18)*(r*1.75+9*s));c.lineTo(px+Math.cos(side+sd*.5)*(r*.5),py+Math.sin(side+sd*.5)*(r*.5));c.closePath();c.fill();c.stroke()})}
         c.restore();
       }
       c.save(); c.shadowColor = skinPreview ? skinColor : '#ff3b1f'; c.shadowBlur = lowEndDevice?4:12 + fury / 8; c.strokeStyle = skinPreview ? skinColor : 'rgba(255,' + (70 + fury / 2) + ',30,' + (.55 + .3 * Math.sin(t / 220)) + ')'; c.lineWidth = 2.4;
@@ -2392,7 +2368,7 @@ function renderCampaign(){
       if (speciesId === 'frost' || speciesId === 'glacier') {
         c.save(); c.strokeStyle=skinPreview?skinColor:'#c8f3ff'; c.fillStyle=skinPreview?skinColor:'#c8f3ff'; c.lineWidth=3;
         [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-7,sd*7);c.lineTo(-19,sd*18);c.lineTo(-30,sd*31);c.lineTo(-25,sd*13);c.lineTo(-34,sd*7);c.closePath();c.fill();c.stroke()});c.restore();
-      } else if (speciesId === 'void' || speciesId === 'fallen') {
+      } else if (speciesId === 'void') {
         c.save(); c.strokeStyle=skinPreview?skinColor:'#c8aaff'; c.lineWidth=3.2;
         [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*8);c.quadraticCurveTo(-27,sd*2,-35,sd*22);c.quadraticCurveTo(-42,sd*36,-51,sd*28);c.stroke();c.beginPath();c.moveTo(-17,sd*13);c.lineTo(-25,sd*29);c.stroke()});c.restore();
       }
@@ -2400,44 +2376,6 @@ function renderCampaign(){
         c.save(); c.strokeStyle=skinPreview?skinColor:'#b7d96b'; c.fillStyle=skinPreview?skinColor:'#b7d96b'; c.lineWidth=3;
         [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-18,sd*14);c.lineTo(-31,sd*10);c.lineTo(-25,sd*21);c.lineTo(-39,sd*27);c.lineTo(-18,sd*25);c.closePath();c.fill();c.stroke()});
         c.beginPath();c.moveTo(8,-8);c.lineTo(19,-12);c.lineTo(24,0);c.lineTo(19,12);c.lineTo(8,8);c.stroke();c.restore();
-      }
-      if(speciesId==='ocean'||speciesId==='bloodmoon'||speciesId==='fallen'){
-        c.save();c.globalCompositeOperation=speciesId==='ocean'?'lighter':'source-over';c.lineJoin='round';c.lineCap='round';
-        const detailColor=skinPreview?skinColor:(speciesId==='ocean'?'#75dfff':speciesId==='bloodmoon'?'#ff789d':'#c8a9ff');
-        c.strokeStyle=detailColor;c.fillStyle=detailColor;c.globalAlpha=.92;c.lineWidth=2.6;
-        if(speciesId==='ocean'){
-          for(let i=4;i<n-5;i+=3){const p=P[i],r=player.R[i]*s,ang=motionAngle(i),x=p.x+motionOffsetX(i),y=p.y+motionOffsetY(i);c.beginPath();c.moveTo(x-Math.sin(ang)*r*.3,y+Math.cos(ang)*r*.3);c.lineTo(x-Math.sin(ang)*(r+15*s),y+Math.cos(ang)*(r+15*s));c.lineTo(x-Math.sin(ang+0.22)*(r+5*s),y+Math.cos(ang+0.22)*(r+5*s));c.closePath();c.fill();c.stroke();c.beginPath();c.ellipse(x,y,r*1.25,r*.55,ang,0,TAU);c.stroke()}
-        }else if(speciesId==='bloodmoon'){
-          for(let i=6;i<n-6;i+=5){const p=P[i],r=player.R[i]*s,ang=motionAngle(i),x=p.x+motionOffsetX(i),y=p.y+motionOffsetY(i);[-1,1].forEach(sd=>{const a=ang+sd*Math.PI/2;c.beginPath();c.moveTo(x+Math.cos(a)*r*.5,y+Math.sin(a)*r*.5);c.quadraticCurveTo(x+Math.cos(a)*r*1.5,y+Math.sin(a)*r*1.5,x+Math.cos(a+sd*.35)*(r+13*s),y+Math.sin(a+sd*.35)*(r+13*s));c.stroke()})}
-        }else{
-          for(let i=5;i<n-5;i+=2){const p=P[i],r=player.R[i]*s,ang=motionAngle(i),x=p.x+motionOffsetX(i),y=p.y+motionOffsetY(i);[-1,1].forEach(sd=>{const a=ang+sd*Math.PI/2;c.beginPath();c.moveTo(x+Math.cos(a)*r*.5,y+Math.sin(a)*r*.5);c.lineTo(x+Math.cos(a+sd*.28)*(r+14*s),y+Math.sin(a+sd*.28)*(r+14*s));c.lineTo(x+Math.cos(a+sd*.55)*(r+4*s),y+Math.sin(a+sd*.55)*(r+4*s));c.closePath();c.fill();c.stroke()})}
-        }
-        c.restore();
-      }
-      if(speciesId==='ocean'){c.save();c.strokeStyle=skinPreview?skinColor:'#8beaff';c.fillStyle=skinPreview?skinColor:'#8beaff';c.lineWidth=3;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-18,sd*19);c.lineTo(-34,sd*30);c.lineTo(-28,sd*11);c.closePath();c.fill();c.stroke()});c.restore()}
-      if(speciesId==='bloodmoon'){c.save();c.strokeStyle=skinPreview?skinColor:'#ff668f';c.lineWidth=3.4;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.quadraticCurveTo(-30,sd*3,-32,sd*26);c.quadraticCurveTo(-41,sd*42,-50,sd*32);c.stroke()});c.restore()}
-      if(speciesId==='fallen'){c.save();c.strokeStyle=skinPreview?skinColor:'#c7a6ff';c.fillStyle=skinPreview?skinColor:'#c7a6ff';c.lineWidth=3.5;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-20,sd*12);c.lineTo(-26,sd*30);c.lineTo(-34,sd*20);c.lineTo(-45,sd*35);c.lineTo(-39,sd*8);c.closePath();c.fill();c.stroke()});c.restore()}
-      // Cráneos y coronas: la cabeza también cambia de especie, no solo sus adornos corporales.
-      if(speciesId==='frost'||speciesId==='glacier'){
-        c.save();c.fillStyle=skinPreview?skinColor:'#d8f7ff';c.strokeStyle='#5cabc5';c.lineWidth=2.3;
-        c.beginPath();c.moveTo(-13,-9);c.lineTo(-26,-19);c.lineTo(-31,-37);c.lineTo(-16,-29);c.lineTo(-5,-15);c.lineTo(5,-15);c.lineTo(17,-30);c.lineTo(31,-38);c.lineTo(26,-18);c.lineTo(13,-8);c.closePath();c.fill();c.stroke();
-        c.fillStyle='#f5ffff';c.beginPath();c.moveTo(1,-15);c.lineTo(0,-34);c.lineTo(8,-19);c.closePath();c.fill();c.restore();
-      }else if(speciesId==='ocean'){
-        c.save();c.strokeStyle=skinPreview?skinColor:'#91eaff';c.fillStyle='#102c4b';c.lineWidth=3;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-14,sd*7);c.quadraticCurveTo(-28,sd*16,-35,sd*37);c.quadraticCurveTo(-18,sd*29,-8,sd*14);c.closePath();c.fill();c.stroke()});
-        c.beginPath();c.moveTo(-18,-7);c.lineTo(-29,-20);c.lineTo(-17,-17);c.lineTo(-8,-9);c.lineTo(0,-18);c.lineTo(8,-9);c.lineTo(17,-17);c.lineTo(29,-20);c.lineTo(18,-5);c.stroke();c.restore();
-      }else if(speciesId==='venom'){
-        c.save();c.fillStyle='#35451d';c.strokeStyle=skinPreview?skinColor:'#c8e78a';c.lineWidth=3;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-10,sd*8);c.lineTo(-24,sd*17);c.lineTo(-37,sd*34);c.lineTo(-33,sd*13);c.lineTo(-19,sd*4);c.closePath();c.fill();c.stroke()});
-        c.beginPath();c.moveTo(-7,-9);c.lineTo(-14,-25);c.lineTo(-2,-17);c.lineTo(5,-26);c.lineTo(14,-10);c.stroke();c.restore();
-      }else if(speciesId==='void'||speciesId==='fallen'){
-        c.save();c.strokeStyle=skinPreview?skinColor:'#d2c2f3';c.fillStyle='#21182e';c.lineWidth=3.2;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-12,sd*7);c.quadraticCurveTo(-29,sd*1,-30,sd*20);c.lineTo(-45,sd*38);c.lineTo(-39,sd*13);c.quadraticCurveTo(-31,sd*-6,-12,sd*-2);c.closePath();c.fill();c.stroke()});
-        c.beginPath();c.moveTo(-15,-8);c.lineTo(-24,-28);c.lineTo(-7,-18);c.lineTo(0,-35);c.lineTo(9,-17);c.lineTo(25,-28);c.lineTo(15,-7);c.stroke();c.restore();
-      }else if(speciesId==='bloodmoon'){
-        c.save();c.strokeStyle=skinPreview?skinColor:'#ff7899';c.fillStyle='#42101f';c.lineWidth=3.5;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-12,sd*8);c.bezierCurveTo(-30,sd*12,-38,sd*35,-28,sd*43);c.bezierCurveTo(-31,sd*24,-17,sd*20,-8,sd*13);c.closePath();c.fill();c.stroke()});
-        c.beginPath();c.moveTo(-10,-9);c.quadraticCurveTo(-28,-30,-39,-25);c.quadraticCurveTo(-28,-18,-20,-5);c.moveTo(10,-9);c.quadraticCurveTo(28,-30,39,-25);c.quadraticCurveTo(28,-18,20,-5);c.stroke();c.restore();
       }
       const bitePulse=cobra.phase===2?Math.sin(Math.min(1,cobra.t/.58)*Math.PI):cobra.phase===3?Math.max(0,cobra.t/.42):0;
       const cobraOpen=cobra.phase===2?Math.min(1.9,.35+bitePulse*1.55):cobra.phase===3&&cobra.swallowed?Math.max(0,cobra.t/.42)*1.15:cobra.phase===1?.12:0;
@@ -2453,7 +2391,7 @@ function renderCampaign(){
         c.fillStyle = skinPreview ? skinColor : '#d9c7b0';[5, 9, 12, 15].forEach((k, j) => { const hh = j % 2 ? 4.5 : 7; c.beginPath(); c.moveTo(k - 1.6, 0); c.lineTo(k + 1.6, 0); c.lineTo(k, -sd * hh); c.fill() }); c.restore()
       });
       [-1, 1].forEach(sd => { c.save(); c.translate(4, sd * 6.4); c.rotate(-sd * .5); c.shadowColor = skinPreview ? skinColor : '#ff3b1f'; c.shadowBlur = 18; c.fillStyle = skinPreview ? skinColor : (pm > .5 ? '#ffb066' : '#ff3b1f'); c.beginPath(); c.ellipse(0, 0, 4.2, 2.3, 0, 0, TAU); c.fill(); c.shadowBlur = 0; c.fillStyle = '#0a0002'; c.beginPath(); c.ellipse(0, 0, .9, 2.2, 0, 0, TAU); c.fill(); c.restore() });
-      c.restore();c.restore(); c.globalAlpha = 1;
+      c.restore(); c.globalAlpha = 1;
     }
     function drawTents(t) {
       if(!pl||!Array.isArray(pl.P))return;
