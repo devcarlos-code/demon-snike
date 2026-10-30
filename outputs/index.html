@@ -2322,7 +2322,9 @@ function renderCampaign(){
       c.globalCompositeOperation = 'source-over';
       c.globalAlpha = inv > 0 && Math.floor(t / 70) % 2 ? .45 : 1;
       player.legs.forEach(l => {
-        if (!l.f) return; const q=player.ik(l),bone=skinPreview?skinColor:(speciesId==='frost'?'#c9f4ff':speciesId==='ocean'?'#8edff0':speciesId==='venom'?'#b8dc72':speciesId==='void'||speciesId==='fallen'?'#c5b2ed':speciesId==='bloodmoon'?'#e58aa2':'#d9c7b0');
+        if (!l.f) return; const q=player.ik(l);
+        if(speciesId==='ember'){c.beginPath();c.moveTo(q[0],q[1]);c.lineTo(q[2],q[3]);c.lineTo(q[4],q[5]);c.strokeStyle='#0a0305';c.lineWidth=8*s;c.stroke();c.strokeStyle=skinPreview?skinColor:'#8a0f1a';c.lineWidth=4*s;c.stroke();const d=Math.atan2(q[5]-q[3],q[4]-q[2]);c.strokeStyle=skinPreview?skinColor:'#d9c7b0';c.lineWidth=2;[-.7,-.25,.25,.7].forEach(o=>{c.beginPath();c.moveTo(q[4],q[5]);c.lineTo(q[4]+Math.cos(d+o)*12*s,q[5]+Math.sin(d+o)*12*s);c.stroke()});return}
+        const bone=skinPreview?skinColor:(speciesId==='frost'?'#c9f4ff':speciesId==='ocean'?'#8edff0':speciesId==='venom'?'#b8dc72':speciesId==='void'||speciesId==='fallen'?'#c5b2ed':speciesId==='bloodmoon'?'#e58aa2':'#d9c7b0');
         c.save();c.lineCap='round';c.lineJoin='round';
         const width=(speciesId==='venom'?5.2:speciesId==='frost'?3.6:speciesId==='ember'?4:4.5)*s;
         c.strokeStyle='#09050b';c.lineWidth=width+3*s;c.beginPath();c.moveTo(q[0],q[1]);c.lineTo(q[2],q[3]);c.lineTo(q[4],q[5]);c.stroke();
