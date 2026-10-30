@@ -1824,7 +1824,7 @@ body{background:
         if(this.k==='p'&&(cobra.phase===1||cobra.phase===4)){
           const a=cobra.angle,ax=Math.cos(a),ay=Math.sin(a),cx=cobra.anchorX,cy=cobra.anchorY;
           this.h=a;this.A[0]=a;hd.x=cx+ax*42*this.sc;hd.y=cy+ay*42*this.sc;
-          for(let i=1;i<this.n;i++){const theta=a+Math.PI+i*.62,rad=(12+i*.58)*this.sc;P[i].x=cx+Math.cos(theta)*rad;P[i].y=cy+Math.sin(theta)*rad;this.A[i]=theta+Math.PI/2}
+          for(let i=1;i<this.n;i++){if(i<=5){P[i].x=hd.x-ax*i*7.2*this.sc;P[i].y=hd.y-ay*i*7.2*this.sc;this.A[i]=a}else{const j=i-5,theta=a+Math.PI+j*.62,rad=(12+j*.58)*this.sc;P[i].x=cx+Math.cos(theta)*rad;P[i].y=cy+Math.sin(theta)*rad;this.A[i]=theta+Math.PI/2}}
           this.legs.forEach(l=>{if(l.f){l.f.x=P[l.i].x;l.f.y=P[l.i].y}});
           return;
         }
