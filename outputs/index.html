@@ -1577,6 +1577,30 @@ body{background:
     @media(max-width:480px){.skin-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.skin-card{padding:11px}.skin-preview{height:78px}}
 
 .skin-card .skin-preview{height:102px;cursor:pointer}.skin-card .skin-preview i{display:none}.skin-card .skin-preview::after{content:"VISTA RÁPIDA";position:absolute;bottom:7px;font-size:8px;letter-spacing:.14em;color:#d8c9e8;opacity:.8}.skin-card .skin-preview span{position:absolute;top:8px;right:10px;font-size:20px}.skin-card .skin-preview .skin-sample{width:100%;height:100%;display:block}.skin-card .skin-preview .skin-sample path{fill:none;stroke:var(--skin-color);stroke-width:17;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px var(--skin-color))}.skin-card .skin-preview .skin-sample circle{fill:var(--skin-color);stroke:rgba(255,255,255,.6);stroke-width:1.4}.skin-card .skin-preview .skin-sample .eye{fill:#17111f;stroke:none}.skin-card .skin-preview-btn{width:100%;margin:0;background:rgba(170,130,210,.12);border:1px solid rgba(195,160,230,.35);color:#e7d9f5}.skin-preview-modal[hidden]{display:none!important}.skin-preview-modal{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;background:rgba(4,3,8,.82);backdrop-filter:blur(9px)}.skin-preview-dialog{width:min(440px,100%);padding:22px;border:1px solid rgba(195,160,230,.32);border-radius:20px;background:linear-gradient(150deg,#21172c,#0d0a13);box-shadow:0 24px 80px rgba(0,0,0,.55);text-align:center;position:relative}.skin-preview-close{position:absolute;right:12px;top:10px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:22px}.skin-preview-stage{height:190px;margin:18px 0 12px;border-radius:15px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--skin-color) 23%,transparent),transparent 68%),#09070e}.skin-preview-stage canvas{width:min(320px,100%);height:190px;display:block;}.skin-preview-stage path{fill:none;stroke:var(--skin-color);stroke-width:23;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 9px var(--skin-color))}.skin-preview-stage circle{fill:var(--skin-color);stroke:rgba(255,255,255,.65);stroke-width:1.8}.skin-preview-stage .eye{fill:#17111f;stroke:none}.skin-preview-stage .shine{fill:rgba(255,255,255,.75);stroke:none}.skin-preview-dialog h3{margin:4px 0;color:#fff;font-size:21px}.skin-preview-dialog p{margin:7px 0 15px;color:#c9bad7;font-size:12px}.skin-preview-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.skin-preview-actions button{min-height:42px}@media(max-width:480px){.skin-preview-dialog{padding:18px}.skin-preview-stage{height:165px}.skin-preview-stage canvas{height:165px}}
+
+    /* Radar móvil: estadísticas alineadas sobre el minimapa y jugador destacado */
+    @media (pointer:coarse) {
+      #hud #lv {
+        position:fixed;
+        top:calc(env(safe-area-inset-top,0px) + 8px);
+        right:max(10px,env(safe-area-inset-right,0px) + 10px);
+        left:auto;
+        width:clamp(84px,22vw,112px);
+        max-width:none;
+        margin:0;
+        box-sizing:border-box;
+        padding:5px 6px;
+        text-align:center;
+        font-size:8.5px;
+        line-height:1.35;
+      }
+    }
+    @media (pointer:coarse) and (orientation:landscape) {
+      #hud #lv {
+        width:clamp(76px,16vh,96px);
+      }
+    }
+
 </style>
 </head>
 
@@ -2645,7 +2669,7 @@ function renderCampaign(){
       const playerPoint=radarPoint(pl.P[0].x,pl.P[0].y),px=playerPoint.x,py=playerPoint.y;
       en.forEach(e=>{if(e.dead)return;const p=radarPoint(e.P[0].x,e.P[0].y),x=p.x,y=p.y;g.fillStyle=e.boss?'#ff594f':e.k==='spitter'?'#7dffa0':e.k==='armor'?'#8fb4ff':e.k==='split'?'#d98bff':e.k==='dasher'?'#ffc66b':'#fff0c5';g.shadowColor=g.fillStyle;g.shadowBlur=e.boss?7:2;g.beginPath();g.arc(x,y,e.boss?4.5:(p.edge?3.2:2.5),0,TAU);g.fill();if(p.edge){g.strokeStyle=g.fillStyle;g.lineWidth=1;g.beginPath();g.arc(x,y,5,0,TAU);g.stroke()}});
       spawnQ.forEach(q=>{if(!q.pos)return;const p=radarPoint(q.pos.x,q.pos.y);g.fillStyle='#d98bff';g.beginPath();g.arc(p.x,p.y,2,0,TAU);g.fill()});
-      g.fillStyle='#fff2c5';g.shadowColor='#ffe29a';g.shadowBlur=10;g.beginPath();g.arc(px,py,4,0,TAU);g.fill();g.restore();
+      g.save();g.shadowColor='#35f4ff';g.shadowBlur=12;g.fillStyle='rgba(0,12,18,.96)';g.beginPath();g.arc(px,py,8,0,TAU);g.fill();g.strokeStyle='#35f4ff';g.lineWidth=2.5;g.beginPath();g.arc(px,py,7,0,TAU);g.stroke();g.fillStyle='#eaffff';g.beginPath();g.moveTo(px,py-5);g.lineTo(px+4,py);g.lineTo(px,py+5);g.lineTo(px-4,py);g.closePath();g.fill();g.restore();g.restore();
       g.strokeStyle='rgba(241,194,118,.9)';g.lineWidth=2;g.beginPath();g.arc(w/2,h/2,(Math.min(iw,ih)/2)+1,0,TAU);g.stroke()
     }
     function draw(t) {
