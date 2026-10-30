@@ -1601,6 +1601,19 @@ body{background:
       }
     }
 
+
+    /* Separación vertical: evita que el bloque de estadísticas invada el radar */
+    @media (pointer:coarse) {
+      #radar {
+        top:calc(env(safe-area-inset-top,0px) + 154px) !important;
+      }
+    }
+    @media (pointer:coarse) and (orientation:landscape) {
+      #radar {
+        top:calc(env(safe-area-inset-top,0px) + 126px) !important;
+      }
+    }
+
 </style>
 </head>
 
