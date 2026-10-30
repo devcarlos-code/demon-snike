@@ -2312,7 +2312,7 @@ function renderCampaign(){
       const motionPhase=(player.ph||0)*.55+t*.001;
       const motionOffsetX=i=>motionProfile?-Math.sin(A[i])*Math.sin(motionPhase*motionProfile.speed-i*motionProfile.wave)*motionProfile.amp*s*(i/Math.max(1,n-1)):0;
       const motionOffsetY=i=>motionProfile?Math.cos(A[i])*Math.sin(motionPhase*motionProfile.speed-i*motionProfile.wave)*motionProfile.amp*s*(i/Math.max(1,n-1)):0;
-      const motionAngle=i=>A[i]+(motionProfile?Math.cos(motionPhase*motionProfile.speed-i*motionProfile.wave)*motionProfile.bend*(i/Math.max(1,n-1)):0);
+      const motionAngle=i=>A[i]+(motionProfile?Math.cos(motionPhase*motionProfile.speed-i*motionProfile.wave)*motionProfile.bend*(.22+.78*i/Math.max(1,n-1)):0);
       c.lineJoin = 'round'; c.lineCap = 'round';
       c.globalCompositeOperation = 'lighter';
       for (let i = 0; i < n; i += (lowEndDevice?18:10)) { const p = P[i], g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, skinPreview ? skinColor+'38' : 'rgba(170,10,20,.22)'); g.addColorStop(1, skinPreview ? skinColor+'00' : 'rgba(170,10,20,0)'); c.fillStyle = g; c.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
