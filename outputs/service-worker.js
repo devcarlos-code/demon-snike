@@ -1,4 +1,4 @@
-const CACHE = 'arena-serpientes-v99';
+const CACHE = 'arena-serpientes-v100';
 const ASSETS = ['./manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', event => {
