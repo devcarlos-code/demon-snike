@@ -1824,8 +1824,26 @@ body{background:
     const skillById=id=>SKILL_CATALOG.find(x=>x.id===id)||null;
     const cd = { a: 0, s: 0, d: 0, f: 0 }, MAXCD = { a: .7, s: 2.8, d: 3.8, f: 0 };
     const U0={dA:1,dS:1,dD:1,cd:1,spd:1,def:1,fury:1,life:0,combo:1,tn:4};
-    const SAVE_KEY='arena_serpientes_save_v2';
-    function loadSave(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');return x&&x.version===2?x:{}}catch(e){return {}}}
+    const SAVE_KEY='arena_serpientes_save_v2', SURVIVAL_BACKUP_KEY='arena_serpientes_survival_backup_v1';
+    function loadSave(){
+      let data={};
+      try{const raw=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');if(raw&&raw.version===2)data=raw}catch(error){console.warn('El guardado principal no se pudo leer; se comprobará el respaldo',error)}
+      try{
+        const backup=JSON.parse(localStorage.getItem(SURVIVAL_BACKUP_KEY)||'null');
+        if(backup&&backup.version===1&&backup.mode==='survival'&&backup.checkpoint&&backup.checkpoint.mode==='survival'){
+          const list=Array.isArray(data.sessions)?data.sessions.slice():[];
+          const index=list.findIndex(item=>item&&item.id===backup.sessionId);
+          const current=index>=0?list[index]:null;
+          if(!current||(!current.ended&&(!current.checkpoint||(Number(backup.savedAt)||0)>(Number(current.updatedAt)||0)))){
+            const recovered={id:backup.sessionId||'survival-recovered',name:'Supervivencia',mode:'survival',createdAt:backup.createdAt||backup.savedAt||Date.now(),updatedAt:backup.savedAt||Date.now(),level:backup.checkpoint.level||1,score:backup.checkpoint.score||0,checkpoint:backup.checkpoint,ended:false};
+            if(index>=0)list[index]=recovered;else list.unshift(recovered);
+            data.sessions=list;data.activeSessionId=recovered.id;
+            console.warn('Se recuperó el progreso de Supervivencia desde el respaldo');
+          }
+        }
+      }catch(error){console.warn('El respaldo de Supervivencia no se pudo leer',error)}
+      return data;
+    }
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
@@ -1846,7 +1864,17 @@ body{background:
     sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)).slice(0,1);
     if(saveData.checkpoint&&saveData.checkpoint.mode!=='campaign'&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
     if(!sessions.some(x=>x.id===activeSessionId))activeSessionId=sessions[0]?.id||null;
-        function runSnapshot(){return {U:{...U},growthStacks, maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
+        function writeSurvivalBackup(checkpoint){
+      if(!checkpoint||checkpoint.mode!=='survival'||!activeSessionId)return false;
+      try{
+        const session=sessions.find(item=>item.id===activeSessionId);
+        const payload={version:1,mode:'survival',sessionId:activeSessionId,createdAt:session?.createdAt||Date.now(),savedAt:Date.now(),checkpoint};
+        localStorage.setItem(SURVIVAL_BACKUP_KEY,JSON.stringify(payload));
+        const verified=JSON.parse(localStorage.getItem(SURVIVAL_BACKUP_KEY)||'null');
+        return !!(verified&&verified.version===1&&verified.mode==='survival'&&verified.sessionId===activeSessionId&&verified.checkpoint&&verified.checkpoint.mode==='survival'&&verified.savedAt===payload.savedAt);
+      }catch(error){console.warn('No se pudo verificar el respaldo de Supervivencia',error);return false}
+    }
+    function runSnapshot(){return {U:{...U},growthStacks, maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
     function persist(checkpoint=true){
        try{
          if(gameMode==='campaign'){sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');activeSessionId=null;saveData.checkpoint=null;checkpoint=false}
@@ -1880,6 +1908,7 @@ body{background:
              toast('PARTIDA GUARDADA · DATOS OPTIMIZADOS');
            }else toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
          }
+         if(gameMode==='survival'&&cp&&!writeSurvivalBackup(cp)){toast('GUARDADO PRINCIPAL OK · RESPALDO NO VERIFICADO');return false}
          try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
          try{refreshHome()}catch(homeRefreshError){}
          return true
@@ -2067,7 +2096,7 @@ function renderCampaign(){
       if (e.boss) { const bossReward=gameMode==='campaign'?Math.round(500+lvl*18):Math.round(180+lvl*12);coins+=bossReward;const fragmentReward=gameMode==='campaign'?0:2+Math.floor(lvl/10);if(fragmentReward)skillFragments+=fragmentReward;pop(e.P[0].x,e.P[0].y-54,'BONUS +'+bossReward+' ◈'+(fragmentReward?' · +'+fragmentReward+' ◆':''),'#ffe3a0',true);shots.length = 0; slow = .2; banner('EL REY HA CAÍDO', 'Recompensa de jefe obtenida · '+bossReward+' monedas') }
     }
     function hurtP(d) { if (state !== 'play') return; if(guard>0){guard=0;guardFlash=.45;inv=Math.max(inv,.35);toast('ESCUDO ROTO');SFX.hit();return} if (inv > 0) return; hp -= d * U.def; inv = .55; streak = 0; shake = Math.max(shake, 8); rf = .3; fury = Math.min(100, fury + d * .4 * U.fury); SFX.hurt(); if (hp <= 0) { hp = 0; gameOver() } }
-    function gameOver(){state='over';overAt=performance.now();SFX.over();const nr=score>best&&score>0;best=Math.max(best,score);const finished=sessions.find(x=>x.id===activeSessionId);if(finished){finished.checkpoint=null;finished.ended=true;finished.level=lvl;finished.score=score;finished.updatedAt=Date.now()}activeSessionId=null;saveData.checkpoint=null;persist(false);
+    function gameOver(){state='over';overAt=performance.now();try{localStorage.removeItem(SURVIVAL_BACKUP_KEY)}catch(backupError){}SFX.over();const nr=score>best&&score>0;best=Math.max(best,score);const finished=sessions.find(x=>x.id===activeSessionId);if(finished){finished.checkpoint=null;finished.ended=true;finished.level=lvl;finished.score=score;finished.updatedAt=Date.now()}activeSessionId=null;saveData.checkpoint=null;persist(false);
       $('ovp').textContent = 'Nivel ' + lvl + ' · ' + score + ' puntos · Récord ' + best + (nr ? ' · ¡NUEVO RÉCORD!' : ''); $('over').style.display = 'flex'
     }
     function shoot(h,a,v,d,owner=null){if(shots.length>=MAX_ACTIVE_SHOTS)return;once('sh',80,SFX.shoot);if(owner){owner.attackT=.22;owner.attackAngle=a}shots.push({x:h.x,y:h.y,vx:Math.cos(a)*v*sc,vy:Math.sin(a)*v*sc,d,l:5,owner})}
@@ -2682,6 +2711,7 @@ function renderCampaign(){
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { moveKeys.clear() });
     document.addEventListener('visibilitychange', () => { if (!hasTouchInput() && !mobile && document.hidden && state === 'play') togglePause() });
+    window.addEventListener('pagehide',()=>{if(gameMode==='survival'&&['play','pause','upg'].includes(state))persist(true)});
     document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button'); if (b) b.blur() });
     const KB = [...document.querySelectorAll('.k')], CH = [...document.querySelectorAll('#combos span')];
     KB.forEach(b => { b._n = b.lastElementChild.textContent; b._r = true });
