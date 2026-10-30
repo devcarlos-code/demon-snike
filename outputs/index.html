@@ -1702,6 +1702,16 @@ body{background:
   </div>
   <script>
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
+    // Delegación de navegación en captura: los botones del menú siguen respondiendo
+    // aunque un componente visual añada listeners que detengan la propagación.
+    document.addEventListener('click',function(e){
+      const b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;
+      const page=b.dataset&&b.dataset.page;
+      if(page){e.preventDefault();e.stopImmediatePropagation();if(typeof showHomePage==='function')showHomePage(page);return}
+      if(b.id==='go'){e.preventDefault();e.stopImmediatePropagation();if(typeof startGame==='function')startGame('survival');return}
+      if(b.id==='campaignGo'){e.preventDefault();e.stopImmediatePropagation();if(typeof showHomePage==='function')showHomePage('campaignPage');return}
+      if(b.dataset&&b.dataset.campaignLevel){e.preventDefault();e.stopImmediatePropagation();const level=Number(b.dataset.campaignLevel);if(!b.disabled&&level<=campaignUnlocked&&typeof startGame==='function')startGame('campaign',level)}
+    },true);
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const mobileMQ=matchMedia('(pointer: coarse)');
     const hasTouchInput=()=>mobileMQ.matches||navigator.maxTouchPoints>0||('ontouchstart' in window);
@@ -1809,19 +1819,37 @@ body{background:
     const U0={dA:1,dS:1,dD:1,cd:1,spd:1,def:1,fury:1,life:0,combo:1,tn:4};
     const SAVE_KEY='arena_serpientes_save_v2';
     function loadSave(){
-      const candidates=[SAVE_KEY,'arena_serpientes_save_v1','arena_serpientes_save'];
-      for(const key of candidates){
-        try{
-          const raw=localStorage.getItem(key);
-          if(!raw)continue;
+      const candidates=[SAVE_KEY,'arena_serpientes_save_v1','arena_serpientes_save','demon_snike_save','demon_snike_save_v2','demon-snike-save','demon_snake_save'];
+      const found=[];
+      try{
+        for(const key of candidates){
+          const raw=localStorage.getItem(key);if(!raw)continue;
           const value=JSON.parse(raw);
-          if(!value||typeof value!=='object'||Array.isArray(value))continue;
-          return {...value,version:2};
-        }catch(e){}
+          if(value&&typeof value==='object'&&!Array.isArray(value))found.push(value);
+        }
+        // Recupera formatos usados por versiones experimentales sin reemplazar
+        // un guardado válido por un objeto vacío.
+        for(let i=0;i<localStorage.length;i++){
+          const key=localStorage.key(i);if(!key||!/(arena|demon|snake)/i.test(key)||candidates.includes(key)||/skins|best/i.test(key))continue;
+          try{const value=JSON.parse(localStorage.getItem(key)||'null');if(value&&typeof value==='object'&&!Array.isArray(value)&&(('coins'in value)||Array.isArray(value.sessions)||('ownedSkills'in value)||('campaignUnlocked'in value)))found.push(value)}catch(e){}
+        }
+      }catch(e){}
+      if(!found.length){let legacyBest=0;try{legacyBest=Math.max(0,Number(localStorage.getItem('arena_serpientes_best'))||0)}catch(e){}return {version:2,best:legacyBest,coins:0,sessions:[]}}
+      const merged={...found[0]};
+      for(const value of found.slice(1)){
+        merged.best=Math.max(Number(merged.best)||0,Number(value.best)||0);
+        merged.coins=Math.max(Number(merged.coins)||0,Number(value.coins)||0);
+        merged.campaignUnlocked=Math.max(Number(merged.campaignUnlocked)||1,Number(value.campaignUnlocked)||1);
+        merged.campaignCompleted=!!(merged.campaignCompleted||value.campaignCompleted);
+        merged.ownedSkills=[...new Set([...(Array.isArray(merged.ownedSkills)?merged.ownedSkills:[]),...(Array.isArray(value.ownedSkills)?value.ownedSkills:[])])];
+        merged.sessions=[...(Array.isArray(merged.sessions)?merged.sessions:[]),...(Array.isArray(value.sessions)?value.sessions:[])];
+        merged.campaignResults={...(value.campaignResults||{}),...(merged.campaignResults||{})};
+        merged.skillMasteries={...(value.skillMasteries||{}),...(merged.skillMasteries||{})};
+        merged.skillFragments=Math.max(Number(merged.skillFragments)||0,Number(value.skillFragments)||0);
+        merged.stats={...(value.stats||{}),...(merged.stats||{})};
+        if(!merged.checkpoint&&value.checkpoint)merged.checkpoint=value.checkpoint;
       }
-      let legacyBest=0;
-      try{legacyBest=Math.max(0,Number(localStorage.getItem('arena_serpientes_best'))||0)}catch(e){}
-      return {version:2,best:legacyBest,coins:0,sessions:[]};
+      merged.version=2;return merged;
     }
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
@@ -2010,7 +2038,7 @@ function renderCampaign(){
     function makePlayer() { pl = new Snake(WORLD_W/2,WORLD_H/2, { n: 30, hp: 1, v: 0, col: activeSkin().color, s: 1.2 }, 'p'); pl.h = -Math.PI / 2 }
     function tryFullscreen(){if(document.fullscreenElement||matchMedia('(display-mode:fullscreen)').matches)return;const f=document.documentElement.requestFullscreen;if(f)f.call(document.documentElement).catch(()=>{})}
     function startGame(mode='survival',level=1){
-      if(state!=='title')return false;
+      const menuVisible=$('title')&&getComputedStyle($('title')).display!=='none';if(state!=='title'&&!menuVisible)return false;state='title';
       if(mode!=='campaign'&&mode!=='survival')mode='survival';
       try{
         gameMode=mode;
