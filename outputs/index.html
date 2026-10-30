@@ -1602,15 +1602,52 @@ body{background:
     }
 
 
-    /* Separación vertical: evita que el bloque de estadísticas invada el radar */
+    /* HUD y radar en paralelo: priorizar ancho y evitar apilar elementos */
     @media (pointer:coarse) {
+      #hud {
+        position:fixed !important;
+        top:calc(env(safe-area-inset-top,0px) + 8px) !important;
+        left:max(8px,env(safe-area-inset-left,0px) + 8px) !important;
+        right:calc(clamp(84px,22vw,112px) + env(safe-area-inset-right,0px) + 20px) !important;
+        width:auto !important;
+        display:flex !important;
+        align-items:flex-start !important;
+        gap:6px !important;
+      }
+      #hud .bars {
+        flex:0 1 38% !important;
+        width:38% !important;
+        max-width:none !important;
+        min-width:0 !important;
+      }
+      #hud #lv {
+        position:static !important;
+        flex:1 1 62% !important;
+        width:auto !important;
+        max-width:none !important;
+        min-width:0 !important;
+        margin:0 !important;
+        padding:4px 6px !important;
+        font-size:8px !important;
+        line-height:1.2 !important;
+        text-align:right !important;
+        overflow-wrap:anywhere !important;
+      }
       #radar {
-        top:calc(env(safe-area-inset-top,0px) + 154px) !important;
+        top:calc(env(safe-area-inset-top,0px) + 8px) !important;
+        right:max(10px,env(safe-area-inset-right,0px) + 10px) !important;
+        left:auto !important;
+        width:clamp(84px,22vw,112px) !important;
+        height:auto !important;
       }
     }
     @media (pointer:coarse) and (orientation:landscape) {
+      #hud {
+        right:calc(clamp(76px,16vh,96px) + env(safe-area-inset-right,0px) + 20px) !important;
+      }
       #radar {
-        top:calc(env(safe-area-inset-top,0px) + 126px) !important;
+        top:calc(env(safe-area-inset-top,0px) + 8px) !important;
+        width:clamp(76px,16vh,96px) !important;
       }
     }
 
