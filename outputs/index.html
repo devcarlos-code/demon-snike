@@ -2300,7 +2300,7 @@ function renderCampaign(){
     }
 
     function drawDemon(t, targetCtx, targetPlayer) {
-      const c = targetCtx || c, player = targetPlayer || player;
+      const c = targetCtx || ctx, player = targetPlayer || pl;
       if (!player) return;
       const s = player.sc, P = player.P, A = player.A, n = player.n; c.lineJoin = 'round'; c.lineCap = 'round';
       c.globalCompositeOperation = 'lighter';
