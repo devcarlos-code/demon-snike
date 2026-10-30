@@ -1808,13 +1808,27 @@ body{background:
     const cd = { a: 0, s: 0, d: 0, f: 0 }, MAXCD = { a: .7, s: 2.8, d: 3.8, f: 0 };
     const U0={dA:1,dS:1,dD:1,cd:1,spd:1,def:1,fury:1,life:0,combo:1,tn:4};
     const SAVE_KEY='arena_serpientes_save_v2';
-    function loadSave(){try{const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');return x&&x.version===2?x:{}}catch(e){return {}}}
+    function loadSave(){
+      const candidates=[SAVE_KEY,'arena_serpientes_save_v1','arena_serpientes_save'];
+      for(const key of candidates){
+        try{
+          const raw=localStorage.getItem(key);
+          if(!raw)continue;
+          const value=JSON.parse(raw);
+          if(!value||typeof value!=='object'||Array.isArray(value))continue;
+          return {...value,version:2};
+        }catch(e){}
+      }
+      let legacyBest=0;
+      try{legacyBest=Math.max(0,Number(localStorage.getItem('arena_serpientes_best'))||0)}catch(e){}
+      return {version:2,best:legacyBest,coins:0,sessions:[]};
+    }
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
-    let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
+    let sessions=Array.isArray(saveData.sessions)?saveData.sessions.filter(x=>x&&typeof x==='object'&&!Array.isArray(x)&&typeof x.id==='string'):[],activeSessionId=saveData.activeSessionId||null;
     // Una sola ranura local de supervivencia. La campaña solo guarda progreso y resultados.
-    sessions=sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)).slice(0,1);
+    sessions=sessions.filter(x=>x&&typeof x==='object'&&(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(Number(b.updatedAt||b.createdAt)||0)-(Number(a.updatedAt||a.createdAt)||0)).slice(0,1);
     if(saveData.checkpoint&&saveData.checkpoint.mode!=='campaign'&&!sessions.length){activeSessionId='legacy-'+Date.now().toString(36);sessions.push({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),checkpoint:saveData.checkpoint,ended:false})}
     if(!sessions.some(x=>x.id===activeSessionId))activeSessionId=sessions[0]?.id||null;
         function runSnapshot(){return {U:{...U},growthStacks, maxHp,mode:gameMode,level:Math.max(1,lvl),score,hp,fury,guard,loadout:[...skillLoadout],enemies:en.map(e=>({...e,P:e.P.map(q=>({...q})),A:[...e.A],R:[...e.R],SP:[...e.SP],legs:e.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))})),spawnQ:spawnQ.map(q=>({...q,pos:q.pos&&{...q.pos}})),player:pl&&({...pl,P:pl.P.map(q=>({...q})),A:[...pl.A],R:[...pl.R],SP:[...pl.SP],legs:pl.legs.map(l=>({...l,f:l.f&&{...l.f},a:l.a&&{...l.a},b:l.b&&{...l.b}}))}),cooldowns:{...cd}}}
