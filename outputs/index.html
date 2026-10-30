@@ -2415,6 +2415,28 @@ function renderCampaign(){
       if(speciesId==='ocean'){c.save();c.strokeStyle=skinPreview?skinColor:'#8beaff';c.fillStyle=skinPreview?skinColor:'#8beaff';c.lineWidth=3;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-18,sd*19);c.lineTo(-34,sd*30);c.lineTo(-28,sd*11);c.closePath();c.fill();c.stroke()});c.restore()}
       if(speciesId==='bloodmoon'){c.save();c.strokeStyle=skinPreview?skinColor:'#ff668f';c.lineWidth=3.4;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.quadraticCurveTo(-30,sd*3,-32,sd*26);c.quadraticCurveTo(-41,sd*42,-50,sd*32);c.stroke()});c.restore()}
       if(speciesId==='fallen'){c.save();c.strokeStyle=skinPreview?skinColor:'#c7a6ff';c.fillStyle=skinPreview?skinColor:'#c7a6ff';c.lineWidth=3.5;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-20,sd*12);c.lineTo(-26,sd*30);c.lineTo(-34,sd*20);c.lineTo(-45,sd*35);c.lineTo(-39,sd*8);c.closePath();c.fill();c.stroke()});c.restore()}
+      // Cráneos y coronas: la cabeza también cambia de especie, no solo sus adornos corporales.
+      if(speciesId==='frost'||speciesId==='glacier'){
+        c.save();c.fillStyle=skinPreview?skinColor:'#d8f7ff';c.strokeStyle='#5cabc5';c.lineWidth=2.3;
+        c.beginPath();c.moveTo(-13,-9);c.lineTo(-26,-19);c.lineTo(-31,-37);c.lineTo(-16,-29);c.lineTo(-5,-15);c.lineTo(5,-15);c.lineTo(17,-30);c.lineTo(31,-38);c.lineTo(26,-18);c.lineTo(13,-8);c.closePath();c.fill();c.stroke();
+        c.fillStyle='#f5ffff';c.beginPath();c.moveTo(1,-15);c.lineTo(0,-34);c.lineTo(8,-19);c.closePath();c.fill();c.restore();
+      }else if(speciesId==='ocean'){
+        c.save();c.strokeStyle=skinPreview?skinColor:'#91eaff';c.fillStyle='#102c4b';c.lineWidth=3;
+        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-14,sd*7);c.quadraticCurveTo(-28,sd*16,-35,sd*37);c.quadraticCurveTo(-18,sd*29,-8,sd*14);c.closePath();c.fill();c.stroke()});
+        c.beginPath();c.moveTo(-18,-7);c.lineTo(-29,-20);c.lineTo(-17,-17);c.lineTo(-8,-9);c.lineTo(0,-18);c.lineTo(8,-9);c.lineTo(17,-17);c.lineTo(29,-20);c.lineTo(18,-5);c.stroke();c.restore();
+      }else if(speciesId==='venom'){
+        c.save();c.fillStyle='#35451d';c.strokeStyle=skinPreview?skinColor:'#c8e78a';c.lineWidth=3;
+        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-10,sd*8);c.lineTo(-24,sd*17);c.lineTo(-37,sd*34);c.lineTo(-33,sd*13);c.lineTo(-19,sd*4);c.closePath();c.fill();c.stroke()});
+        c.beginPath();c.moveTo(-7,-9);c.lineTo(-14,-25);c.lineTo(-2,-17);c.lineTo(5,-26);c.lineTo(14,-10);c.stroke();c.restore();
+      }else if(speciesId==='void'||speciesId==='fallen'){
+        c.save();c.strokeStyle=skinPreview?skinColor:'#d2c2f3';c.fillStyle='#21182e';c.lineWidth=3.2;
+        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-12,sd*7);c.quadraticCurveTo(-29,sd*1,-30,sd*20);c.lineTo(-45,sd*38);c.lineTo(-39,sd*13);c.quadraticCurveTo(-31,sd*-6,-12,sd*-2);c.closePath();c.fill();c.stroke()});
+        c.beginPath();c.moveTo(-15,-8);c.lineTo(-24,-28);c.lineTo(-7,-18);c.lineTo(0,-35);c.lineTo(9,-17);c.lineTo(25,-28);c.lineTo(15,-7);c.stroke();c.restore();
+      }else if(speciesId==='bloodmoon'){
+        c.save();c.strokeStyle=skinPreview?skinColor:'#ff7899';c.fillStyle='#42101f';c.lineWidth=3.5;
+        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-12,sd*8);c.bezierCurveTo(-30,sd*12,-38,sd*35,-28,sd*43);c.bezierCurveTo(-31,sd*24,-17,sd*20,-8,sd*13);c.closePath();c.fill();c.stroke()});
+        c.beginPath();c.moveTo(-10,-9);c.quadraticCurveTo(-28,-30,-39,-25);c.quadraticCurveTo(-28,-18,-20,-5);c.moveTo(10,-9);c.quadraticCurveTo(28,-30,39,-25);c.quadraticCurveTo(28,-18,20,-5);c.stroke();c.restore();
+      }
       const bitePulse=cobra.phase===2?Math.sin(Math.min(1,cobra.t/.58)*Math.PI):cobra.phase===3?Math.max(0,cobra.t/.42):0;
       const cobraOpen=cobra.phase===2?Math.min(1.9,.35+bitePulse*1.55):cobra.phase===3&&cobra.swallowed?Math.max(0,cobra.t/.42)*1.15:cobra.phase===1?.12:0;
       const recoil=cobra.phase===1?Math.sin((1-cobra.t/.34)*Math.PI)*.22:cobra.phase===2?bitePulse*.28:cobra.phase===3?Math.sin(cobra.t*31)*.07:0;
