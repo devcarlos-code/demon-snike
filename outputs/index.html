@@ -1564,6 +1564,16 @@ body{background:
 
 
     .home-skin-feature{width:min(100%,900px);margin:22px auto 8px;padding:14px;border:1px solid rgba(185,145,220,.2);border-radius:18px;background:linear-gradient(145deg,rgba(35,25,48,.62),rgba(12,9,18,.78));box-sizing:border-box}.home-skin-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;color:#ead8ff;font-size:11px;letter-spacing:.12em}.home-skin-heading button{font-size:10px;padding:7px 10px}.home-skin-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.home-skin-grid .skin-card{padding:9px;gap:6px}.home-skin-grid .skin-preview{height:58px}.home-skin-grid .skin-preview span{font-size:25px}.home-skin-grid .skin-card>b{font-size:11px}.home-skin-grid .skin-card>small{font-size:9px}.home-skin-grid .skin-card>button{font-size:9px;padding:7px 5px}@media(max-width:600px){.home-skin-feature{margin:16px 0 5px;padding:10px}.home-skin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}    .skin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:24px 0 48px}.skin-card{display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px;border:1px solid rgba(185,145,220,.22);border-radius:16px;background:linear-gradient(145deg,rgba(35,25,48,.92),rgba(12,9,18,.96));text-align:center;min-width:0}.skin-card.is-selected{border-color:#c28bff;box-shadow:0 0 22px rgba(162,100,255,.2)}.skin-preview{width:100%;height:92px;border-radius:12px;display:grid;place-items:center;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--skin-color) 35%,transparent),transparent 68%),#100c18}.skin-preview span{font-size:34px;filter:drop-shadow(0 0 12px var(--skin-color))}.skin-preview i{position:absolute;left:15%;right:15%;bottom:17px;height:7px;border-radius:99px;background:var(--skin-color);box-shadow:0 0 14px var(--skin-color)}.skin-card>b{font-size:13px}.skin-card>small{font-size:10px;color:#c7b5d8;letter-spacing:.08em}.skin-card>button{width:100%;margin-top:3px}.skin-card>button:disabled{opacity:.4;cursor:not-allowed}@media(max-width:480px){.skin-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.skin-card{padding:11px}.skin-preview{height:78px}}
+
+/* Layout repair for internal pages: remove the old 3-row grid constraint */
+#title{display:block!important;min-height:100dvh;box-sizing:border-box;overflow-x:hidden!important;overflow-y:auto!important}
+#title>.home-view{width:100%;min-height:calc(100dvh - 2*clamp(20px,4vw,58px));box-sizing:border-box}
+#title>.section-page{display:none;position:relative!important;inset:auto!important;grid-column:auto!important;grid-row:auto!important;width:min(1380px,100%)!important;min-height:calc(100dvh - 2*clamp(20px,4vw,58px));height:auto!important;margin:0 auto!important;padding:0!important;box-sizing:border-box;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;overflow:visible!important}
+#title>.section-page[aria-hidden="false"]{display:flex!important;visibility:visible!important}
+#title .section-content{display:block!important;flex:1 0 auto;width:min(100%,1120px)!important;min-width:0!important;margin:0 auto 30px!important;visibility:visible!important;opacity:1!important}
+#title .section-header{flex:0 0 auto}
+.section-render-error,.section-empty-state{margin:20px 0;padding:18px;border:1px solid #a66f65;border-radius:12px;background:rgba(8,8,10,.82);color:#f3e8df}
+.section-render-error p{margin:8px 0;color:#ffb4a9}
 </style>
 </head>
 
@@ -2558,7 +2568,41 @@ function renderCampaign(){
       if ((k === 'enter' || k === ' ') && !e.repeat) { if (state === 'title') startGame(); else if (state === 'over') restart() }
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
-    $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('skinGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-skin-action]');if(b&&!b.disabled)chooseSkin(b.dataset.skinAction)});$('homeSkinGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-skin-action]');if(b&&!b.disabled)chooseSkin(b.dataset.skinAction)});$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});$('masteryList').addEventListener('click',e=>{const b=e.target.closest('button[data-upgrade-skill]');if(b&&!b.disabled)upgradeSkill(b.dataset.upgradeSkill)});function showHomePage(pageId){const allowed=['homeView','shopPage','skillsPage','campaignPage','profilePage','skinsPage'];if(!allowed.includes(pageId)){toast('SECCIÓN NO DISPONIBLE');return false}const home=$('homeView');if(home){home.style.display=pageId==='homeView'?'flex':'none';home.setAttribute('aria-hidden',String(pageId!=='homeView'))}document.querySelectorAll('#title .section-page').forEach(v=>{const active=v.id===pageId;v.style.display=active?'flex':'none';v.setAttribute('aria-hidden',String(!active))});const title=$('title');title.scrollTop=0;if(pageId==='shopPage')renderShop();if(pageId==='skillsPage')renderLoadout();if(pageId==='campaignPage')renderCampaign();if(pageId==='profilePage')renderProfile();if(pageId==='skinsPage')renderSkins();document.querySelectorAll('.top-nav [data-page]').forEach(b=>b.classList.toggle('is-active',b.dataset.page===pageId));return true}document.addEventListener('click',e=>{const b=e.target&&e.target.closest?e.target.closest('button[data-page]'):null;if(b){e.preventDefault();showHomePage(b.dataset.page)}});$('sessionList').addEventListener('click',e=>{const del=e.target.closest('button[data-delete-session]');if(del){const id=del.dataset.deleteSession;if(!id)return;const session=sessions.find(x=>x.id===id);if(!session)return;if(!confirm('¿Eliminar esta sesión y su progreso guardado?'))return;sessions=sessions.filter(x=>x.id!==id);if(activeSessionId===id)activeSessionId=null;persist(false);refreshHome();toast('SESIÓN ELIMINADA');return}const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
+    $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('skinGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-skin-action]');if(b&&!b.disabled)chooseSkin(b.dataset.skinAction)});$('homeSkinGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-skin-action]');if(b&&!b.disabled)chooseSkin(b.dataset.skinAction)});$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});$('loadoutGrid').addEventListener('change',e=>{const q=e.target.closest('select[data-skill-slot]');if(q)equipSkill(+q.dataset.skillSlot,q.value)});$('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout()});$('shopList').addEventListener('click',e=>{const b=e.target.closest('button[data-buy-skill]');if(b&&!b.disabled)buySkill(b.dataset.buySkill)});$('masteryList').addEventListener('click',e=>{const b=e.target.closest('button[data-upgrade-skill]');if(b&&!b.disabled)upgradeSkill(b.dataset.upgradeSkill)});function showHomePage(pageId){
+      const allowed=['homeView','shopPage','skillsPage','campaignPage','profilePage','skinsPage'];
+      if(!allowed.includes(pageId)){toast('SECCIÓN NO DISPONIBLE');return false}
+      const title=$('title'),home=$('homeView');
+      if(title){title.style.display='block';title.style.overflowY='auto';title.scrollTop=0}
+      if(home){home.style.display=pageId==='homeView'?'flex':'none';home.setAttribute('aria-hidden',String(pageId!=='homeView'))}
+      document.querySelectorAll('#title .section-page').forEach(v=>{
+        const active=v.id===pageId;
+        v.style.display=active?'flex':'none';
+        v.style.visibility=active?'visible':'hidden';
+        v.style.position='relative';
+        v.style.width='100%';
+        v.setAttribute('aria-hidden',String(!active));
+      });
+      try{
+        if(pageId==='shopPage')renderShop();
+        if(pageId==='skillsPage'){renderLoadout();renderMasteries()}
+        if(pageId==='campaignPage')renderCampaign();
+        if(pageId==='profilePage')renderProfile();
+        if(pageId==='skinsPage')renderSkins();
+      }catch(error){
+        console.error('Error al dibujar la sección '+pageId,error);
+        const page=$(pageId),content=page&&page.querySelector('.section-content');
+        if(content)content.innerHTML='<div class="section-render-error"><b>NO SE PUDO CARGAR ESTA SECCIÓN</b><p></p><small>El resto del juego sigue protegido. Comparte este mensaje para corregir el fallo.</small></div>',content.querySelector('p').textContent=error&&error.message?error.message:String(error);
+      }
+      const page=$(pageId);
+      if(page&&pageId!=='homeView'){
+        const content=page.querySelector('.section-content');
+        if(content&&pageId==='shopPage'&&!$('shopList')?.children.length)content.insertAdjacentHTML('beforeend','<p class="section-empty-state">No hay habilidades disponibles para mostrar.</p>');
+        if(content&&pageId==='skillsPage'&&!$('loadoutGrid')?.children.length)content.insertAdjacentHTML('beforeend','<p class="section-empty-state">No se pudo generar el arsenal.</p>');
+        if(content&&pageId==='campaignPage'&&!$('campaignGrid')?.children.length)content.insertAdjacentHTML('beforeend','<p class="section-empty-state">No se pudo generar el mapa de niveles.</p>');
+      }
+      document.querySelectorAll('.top-nav [data-page]').forEach(b=>b.classList.toggle('is-active',b.dataset.page===pageId));
+      return true;
+    }document.addEventListener('click',e=>{const b=e.target&&e.target.closest?e.target.closest('button[data-page]'):null;if(b){e.preventDefault();showHomePage(b.dataset.page)}});$('sessionList').addEventListener('click',e=>{const del=e.target.closest('button[data-delete-session]');if(del){const id=del.dataset.deleteSession;if(!id)return;const session=sessions.find(x=>x.id===id);if(!session)return;if(!confirm('¿Eliminar esta sesión y su progreso guardado?'))return;sessions=sessions.filter(x=>x.id!==id);if(activeSessionId===id)activeSessionId=null;persist(false);refreshHome();toast('SESIÓN ELIMINADA');return}const b=e.target.closest('button[data-session-id]');if(b&&!b.disabled)continueSavedGame(b.dataset.sessionId)});$('rs').addEventListener('click',togglePause);$('overHome').addEventListener('click',goHome);$('pauseHome').addEventListener('click',goHome);
     $('pbtn').addEventListener('pointerdown', e => { e.preventDefault(); togglePause() });
     addEventListener('blur', () => { moveKeys.clear() });
     document.addEventListener('visibilitychange', () => { if (!hasTouchInput() && !mobile && document.hidden && state === 'play') togglePause() });
