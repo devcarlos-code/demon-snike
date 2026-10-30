@@ -1,5 +1,5 @@
-const CACHE = 'arena-serpientes-v98';
-const ASSETS = ['./index.html', './manifest.webmanifest', './icon.svg'];
+const CACHE = 'arena-serpientes-v99';
+const ASSETS = ['./manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -24,28 +24,22 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
 
-  const isPage = request.mode === 'navigate' || new URL(request.url).pathname.endsWith('/index.html');
+  const url = new URL(request.url);
+  const isPage = request.mode === 'navigate' || url.pathname.endsWith('/index.html');
+
+  // Nunca servir HTML antiguo desde caché: el motor y sus controles deben
+  // corresponder siempre al último index.html publicado.
   if (isPage) {
-    event.respondWith(
-      fetch(request, { cache: 'no-store' }).then(response => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE).then(cache => {
-            cache.put(request, copy);
-            cache.put('./index.html', response.clone());
-          });
-        }
-        return response;
-      }).catch(async () => {
-        return (await caches.match(request)) || (await caches.match('./index.html'));
-      })
-    );
+    event.respondWith(fetch(request, { cache: 'no-store' }));
     return;
   }
 
   event.respondWith(
     caches.match(request).then(cached => cached || fetch(request).then(response => {
-      if (response.ok) caches.open(CACHE).then(cache => cache.put(request, response.clone()));
+      if (response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(request, copy)).catch(() => {});
+      }
       return response;
     }))
   );
