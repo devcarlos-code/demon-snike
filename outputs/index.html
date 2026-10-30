@@ -1490,6 +1490,9 @@ body{background:
 #hud{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;isolation:isolate;gap:8px!important;align-items:flex-start!important}
 #hud .bars{flex:0 1 34%!important;width:min(34vw,210px);min-width:104px;max-width:210px!important;padding:6px 8px 2px!important;border:1px solid rgba(185,118,91,.48)!important;border-radius:9px!important;background:rgba(9,7,11,.64)!important;box-shadow:0 3px 12px rgba(0,0,0,.22)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
 #hud .bar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;height:7px!important;margin-bottom:4px!important}
+.skin-preview canvas.skin-sample{position:absolute;left:10px;right:10px;top:6px;bottom:12px;width:calc(100% - 20px);height:calc(100% - 18px);pointer-events:none}
+#hud{padding-right:150px!important}@media(max-width:760px){#hud{padding-right:112px!important}}
+.skin-card .skin-preview::after{top:7px;bottom:auto}.skin-card>button{font-size:10px!important;letter-spacing:.04em!important;white-space:nowrap;padding-left:4px!important;padding-right:4px!important}
 #lv{max-width:min(48%,260px)!important;min-width:0!important;padding:6px 8px!important;border:1px solid rgba(185,118,91,.42)!important;border-radius:9px!important;background:rgba(9,7,11,.64)!important;box-shadow:0 3px 12px rgba(0,0,0,.22)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important;font-size:10px!important;line-height:1.45!important}
 #cards{grid-template-columns:repeat(4,minmax(0,1fr))}
 #cards button{min-height:132px;justify-content:center}
@@ -1826,17 +1829,17 @@ body{background:
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,...(saveData.stats||{})};
-    const PLAYER_SKINS=[{id:'ember',name:'Carmesí',color:'#ff665e',price:0,icon:'🔥'},{id:'frost',name:'Escarcha',color:'#75dcff',price:12000,icon:'❄️'},{id:'venom',name:'Veneno',color:'#8cff8c',price:15000,icon:'☣️'},{id:'amethyst',name:'Amatista',color:'#c28bff',price:700,icon:'🔮'},{id:'gold',name:'Oro solar',color:'#ffd36b',price:950,icon:'☀️'},{id:'ocean',name:'Abismo',color:'#4bd8cf',price:18000,icon:'🌊'},{id:'rose',name:'Rosa espectral',color:'#ff83bd',price:1500,icon:'🌸'},{id:'void',name:'Caído',color:'#b8a1ff',price:22000,icon:'🌑'},{id:'toxic',name:'Toxina radiante',color:'#c5ff42',price:2600,icon:'🧪'},{id:'inferno',name:'Infierno',color:'#ff3d22',price:3000,icon:'🌋'},{id:'glacier',name:'Glaciar',color:'#a8f3ff',price:3400,icon:'🧊'},{id:'storm',name:'Tormenta',color:'#788cff',price:3800,icon:'🌩️'},{id:'bloodmoon',name:'Luna sangrienta',color:'#c51e55',price:28000,icon:'🌘'},{id:'celestial',name:'Celestial',color:'#fff0a8',price:5000,icon:'🌟'},{id:'neon',name:'Neón',color:'#ff4df0',price:5800,icon:'💠'},{id:'ancient',name:'Reliquia antigua',color:'#c49a63',price:6800,icon:'🏺'},{id:'fallen',name:'Caído',color:'#9b75e8',price:25000,icon:'✦'}];
+    const PLAYER_SKINS=[{id:'ember',name:'Carmesí',color:'#ff665e',price:0,icon:'🔥'},{id:'frost',name:'Escarcha',color:'#75dcff',price:12000,icon:'❄️'},{id:'venom',name:'Veneno',color:'#8cff8c',price:15000,icon:'☣️'},{id:'amethyst',name:'Amatista',color:'#c28bff',price:700,icon:'🔮'},{id:'gold',name:'Oro solar',color:'#ffd36b',price:950,icon:'☀️'},{id:'ocean',name:'Abismo',color:'#6f5cff',price:18000,icon:'🌊'},{id:'rose',name:'Rosa espectral',color:'#ff83bd',price:1500,icon:'🌸'},{id:'void',name:'Vacío',color:'#b8a1ff',price:22000,icon:'🌑'},{id:'toxic',name:'Toxina radiante',color:'#c5ff42',price:2600,icon:'🧪'},{id:'inferno',name:'Infierno',color:'#ff3d22',price:3000,icon:'🌋'},{id:'glacier',name:'Glaciar',color:'#a8f3ff',price:3400,icon:'🧊'},{id:'storm',name:'Tormenta',color:'#788cff',price:3800,icon:'🌩️'},{id:'bloodmoon',name:'Luna sangrienta',color:'#c51e55',price:28000,icon:'🌘'},{id:'celestial',name:'Celestial',color:'#fff0a8',price:5000,icon:'🌟'},{id:'neon',name:'Neón',color:'#ff4df0',price:5800,icon:'💠'},{id:'ancient',name:'Reliquia antigua',color:'#c49a63',price:6800,icon:'🏺'},{id:'fallen',name:'Caído',color:'#9b75e8',price:25000,icon:'✦'}];
     let ownedSkins=['ember'],selectedSkin='ember';
     try{const savedSkins=JSON.parse(localStorage.getItem('demon_snike_skins')||'{}');if(Array.isArray(savedSkins.owned))ownedSkins=[...new Set(['ember',...savedSkins.owned.filter(id=>PLAYER_SKINS.some(s=>s.id===id))])];if(PLAYER_SKINS.some(s=>s.id===savedSkins.selected)&&ownedSkins.includes(savedSkins.selected))selectedSkin=savedSkins.selected}catch(error){console.warn('No se pudieron cargar las pieles guardadas',error)}
     const activeSkin=()=>PLAYER_SKINS.find(s=>s.id===selectedSkin)||PLAYER_SKINS[0];
     function saveSkins(){try{localStorage.setItem('demon_snike_skins',JSON.stringify({owned:ownedSkins,selected:selectedSkin}));return true}catch(error){toast('NO SE PUDO GUARDAR LA PIEL');return false}}
     function skinPreviewSvg(){return '<canvas id="skinPreviewCanvas" width="640" height="380" role="img" aria-label="Vista previa del mismo modelo de serpiente que aparece durante la partida"></canvas>'}let skinPreviewSnake=null,skinPreviewSkinId=null,skinPreviewRaf=0;
     function buildSkinPreviewSnake(skin){let source=pl,previewSnake;if(source&&Array.isArray(source.P)&&source.P.length){previewSnake=Object.assign(Object.create(Object.getPrototypeOf(source)),source,{col:skin.color,P:source.P.map(p=>({...p})),A:source.A.slice(),R:source.R.slice(),SP:source.SP.slice(),legs:source.legs.map(l=>({...l,f:l.f?{...l.f}:null,a:l.a?{...l.a}:null,b:l.b?{...l.b}:null}))})}else{previewSnake=new Snake(WORLD_W/2,WORLD_H/2,{n:30,hp:1,v:0,col:skin.color,s:1.2},'p');previewSnake.h=-Math.PI/2;for(let frame=0;frame<150;frame++){const angle=-Math.PI/2+frame*.025;previewSnake.move(WORLD_W/2+Math.cos(angle)*90,WORLD_H/2+Math.sin(angle)*90,112,3.2,1/60)}}previewSnake.col=skin.color;previewSnake.previewSkin=true;previewSnake.previewSkinColor=skin.color;previewSnake.previewSpeciesId=skin.id;return previewSnake}
-    function drawSkinPreview(skin){const canvas=$('skinPreviewCanvas');if(!canvas)return;const previewCtx=canvas.getContext('2d');if(!previewCtx)return;if(!skinPreviewSnake||skinPreviewSkinId!==skin.id){skinPreviewSnake=buildSkinPreviewSnake(skin);skinPreviewSkinId=skin.id}const previewSnake=skinPreviewSnake;previewCtx.clearRect(0,0,canvas.width,canvas.height);const pts=previewSnake.P;let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;for(const p of pts){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y)}const pad=62,bw=Math.max(1,maxX-minX+pad*2),bh=Math.max(1,maxY-minY+pad*2),scale=Math.min(canvas.width/bw,canvas.height/bh,2.4);previewCtx.save();previewCtx.translate((canvas.width-(minX+maxX)*scale)/2,(canvas.height-(minY+maxY)*scale)/2);previewCtx.scale(scale,scale);drawDemon(performance.now(),previewCtx,previewSnake);previewCtx.restore()}
+    function paintSnakeOn(canvas, snake){const g=canvas.getContext('2d');if(!g)return;g.clearRect(0,0,canvas.width,canvas.height);let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;for(const p of snake.P){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y)}const pad=44,bw=Math.max(1,maxX-minX+pad*2),bh=Math.max(1,maxY-minY+pad*2),scale=Math.min(canvas.width/bw,canvas.height/bh,3);g.save();g.translate((canvas.width-(minX+maxX)*scale)/2,(canvas.height-(minY+maxY)*scale)/2);g.scale(scale,scale);drawDemon(performance.now(),g,snake);g.restore()}function paintSkinThumbs(grid){grid.querySelectorAll('.skin-preview[data-skin-preview]').forEach(el=>{const skin=PLAYER_SKINS.find(x=>x.id===el.dataset.skinPreview),old=el.querySelector('svg.skin-sample');if(!skin||!old)return;const cv=document.createElement('canvas');cv.className='skin-sample';cv.width=360;cv.height=200;cv.setAttribute('aria-hidden','true');old.replaceWith(cv);const ic=el.querySelector('span');if(ic)ic.style.display='none';try{paintSnakeOn(cv,buildSkinPreviewSnake(skin))}catch(error){}})}function drawSkinPreview(skin){const canvas=$('skinPreviewCanvas');if(!canvas)return;const previewCtx=canvas.getContext('2d');if(!previewCtx)return;if(!skinPreviewSnake||skinPreviewSkinId!==skin.id){skinPreviewSnake=buildSkinPreviewSnake(skin);skinPreviewSkinId=skin.id}const previewSnake=skinPreviewSnake;previewCtx.clearRect(0,0,canvas.width,canvas.height);const pts=previewSnake.P;let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;for(const p of pts){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y)}const pad=44,bw=Math.max(1,maxX-minX+pad*2),bh=Math.max(1,maxY-minY+pad*2),scale=Math.min(canvas.width/bw,canvas.height/bh,3);previewCtx.save();previewCtx.translate((canvas.width-(minX+maxX)*scale)/2,(canvas.height-(minY+maxY)*scale)/2);previewCtx.scale(scale,scale);drawDemon(performance.now(),previewCtx,previewSnake);previewCtx.restore()}
     function animateSkinPreview(){const modal=$('skinPreviewModal');if(!modal||modal.hidden){skinPreviewRaf=0;return}const skin=PLAYER_SKINS.find(s=>s.id===skinPreviewSkinId);if(skin)drawSkinPreview(skin);skinPreviewRaf=requestAnimationFrame(animateSkinPreview)}
     function openSkinPreview(id){const skin=PLAYER_SKINS.find(s=>s.id===id);if(!skin)return;const modal=$('skinPreviewModal'),stage=$('skinPreviewStage'),title=$('skinPreviewTitle'),desc=$('skinPreviewDescription'),action=$('skinPreviewAction');if(!modal||!stage||!title||!action)return;stage.style.setProperty('--skin-color',skin.color);stage.innerHTML=skinPreviewSvg();title.textContent=skin.name;desc.textContent=ownedSkins.includes(id)?(selectedSkin===id?'Esta es tu piel equipada.':'Ya la tienes desbloqueada. Puedes equiparla cuando quieras.'):'Vista previa de la apariencia. No se descuentan monedas.';action.textContent=ownedSkins.includes(id)?(selectedSkin===id?'EQUIPADA':'EQUIPAR'):'DESBLOQUEAR · ◈ '+skin.price.toLocaleString('es');action.disabled=selectedSkin===id;action.dataset.skinAction=id;skinPreviewSkinId=id;skinPreviewSnake=buildSkinPreviewSnake(skin);modal.hidden=false;drawSkinPreview(skin);if(skinPreviewRaf)cancelAnimationFrame(skinPreviewRaf);skinPreviewRaf=RM?0:requestAnimationFrame(animateSkinPreview)}function closeSkinPreview(){const modal=$('skinPreviewModal');if(modal)modal.hidden=true;if(skinPreviewRaf)cancelAnimationFrame(skinPreviewRaf);skinPreviewRaf=0;skinPreviewSnake=null;skinPreviewSkinId=null}
-    function renderSkins(){const grid=$('skinGrid');if(!grid)return;grid.innerHTML=PLAYER_SKINS.map(s=>{const owned=ownedSkins.includes(s.id),active=selectedSkin===s.id;return '<article class="skin-card '+(active?'is-selected':'')+'"><div class="skin-preview" role="button" tabindex="0" data-skin-preview="'+s.id+'" aria-label="Ver vista previa de '+s.name+'" style="--skin-color:'+s.color+'"><span>'+s.icon+'</span><svg class="skin-sample" viewBox="0 0 180 100" aria-hidden="true"><path d="M35 68 C18 46 42 23 66 38 S110 78 137 53 S143 25 123 25"/><circle cx="35" cy="68" r="9"/><circle cx="53" cy="34" r="9"/><circle cx="76" cy="43" r="9"/><circle cx="98" cy="62" r="9"/><circle cx="121" cy="67" r="9"/><circle cx="143" cy="48" r="9"/><circle cx="136" cy="24" r="10"/><circle class="eye" cx="139" cy="21" r="2"/><circle class="eye" cx="132" cy="23" r="2"/></svg></div><b>'+s.name+'</b><small>'+(owned?(active?'EQUIPADA':'DESBLOQUEADA'):'◈ '+s.price.toLocaleString('es'))+'</small><button type="button" class="skin-preview-btn" data-skin-preview="'+s.id+'">VER CRIATURA</button><button type="button" data-skin-action="'+s.id+'" '+(!owned&&coins<s.price?'disabled':'')+'>'+(active?'EQUIPADA':owned?'EQUIPAR':'DESBLOQUEAR')+'</button></article>'}).join('');const balance=$('skinBalance');if(balance)balance.textContent=coins.toLocaleString('es')}
+    function renderSkins(){const grid=$('skinGrid');if(!grid)return;grid.innerHTML=PLAYER_SKINS.map(s=>{const owned=ownedSkins.includes(s.id),active=selectedSkin===s.id;return '<article class="skin-card '+(active?'is-selected':'')+'"><div class="skin-preview" role="button" tabindex="0" data-skin-preview="'+s.id+'" aria-label="Ver vista previa de '+s.name+'" style="--skin-color:'+s.color+'"><span>'+s.icon+'</span><svg class="skin-sample" viewBox="0 0 180 100" aria-hidden="true"><path d="M35 68 C18 46 42 23 66 38 S110 78 137 53 S143 25 123 25"/><circle cx="35" cy="68" r="9"/><circle cx="53" cy="34" r="9"/><circle cx="76" cy="43" r="9"/><circle cx="98" cy="62" r="9"/><circle cx="121" cy="67" r="9"/><circle cx="143" cy="48" r="9"/><circle cx="136" cy="24" r="10"/><circle class="eye" cx="139" cy="21" r="2"/><circle class="eye" cx="132" cy="23" r="2"/></svg></div><b>'+s.name+'</b><small>'+(owned?(active?'EQUIPADA':'DESBLOQUEADA'):'◈ '+s.price.toLocaleString('es'))+'</small><button type="button" class="skin-preview-btn" data-skin-preview="'+s.id+'">VER CRIATURA</button><button type="button" data-skin-action="'+s.id+'" '+(!owned&&coins<s.price?'disabled':'')+'>'+(active?'EQUIPADA':owned?'EQUIPAR':'DESBLOQUEAR')+'</button></article>'}).join('');paintSkinThumbs(grid);const balance=$('skinBalance');if(balance)balance.textContent=coins.toLocaleString('es')}
     function chooseSkin(id){const skin=PLAYER_SKINS.find(s=>s.id===id);if(!skin)return;const wasOwned=ownedSkins.includes(id),previousCoins=coins,previousSkin=selectedSkin;if(!wasOwned){if(coins<skin.price){toast('NO TIENES SUFICIENTES MONEDAS');return}coins-=skin.price;ownedSkins.push(id)}selectedSkin=id;if(!saveSkins()){coins=previousCoins;selectedSkin=previousSkin;if(!wasOwned)ownedSkins=ownedSkins.filter(x=>x!==id);renderSkins();return}if(!wasOwned&&!persist(false)){coins=previousCoins;selectedSkin=previousSkin;ownedSkins=ownedSkins.filter(x=>x!==id);saveSkins();renderSkins();toast('NO SE PUDO GUARDAR LA COMPRA · NO SE DESCONTARON MONEDAS');return}renderSkins();renderShop();renderProfile();if(pl){pl.col=skin.color;pl.speciesId=skin.id}toast('CRIATURA EQUIPADA · '+skin.name)}
     let sessions=Array.isArray(saveData.sessions)?saveData.sessions:[],activeSessionId=saveData.activeSessionId||null;
     // Una sola ranura local de supervivencia. La campaña solo guarda progreso y resultados.
@@ -2303,94 +2306,184 @@ function renderCampaign(){
       if (!spawnQ.length && !en.length) { clearT += dt; const bossWarmup=gameMode==='campaign'&&bossDue&&!bossSpawned?2.4:1.6; if(clearT>bossWarmup){clearT=0;if(bossDue&&!bossSpawned){bossSpawned=true;const arch=BOSS_ARCHETYPES[(Math.max(0,Math.floor(lvl/8)-1))%BOSS_ARCHETYPES.length];banner('EL GUARDIÁN HA DESPERTADO',arch.name+' · '+arch.intro);SFX.roar();spawn('boss')}else{const bonus=180+lvl*28,coinBonus=gameMode==='campaign'?0:Math.min(220,28+lvl*7),fragmentBonus=gameMode==='campaign'?0:(lvl%8===0?2:0);score+=bonus;coins+=coinBonus;if(fragmentBonus)skillFragments+=fragmentBonus;pop(pl.P[0].x,pl.P[0].y-42,'+'+bonus+' PTS · +'+coinBonus+' ◈'+(fragmentBonus?' · +'+fragmentBonus+' ◆':''),'#ffe09a',true);if(gameMode==='campaign'){campaignUnlocked=Math.max(campaignUnlocked,Math.min(100,lvl+1));showCampaignResult()}else showUpgrades()}} } else clearT = 0;
     }
 
+    // ── Especies: id interno -> familia de dibujo. Los alias (glacier, toxic, void) reutilizan la familia de su especie.
+    const SPECIES_KIND = { ember: 'ember', frost: 'frost', glacier: 'frost', ocean: 'ocean', venom: 'venom', toxic: 'venom', fallen: 'fallen', void: 'fallen', bloodmoon: 'bloodmoon' };
+    const SPECIES_PAL = {
+      frost: { bone: '#eefbff', boneDark: '#86d8f4', core: '#0a3550', glow: '#6fe2ff', eye: '#e9fdff', accent: '#b4f3ff' },
+      ocean: { bone: '#d2c4ff', boneDark: '#4b3cae', core: '#0b0726', glow: '#5f86ff', eye: '#86f4ff', accent: '#9fc8ff' },
+      venom: { bone: '#f1f7c8', boneDark: '#86ad2c', core: '#0f1804', glow: '#a6ff2e', eye: '#e2ff5e', accent: '#d2ff3a' },
+      fallen: { bone: '#dccdf0', boneDark: '#4a2a7c', core: '#110520', glow: '#a777ff', eye: '#f0e0ff', accent: '#8a5cf0' },
+      bloodmoon: { bone: '#fff2ef', boneDark: '#b9566b', core: '#2a0610', glow: '#ff2d5e', eye: '#ffd3dc', accent: '#ff3b6e' }
+    };
+    // Movimiento propio por especie (solo visual: no altera P, R, n ni las colisiones).
+    const SPECIES_MOTION = {
+      frost: { amp: 1.25, wave: .13, speed: .46, drift: .00024, bend: .022, head: .025 },
+      ocean: { amp: 2.25, wave: .075, speed: .3, drift: .00016, bend: .018, head: .018 },
+      venom: { amp: 2.7, wave: .19, speed: .76, drift: .00034, bend: .045, head: .038 },
+      fallen: { amp: 1.5, wave: .16, speed: .33, drift: .00013, bend: .03, head: .06, jit: 1.2, jitSpeed: 1.7 },
+      bloodmoon: { amp: 2.05, wave: .085, speed: .27, drift: .00019, bend: .05, head: .075 }
+    };
+
+    // Dibuja a la criatura del jugador. La vista previa usa esta misma función y la misma paleta,
+    // así que lo que se ve en la tienda es lo que aparece en partida.
     function drawDemon(t, targetCtx, targetPlayer) {
       const c = targetCtx || ctx, player = targetPlayer || pl;
       if (!player) return;
-      const s = player.sc, P = player.P, A = player.A, n = player.n, skinPreview = player.previewSkin === true, skinColor = player.previewSkinColor || player.col || '#d51cff';
-      const speciesId = skinPreview ? (player.previewSpeciesId || 'ember') : (player === pl ? selectedSkin : 'ember');
-      const motionProfile=speciesId==='frost'||speciesId==='glacier'?{amp:1.25,wave:.13,speed:.46,drift:.00024,bend:.022,head:.025}:speciesId==='ocean'?{amp:2.25,wave:.075,speed:.3,drift:.00016,bend:.018,head:.018}:speciesId==='venom'||speciesId==='toxic'?{amp:2.7,wave:.19,speed:.76,drift:.00034,bend:.045,head:.038}:speciesId==='void'||speciesId==='bloodmoon'?{amp:1.8,wave:.1,speed:.36,drift:.0002,bend:.038,head:.05}:null;
-      const motionPhase=(player.ph||0)*.55;
-      const motionOffsetX=i=>motionProfile?-Math.sin(A[i])*Math.sin(motionPhase*motionProfile.speed+t*motionProfile.drift-i*motionProfile.wave)*motionProfile.amp*s*(i/Math.max(1,n-1)):0;
-      const motionOffsetY=i=>motionProfile?Math.cos(A[i])*Math.sin(motionPhase*motionProfile.speed-i*motionProfile.wave)*motionProfile.amp*s*(i/Math.max(1,n-1)):0;
-      const motionAngle=i=>A[i]+(motionProfile?Math.cos(motionPhase*motionProfile.speed+t*motionProfile.drift-i*motionProfile.wave)*(i===0?motionProfile.head:motionProfile.bend*i/Math.max(1,n-1)):0);
+      const s = player.sc, P = player.P, A = player.A, n = player.n;
+      const speciesId = player.previewSkin === true ? (player.previewSpeciesId || 'ember') : (player === pl ? selectedSkin : 'ember');
+      const kind = SPECIES_KIND[speciesId] || 'generic';
+      const isEmber = kind === 'ember';
+      const pal = SPECIES_PAL[kind] || { bone: '#ece0cf', boneDark: '#8a7860', core: '#120809', glow: player.col || '#ff665e', eye: player.col || '#ffd0c0', accent: player.col || '#ff665e' };
+      const mp = SPECIES_MOTION[kind] || null;
+      const lowEnd = !!lowEndDevice, last = Math.max(1, n - 1);
+      const mph = (player.ph || 0) * .55;
+      const jitAt = i => mp && mp.jit ? Math.sin(mph * mp.jitSpeed + t * .0009 + i * 2.7) * mp.jit * s * (i / last) : 0;
+      const motionOffsetX = i => mp ? -Math.sin(A[i]) * (Math.sin(mph * mp.speed + t * mp.drift - i * mp.wave) * mp.amp * s * (i / last) + jitAt(i)) : 0;
+      const motionOffsetY = i => mp ? Math.cos(A[i]) * (Math.sin(mph * mp.speed - i * mp.wave) * mp.amp * s * (i / last) + jitAt(i)) : 0;
+      const motionAngle = i => A[i] + (mp ? Math.cos(mph * mp.speed + t * mp.drift - i * mp.wave) * (i === 0 ? mp.head : mp.bend * i / last) + (mp.jit ? Math.sin(mph * mp.jitSpeed + i * 2.7) * .08 * (i / last) : 0) : 0);
+      // Marco local de cada segmento: x = hacia la cabeza, y = lateral (+ = lado izquierdo del cuerpo).
+      const F = i => ({ x: P[i].x + motionOffsetX(i), y: P[i].y + motionOffsetY(i), a: motionAngle(i), r: player.R[i] * s, u: i / n });
+      const at = (f, fx, fy) => { const ca = Math.cos(f.a), sa = Math.sin(f.a); return [f.x + fx * ca - fy * sa, f.y + fx * sa + fy * ca] };
+      const poly = (pts, fill, stroke, lw) => { c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath(); if (fill) { c.fillStyle = fill; c.fill() } if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1; c.stroke() } };
+      const hsh = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x) };
+      const limb = (pts, w, core, bone) => { c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.strokeStyle = core; c.lineWidth = (w + 3) * s; c.stroke(); c.strokeStyle = bone; c.lineWidth = w * s; c.stroke() };
+      const claws = (fx, fy, d, count, len, bend, fill, core) => { for (let k = 0; k < count; k++) { const a = d + (k - (count - 1) / 2) * .42, L = len * s, tx = fx + Math.cos(a) * L, ty = fy + Math.sin(a) * L, mx = fx + Math.cos(a + bend * .5) * L * .55, my = fy + Math.sin(a + bend * .5) * L * .55, px = -Math.sin(a) * 1.6 * s, py = Math.cos(a) * 1.6 * s; c.beginPath(); c.moveTo(fx + px, fy + py); c.quadraticCurveTo(mx + px * .5, my + py * .5, tx, ty); c.quadraticCurveTo(mx - px * .5, my - py * .5, fx - px, fy - py); c.closePath(); c.fillStyle = fill; c.fill(); c.strokeStyle = core; c.lineWidth = .8 * s; c.stroke() } };
+
       c.lineJoin = 'round'; c.lineCap = 'round';
+      // 1) Aura
       c.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < n; i += (lowEndDevice?18:10)) { const p = P[i], g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, skinPreview ? skinColor+'38' : 'rgba(170,10,20,.22)'); g.addColorStop(1, skinPreview ? skinColor+'00' : 'rgba(170,10,20,0)'); c.fillStyle = g; c.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
+      const aura0 = isEmber ? 'rgba(170,10,20,.22)' : pal.glow + '38', aura1 = isEmber ? 'rgba(170,10,20,0)' : pal.glow + '00';
+      for (let i = 0; i < n; i += (lowEnd ? 18 : 10)) { const p = P[i], g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, 75 * s); g.addColorStop(0, aura0); g.addColorStop(1, aura1); c.fillStyle = g; c.fillRect(p.x - 75 * s, p.y - 75 * s, 150 * s, 150 * s) }
       c.globalCompositeOperation = 'source-over';
       c.globalAlpha = inv > 0 && Math.floor(t / 70) % 2 ? .45 : 1;
+      const ba = c.globalAlpha;
+
+      // 2) Patas
+      const drawLeg = (l, q) => {
+        const sx = q[0], sy = q[1], kx = q[2], ky = q[3], fx = q[4], fy = q[5], d = Math.atan2(fy - ky, fx - kx);
+        if (kind === 'frost') { limb([[sx, sy], [kx, ky], [fx, fy]], 4.2, pal.core, pal.bone); claws(fx, fy, d, 3, 15, .35, pal.accent, pal.core) }
+        else if (kind === 'ocean') { c.globalAlpha = ba * .8; limb([[sx, sy], [kx, ky], [fx, fy]], 2, pal.core, pal.glow); claws(fx, fy, d, 3, 13, .5, pal.bone, pal.core); c.globalAlpha = ba }
+        else if (kind === 'venom') { limb([[sx, sy], [kx, ky], [fx, fy]], 5, pal.core, pal.bone); claws(fx, fy, d, 4, 17, .7, pal.bone, pal.core) }
+        else if (kind === 'fallen') { const jx = kx + (fx - kx) * .5 - Math.sin(d) * 5 * s * l.s, jy = ky + (fy - ky) * .5 + Math.cos(d) * 5 * s * l.s; limb([[sx, sy], [kx, ky], [jx, jy], [fx, fy]], 3.4, pal.core, '#8a6ac0'); claws(fx, fy, d + .25 * l.s, 2, 14, 1.1, pal.accent, pal.core) }
+        else if (kind === 'bloodmoon') { limb([[sx, sy], [kx, ky], [fx, fy]], 2.8, pal.core, pal.bone); c.fillStyle = pal.glow; c.beginPath(); c.arc(kx, ky, 1.7 * s, 0, TAU); c.fill(); claws(fx, fy, d, 3, 16, .8, pal.bone, pal.core) }
+        else { limb([[sx, sy], [kx, ky], [fx, fy]], 3, pal.core, pal.bone); claws(fx, fy, d, 3, 12, .3, pal.bone, pal.core) }
+      };
       player.legs.forEach(l => {
-        if (!l.f) return; const q = player.ik(l); c.beginPath(); c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); c.lineTo(q[4], q[5]); c.strokeStyle = '#0a0305'; c.lineWidth = 8 * s; c.stroke(); c.strokeStyle = skinPreview ? skinColor : '#8a0f1a'; c.lineWidth = 4 * s; c.stroke();
-        const d = Math.atan2(q[5] - q[3], q[4] - q[2]); c.strokeStyle = skinPreview ? skinColor : '#d9c7b0'; c.lineWidth = 2;[-.7, -.25, .25, .7].forEach(o => { c.beginPath(); c.moveTo(q[4], q[5]); c.lineTo(q[4] + Math.cos(d + o) * 12 * s, q[5] + Math.sin(d + o) * 12 * s); c.stroke() })
+        if (!l.f) return; const q = player.ik(l);
+        if (!isEmber) return drawLeg(l, q);
+        c.beginPath(); c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); c.lineTo(q[4], q[5]); c.strokeStyle = '#0a0305'; c.lineWidth = 8 * s; c.stroke(); c.strokeStyle = '#8a0f1a'; c.lineWidth = 4 * s; c.stroke();
+        const d = Math.atan2(q[5] - q[3], q[4] - q[2]); c.strokeStyle = '#d9c7b0'; c.lineWidth = 2; [-.7, -.25, .25, .7].forEach(o => { c.beginPath(); c.moveTo(q[4], q[5]); c.lineTo(q[4] + Math.cos(d + o) * 12 * s, q[5] + Math.sin(d + o) * 12 * s); c.stroke() });
       });
-      for (let i = n - 1; i >= 0; i--) {
-        const p = P[i], r = player.R[i] * s, u = i / n, px=p.x+motionOffsetX(i), py=p.y+motionOffsetY(i), ang=motionAngle(i);
-        if (i >= 2 && i < n - 3) [-1, 1].forEach(sd => { const pa = ang + sd * Math.PI / 2, ta = ang + sd * (Math.PI / 2 + .8), L = r * 1.1 + 5 * s; c.beginPath(); c.moveTo(px + Math.cos(pa - sd * .25) * r, py + Math.sin(pa - sd * .25) * r); c.lineTo(px + Math.cos(pa) * r + Math.cos(ta) * L, py + Math.sin(pa) * r + Math.sin(ta) * L); c.lineTo(px + Math.cos(pa + sd * .25) * r, py + Math.sin(pa + sd * .25) * r); c.fillStyle = skinPreview ? skinColor : (i % 2 ? '#a89580' : '#d9c7b0'); c.fill() });
-        c.beginPath(); c.arc(px, py, r, 0, TAU); c.fillStyle = skinPreview ? skinColor : 'hsl(' + (350 + u * 8) + ',75%,' + (12 - 7 * u) + '%)'; c.fill(); c.strokeStyle = skinPreview ? skinColor : 'hsla(355,85%,' + (42 - 22 * u) + '%,.95)'; c.lineWidth = 1.4; c.stroke()
-      }
-      // Costillas y vértebras: la estructura sigue las articulaciones reales del cuerpo.
-      if (speciesId !== 'ember') {
-        c.save(); c.globalCompositeOperation='source-over'; c.lineCap='round';
-        const boneTone=skinPreview?skinColor:(speciesId==='frost'||speciesId==='glacier'?'#c9f4ff':speciesId==='void'?'#bba4e8':speciesId==='venom'?'#b7d96b':'#d9c7b0');
-        c.strokeStyle=boneTone; c.fillStyle=boneTone; c.globalAlpha=skinPreview?.96:.88;
-        for(let i=4;i<n-4;i+=speciesId==='void'?3:2){
-          const p=P[i],r=player.R[i]*s,ang=motionAngle(i),px=p.x+motionOffsetX(i),py=p.y+motionOffsetY(i),sideGap=speciesId==='void'?1.2:1.0;
-          [-1,1].forEach(sd=>{
-            const side=ang+sd*Math.PI/2, startX=px+Math.cos(side)*r*.18,startY=py+Math.sin(side)*r*.18;
-            const midX=px+Math.cos(side)*(r*1.05+2*s),midY=py+Math.sin(side)*(r*1.05+2*s);
-            const endX=px+Math.cos(side+sd*.2)*(r*(speciesId==='venom'?2.05:1.65)+3*s)+motionOffsetX(i+1)*.12,endY=py+Math.sin(side+sd*.2)*(r*(speciesId==='venom'?2.05:1.65)+3*s)+motionOffsetY(i+1)*.12;
-            c.lineWidth=(speciesId==='venom'?2.8:2.1)*s;c.beginPath();c.moveTo(startX,startY);c.quadraticCurveTo(midX+Math.cos(ang)*r*.28,midY+Math.sin(ang)*r*.28,endX,endY);c.stroke();
-            if(speciesId==='venom'){c.beginPath();c.moveTo(midX,midY);c.lineTo(midX+Math.cos(side+sd*.65)*5*s,midY+Math.sin(side+sd*.65)*5*s);c.lineWidth=1.2*s;c.stroke()}
-          });
-          if(speciesId==='venom'&&i%4===0){const tipX=px-Math.sin(ang)*(r+8*s),tipY=py+Math.cos(ang)*(r+8*s);c.beginPath();c.moveTo(px-Math.sin(ang)*r*.45,py+Math.cos(ang)*r*.45);c.lineTo(tipX,tipY);c.lineTo(p.x+Math.sin(ang)*r*.45,p.y-Math.cos(ang)*r*.45);c.closePath();c.fill()}
+
+      // 3) Cuerpo
+      const bodies = {
+        frost() {
+          for (let i = n - 3; i >= 3; i -= lowEnd ? 4 : 2) { const f = F(i); [-1, 1].forEach(sd => poly([at(f, .6 * f.r, sd * .6 * f.r), at(f, -1.1 * f.r, sd * (3.1 * f.r + 10 * s)), at(f, -.5 * f.r, sd * .6 * f.r)], i % 4 ? pal.accent : pal.bone, pal.core, s)) }
+          for (let i = n - 1; i >= 0; i--) { const f = F(i), L = f.r * 1.02, W = f.r * .98; poly([at(f, L, 0), at(f, .4 * L, W), at(f, -.5 * L, .85 * W), at(f, -L, 0), at(f, -.5 * L, -.85 * W), at(f, .4 * L, -W)], pal.bone, pal.core, 1.2 * s); c.beginPath(); c.moveTo(...at(f, 0, 0)); c.lineTo(...at(f, .4 * L, W)); c.strokeStyle = pal.boneDark; c.lineWidth = .9 * s; c.stroke() }
+        },
+        ocean() {
+          for (let i = n - 1; i >= 0; i -= lowEnd ? 4 : 2) { const f = F(i); c.globalCompositeOperation = 'lighter'; c.globalAlpha = ba * (.25 + .2 * (1 - f.u)); c.fillStyle = pal.glow; c.beginPath(); c.ellipse(f.x, f.y, f.r * 1.8, f.r * 1.15, f.a, 0, TAU); c.fill() }
+          c.globalCompositeOperation = 'source-over'; c.globalAlpha = ba;
+          for (let i = n - 5; i >= 3; i -= 2) { const f = F(i), fade = ba * (.3 + .6 * (1 - f.u)); [-1, 1].forEach(sd => { const p0 = at(f, .2 * f.r, sd * .35 * f.r), p1 = at(f, -.5 * f.r, sd * 1.9 * f.r), p2 = at(f, -1.3 * f.r, sd * 1.1 * f.r); c.globalAlpha = fade; c.beginPath(); c.moveTo(p0[0], p0[1]); c.quadraticCurveTo(p1[0], p1[1], p2[0], p2[1]); c.strokeStyle = pal.glow; c.lineWidth = 2 * s; c.stroke(); c.strokeStyle = pal.bone; c.lineWidth = .8 * s; c.stroke(); c.fillStyle = pal.eye; c.beginPath(); c.arc(p2[0], p2[1], 1.3 * s, 0, TAU); c.fill() }) }
+          c.globalAlpha = ba;
+          for (let i = n - 1; i >= 0; i--) { const f = F(i); c.beginPath(); c.ellipse(f.x, f.y, f.r * 1.02, f.r * .55, f.a, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.core; c.lineWidth = s; c.stroke() }
+          for (let i = n - 2; i >= 2; i -= 4) { const f = F(i); [-1, 1].forEach(sd => poly([at(f, .2 * f.r, sd * .25 * f.r), at(f, -.3 * f.r, sd * 1.3 * f.r), at(f, -1.8 * f.r, sd * (2.6 * f.r + 4 * s)), at(f, -.7 * f.r, sd * .35 * f.r)], pal.core, pal.glow, .9 * s)) }
+        },
+        venom() {
+          for (let i = n - 4; i >= 3; i -= 2) { const f = F(i); [-1, 1].forEach(sd => { const r0 = at(f, .5 * f.r, sd * .35 * f.r), k0 = at(f, .7 * f.r, sd * 2.6 * f.r), r1 = at(f, -.5 * f.r, sd * 2.3 * f.r); c.beginPath(); c.moveTo(r0[0], r0[1]); c.quadraticCurveTo(k0[0], k0[1], r1[0], r1[1]); c.strokeStyle = pal.core; c.lineWidth = 5 * s; c.stroke(); c.strokeStyle = pal.bone; c.lineWidth = 3 * s; c.stroke(); if (i % 4 === 1) poly([at(f, .1 * f.r, sd * 2.2 * f.r), at(f, -1.4 * f.r, sd * (3.7 * f.r + 6 * s)), at(f, -.3 * f.r, sd * 2 * f.r)], pal.accent, pal.core, .9 * s) }) }
+          for (let i = n - 1; i >= 0; i--) { const f = F(i); c.beginPath(); c.ellipse(f.x, f.y, f.r * .95, f.r * .82, f.a, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.boneDark; c.lineWidth = 1.5 * s; c.stroke() }
+        },
+        fallen() {
+          for (let i = n - 2; i >= 2; i--) { if (i % 2) continue; const f = F(i); [-1, 1].forEach(sd => { if (hsh(i, sd > 0 ? 6 : 5) < .5) return; const L = (1.5 + hsh(i, 7) * 1.9) * f.r + 7 * s; poly([at(f, .4 * f.r, sd * .5 * f.r), at(f, (hsh(i, 8) - .5) * 1.2 * f.r, sd * L), at(f, -.6 * f.r, sd * .6 * f.r)], pal.accent, pal.core, .9 * s) }) }
+          for (let i = n - 1; i >= 0; i--) { const f = F(i), j1 = hsh(i, 1) * 2 - 1, j2 = hsh(i, 2) * 2 - 1, j3 = hsh(i, 3) * 2 - 1, q = at(f, 0, j3 * f.r * .35); c.beginPath(); c.ellipse(q[0], q[1], f.r * (.8 + .3 * j1), f.r * (.5 + .25 * j2), f.a + j3 * .25, 0, TAU); c.fillStyle = '#2e1850'; c.fill(); c.strokeStyle = pal.bone; c.lineWidth = 1.3 * s; c.stroke(); if (i % 3 === 0) { const a1 = at(f, -.6 * f.r, -.3 * f.r), a2 = at(f, .4 * f.r, .5 * f.r); c.beginPath(); c.moveTo(a1[0], a1[1]); c.lineTo(a2[0], a2[1]); c.strokeStyle = pal.glow; c.lineWidth = s; c.stroke() } }
+        },
+        bloodmoon() {
+          for (let i = n - 5; i >= 3; i -= lowEnd ? 4 : 2) { const f = F(i), fade = ba * (.5 + .5 * (1 - f.u)); [-1, 1].forEach(sd => { const r0 = at(f, .4 * f.r, sd * .4 * f.r), k0 = at(f, -.1 * f.r, sd * 2.1 * f.r), r1 = at(f, -1.2 * f.r, sd * 1.2 * f.r); c.globalAlpha = fade; c.beginPath(); c.moveTo(r0[0], r0[1]); c.quadraticCurveTo(k0[0], k0[1], r1[0], r1[1]); c.strokeStyle = pal.core; c.lineWidth = 2.6 * s; c.stroke(); c.strokeStyle = pal.bone; c.lineWidth = 1.3 * s; c.stroke() }) }
+          c.globalAlpha = ba;
+          for (let i = n - 2; i >= 2; i -= 2) { const f = F(i); [-1, 1].forEach(sd => poly([at(f, .3 * f.r, sd * .8 * f.r), at(f, -.6 * f.r, sd * (2.4 * f.r + 6 * s)), at(f, -.3 * f.r, sd * .6 * f.r)], pal.accent, pal.core, .9 * s)) }
+          for (let i = n - 1; i >= 0; i--) { const f = F(i); c.beginPath(); c.ellipse(f.x, f.y, f.r * .84, f.r * .5, f.a, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.boneDark; c.lineWidth = 1.2 * s; c.stroke() }
+        },
+        generic() {
+          for (let i = n - 2; i >= 2; i -= 2) { const f = F(i); [-1, 1].forEach(sd => poly([at(f, .4 * f.r, sd * .6 * f.r), at(f, -.5 * f.r, sd * (2 * f.r + 5 * s)), at(f, -.4 * f.r, sd * .5 * f.r)], pal.glow, pal.core, .8 * s)) }
+          for (let i = n - 1; i >= 0; i--) { const f = F(i); c.beginPath(); c.ellipse(f.x, f.y, f.r * .9, f.r * .6, f.a, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.core; c.lineWidth = 1.2 * s; c.stroke() }
         }
-        c.restore();
-      }
-      // Variantes óseas: comparten el esqueleto base, pero cambian su silueta.
-      if (speciesId === 'frost' || speciesId === 'glacier') {
-        c.save(); c.globalCompositeOperation = 'source-over'; c.strokeStyle = skinPreview ? skinColor : '#b8eaff'; c.fillStyle = skinPreview ? skinColor : '#b8eaff'; c.lineWidth = 2.2 * s;
-        for (let i = 5; i < n - 4; i += 3) { const p=P[i], r=player.R[i]*s, ang=motionAngle(i), px=p.x+motionOffsetX(i), py=p.y+motionOffsetY(i); [-1,1].forEach(sd=>{const side=ang+sd*Math.PI/2, bx=px+Math.cos(side)*r*.72, by=py+Math.sin(side)*r*.72, tipx=bx+Math.cos(side+sd*.22)*(r*1.45+7*s), tipy=by+Math.sin(side+sd*.22)*(r*1.45+7*s); c.beginPath();c.moveTo(px-Math.cos(side)*r*.5,py-Math.sin(side)*r*.5);c.lineTo(tipx,tipy);c.lineTo(p.x+Math.cos(side)*r*.7,p.y+Math.sin(side)*r*.7);c.closePath();c.fill();c.stroke()})}
-        c.restore();
-      } else if (speciesId === 'void') {
-        c.save(); c.globalCompositeOperation='lighter'; c.strokeStyle=skinPreview?skinColor:'#b8a1ff'; c.globalAlpha=.82; c.lineWidth=2.5*s;
-        for(let i=4;i<n-3;i+=4){const p=P[i],r=player.R[i]*s*1.45,px=p.x+motionOffsetX(i),py=p.y+motionOffsetY(i),ang=motionAngle(i);c.beginPath();c.ellipse(px,py,r*1.2,r*.72,ang,0,TAU);c.stroke();[-1,1].forEach(sd=>{const an=ang+sd*Math.PI/2, bx=px+Math.cos(an)*r*.7, by=py+Math.sin(an)*r*.7;c.beginPath();c.moveTo(bx,by);c.quadraticCurveTo(bx+Math.cos(an)*r*.8,by+Math.sin(an)*r*.8,bx+Math.cos(an)*r*1.55,by+Math.sin(an)*r*1.55);c.stroke()})}
-        c.restore();
-      } else if (speciesId === 'venom') {
-        c.save(); c.globalCompositeOperation='source-over'; c.strokeStyle=skinPreview?skinColor:'#b7d96b'; c.fillStyle=skinPreview?skinColor:'#b7d96b'; c.lineWidth=2.5*s;
-        for(let i=5;i<n-4;i+=3){const p=P[i],r=player.R[i]*s,ang=motionAngle(i),px=p.x+motionOffsetX(i),py=p.y+motionOffsetY(i);[-1,1].forEach(sd=>{const side=ang+sd*Math.PI/2;c.beginPath();c.moveTo(px+Math.cos(side)*r*.5,py+Math.sin(side)*r*.5);c.lineTo(px+Math.cos(side+sd*.18)*(r*1.75+9*s),py+Math.sin(side+sd*.18)*(r*1.75+9*s));c.lineTo(px+Math.cos(side+sd*.5)*(r*.5),py+Math.sin(side+sd*.5)*(r*.5));c.closePath();c.fill();c.stroke()})}
-        c.restore();
-      }
-      c.save(); c.shadowColor = skinPreview ? skinColor : '#ff3b1f'; c.shadowBlur = lowEndDevice?4:12 + fury / 8; c.strokeStyle = skinPreview ? skinColor : 'rgba(255,' + (70 + fury / 2) + ',30,' + (.55 + .3 * Math.sin(t / 220)) + ')'; c.lineWidth = 2.4;
-      const h = P[0]; c.beginPath(); const glowStep=lowEndDevice?3:2; for (let i = 3; i < n - 4; i+=glowStep) { const pulse=1+Math.sin(t*.008-i*.24)*(lowEndDevice?.018:.045); const gx=h.x+(P[i].x+motionOffsetX(i)-h.x)*pulse,gy=h.y+(P[i].y+motionOffsetY(i)-h.y)*pulse; i===3?c.moveTo(gx,gy):c.lineTo(gx,gy) } c.stroke(); c.restore();
-      // Marcas de evolución: se activan gradualmente al crecer la serpiente.
-      const evo=Math.min(1,Math.max(0,(n-24)/90));
-      if(evo>.04){c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.18+evo*.22;c.strokeStyle=skinPreview?skinColor:(fury>70?'#ffb347':'#b34cff');c.lineWidth=(lowEndDevice?1.2:2)*s;const step=lowEndDevice?Math.max(12,Math.floor(n/9)):Math.max(8,Math.floor(n/14));for(let i=step;i<n-5;i+=step){const q=P[i],rr=player.R[i]*s*(1.45+evo*.25);c.beginPath();c.arc(q.x+motionOffsetX(i),q.y+motionOffsetY(i),rr,0,TAU);c.stroke()}c.restore()}
+      };
+      if (isEmber) {
+        // Carmesí: dibujo original, sin cambios de anatomía.
+        for (let i = n - 1; i >= 0; i--) {
+          const p = P[i], r = player.R[i] * s, u = i / n, px = p.x + motionOffsetX(i), py = p.y + motionOffsetY(i), ang = motionAngle(i);
+          if (i >= 2 && i < n - 3) [-1, 1].forEach(sd => { const pa = ang + sd * Math.PI / 2, ta = ang + sd * (Math.PI / 2 + .8), L = r * 1.1 + 5 * s; c.beginPath(); c.moveTo(px + Math.cos(pa - sd * .25) * r, py + Math.sin(pa - sd * .25) * r); c.lineTo(px + Math.cos(pa) * r + Math.cos(ta) * L, py + Math.sin(pa) * r + Math.sin(ta) * L); c.lineTo(px + Math.cos(pa + sd * .25) * r, py + Math.sin(pa + sd * .25) * r); c.fillStyle = i % 2 ? '#a89580' : '#d9c7b0'; c.fill() });
+          c.beginPath(); c.arc(px, py, r, 0, TAU); c.fillStyle = 'hsl(' + (350 + u * 8) + ',75%,' + (12 - 7 * u) + '%)'; c.fill(); c.strokeStyle = 'hsla(355,85%,' + (42 - 22 * u) + '%,.95)'; c.lineWidth = 1.4; c.stroke()
+        }
+      } else bodies[kind] ? bodies[kind]() : bodies.generic();
+
+      // 4) Contorno luminoso y marcas de evolución
+      const h = P[0];
+      c.save(); c.shadowColor = isEmber ? '#ff3b1f' : pal.glow; c.shadowBlur = lowEnd ? 4 : 12 + fury / 8;
+      c.strokeStyle = isEmber ? 'rgba(255,' + (70 + fury / 2) + ',30,' + (.55 + .3 * Math.sin(t / 220)) + ')' : pal.glow; c.lineWidth = 2.4;
+      c.beginPath(); const glowStep = lowEnd ? 3 : 2; for (let i = 3; i < n - 4; i += glowStep) { const pulse = 1 + Math.sin(t * .008 - i * .24) * (lowEnd ? .018 : .045); const gx = h.x + (P[i].x + motionOffsetX(i) - h.x) * pulse, gy = h.y + (P[i].y + motionOffsetY(i) - h.y) * pulse; i === 3 ? c.moveTo(gx, gy) : c.lineTo(gx, gy) } c.stroke(); c.restore();
+      const evo = Math.min(1, Math.max(0, (n - 24) / 90));
+      if (evo > .04) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = .18 + evo * .22; c.strokeStyle = isEmber ? (fury > 70 ? '#ffb347' : '#b34cff') : pal.accent; c.lineWidth = (lowEnd ? 1.2 : 2) * s; const step = lowEnd ? Math.max(12, Math.floor(n / 9)) : Math.max(8, Math.floor(n / 14)); for (let i = step; i < n - 5; i += step) { const q = P[i], rr = player.R[i] * s * (1.45 + evo * .25); c.beginPath(); c.arc(q.x + motionOffsetX(i), q.y + motionOffsetY(i), rr, 0, TAU); c.stroke() } c.restore() }
+
+      // 5) Cabeza (espacio local: +x hacia adelante, unidades de cabeza escaladas por s)
       c.save(); c.translate(h.x, h.y); c.rotate(motionAngle(0)); c.scale(s, s);
-      if (speciesId === 'frost' || speciesId === 'glacier') {
-        c.save(); c.strokeStyle=skinPreview?skinColor:'#c8f3ff'; c.fillStyle=skinPreview?skinColor:'#c8f3ff'; c.lineWidth=3;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-7,sd*7);c.lineTo(-19,sd*18);c.lineTo(-30,sd*31);c.lineTo(-25,sd*13);c.lineTo(-34,sd*7);c.closePath();c.fill();c.stroke()});c.restore();
-      } else if (speciesId === 'void') {
-        c.save(); c.strokeStyle=skinPreview?skinColor:'#c8aaff'; c.lineWidth=3.2;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*8);c.quadraticCurveTo(-27,sd*2,-35,sd*22);c.quadraticCurveTo(-42,sd*36,-51,sd*28);c.stroke();c.beginPath();c.moveTo(-17,sd*13);c.lineTo(-25,sd*29);c.stroke()});c.restore();
-      }
-      if (speciesId === 'venom') {
-        c.save(); c.strokeStyle=skinPreview?skinColor:'#b7d96b'; c.fillStyle=skinPreview?skinColor:'#b7d96b'; c.lineWidth=3;
-        [-1,1].forEach(sd=>{c.beginPath();c.moveTo(-8,sd*7);c.lineTo(-18,sd*14);c.lineTo(-31,sd*10);c.lineTo(-25,sd*21);c.lineTo(-39,sd*27);c.lineTo(-18,sd*25);c.closePath();c.fill();c.stroke()});
-        c.beginPath();c.moveTo(8,-8);c.lineTo(19,-12);c.lineTo(24,0);c.lineTo(19,12);c.lineTo(8,8);c.stroke();c.restore();
-      }
-      const bitePulse=cobra.phase===2?Math.sin(Math.min(1,cobra.t/.58)*Math.PI):cobra.phase===3?Math.max(0,cobra.t/.42):0;
-      const cobraOpen=cobra.phase===2?Math.min(1.9,.35+bitePulse*1.55):cobra.phase===3&&cobra.swallowed?Math.max(0,cobra.t/.42)*1.15:cobra.phase===1?.12:0;
-      const recoil=cobra.phase===1?Math.sin((1-cobra.t/.34)*Math.PI)*.22:cobra.phase===2?bitePulse*.28:cobra.phase===3?Math.sin(cobra.t*31)*.07:0;
-      const swallowPulse=cobra.phase===3&&cobra.swallowed?Math.sin((1-cobra.t/.42)*Math.PI*3)*.12:0;c.translate(-Math.max(0,recoil)*15,0);c.scale(1+Math.max(0,recoil)*.18+swallowPulse,1-Math.max(0,recoil)*.08-swallowPulse*.45);
-      if(growthStacks>0){c.save();c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(.72,.28+growthStacks*.09);c.strokeStyle=skinPreview?skinColor:'#ff8b45';c.lineWidth=2.5+Math.min(3,growthStacks*.45);c.beginPath();c.arc(P[0].x,P[0].y,player.R[0]*s+9+Math.sin(t*.006)*3,0,TAU);c.stroke();c.globalAlpha*=.55;c.beginPath();c.arc(P[0].x,P[0].y,player.R[0]*s+15+Math.cos(t*.004)*4,0,TAU);c.stroke();c.restore()}if(growthStacks>=3){c.save();c.globalAlpha=.42+Math.min(.4,growthStacks*.05);c.strokeStyle=skinPreview?skinColor:'#d34b35';c.lineWidth=3+Math.min(3,player.sc);c.beginPath();c.moveTo(-7,-10);c.quadraticCurveTo(-38,-34,-48,-8);c.moveTo(-7,10);c.quadraticCurveTo(-38,34,-48,8);c.stroke();c.restore()}
-      if(cobra.phase===1||cobra.phase===2){c.save();c.globalAlpha=.72;c.fillStyle=skinPreview?skinColor:'#64131b';c.strokeStyle=skinPreview?skinColor:'#e45a42';c.lineWidth=2.2;c.beginPath();c.moveTo(-8,-7);c.quadraticCurveTo(-24,-30,-42,-31);c.quadraticCurveTo(-37,-10,-19,0);c.quadraticCurveTo(-37,10,-42,31);c.quadraticCurveTo(-24,30,-8,7);c.closePath();c.fill();c.stroke();c.restore()}
-      if(evo>.12){c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.35+evo*.4;c.strokeStyle=skinPreview?skinColor:(fury>70?'#ffc15c':'#a95cff');c.lineWidth=2;c.beginPath();c.moveTo(-5,-7);c.lineTo(-15-evo*9,-18-evo*8);c.lineTo(-1,-10);c.moveTo(-5,7);c.lineTo(-15-evo*9,18+evo*8);c.lineTo(-1,10);c.stroke();c.restore()}
-      [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(-1, sd * 8); c.quadraticCurveTo(-12, sd * 24, -34, sd * 14); c.strokeStyle = '#14070a'; c.lineWidth = 7; c.stroke(); c.strokeStyle = skinPreview ? skinColor : '#d9c7b0'; c.lineWidth = 3.4; c.stroke() });
-      if (pm > .05||cobraOpen>.05) { const jaw=Math.max(pm,cobraOpen);c.fillStyle = '#260006';c.beginPath();c.ellipse(11,0,15,Math.min(17,2+jaw*11),0,0,TAU);c.fill();c.fillStyle='#8f1820';c.beginPath();c.ellipse(13,0,10,Math.max(1,jaw*5),0,0,TAU);c.fill();if(cobraOpen>.18){c.strokeStyle='#f4b2a0';c.lineWidth=2;c.beginPath();c.moveTo(0,-5-jaw*5);c.quadraticCurveTo(10,-2,23,-5-jaw*5);c.stroke();c.fillStyle='#fff0d8';[-1,1].forEach(sd=>{c.beginPath();c.moveTo(7,sd*5);c.lineTo(11,sd*(5+jaw*8));c.lineTo(14,sd*5);c.fill()});c.strokeStyle='#ff6c70';c.lineWidth=2;c.beginPath();c.moveTo(17,0);c.lineTo(24,2);c.lineTo(29,-2);c.moveTo(24,2);c.lineTo(28,6);c.stroke()}}
+      const bitePulse = cobra.phase === 2 ? Math.sin(Math.min(1, cobra.t / .58) * Math.PI) : cobra.phase === 3 ? Math.max(0, cobra.t / .42) : 0;
+      const cobraOpen = cobra.phase === 2 ? Math.min(1.9, .35 + bitePulse * 1.55) : cobra.phase === 3 && cobra.swallowed ? Math.max(0, cobra.t / .42) * 1.15 : cobra.phase === 1 ? .12 : 0;
+      const recoil = cobra.phase === 1 ? Math.sin((1 - cobra.t / .34) * Math.PI) * .22 : cobra.phase === 2 ? bitePulse * .28 : cobra.phase === 3 ? Math.sin(cobra.t * 31) * .07 : 0;
+      const swallowPulse = cobra.phase === 3 && cobra.swallowed ? Math.sin((1 - cobra.t / .42) * Math.PI * 3) * .12 : 0;
+      c.translate(-Math.max(0, recoil) * 15, 0); c.scale(1 + Math.max(0, recoil) * .18 + swallowPulse, 1 - Math.max(0, recoil) * .08 - swallowPulse * .45);
+      const headParts = {
+        frost() {
+          [-1, 1].forEach(sd => { poly([[-3, sd * 6], [-14, sd * 12], [-31, sd * 31], [-17, sd * 13], [-8, sd * 9]], pal.bone, pal.core, 1.1); poly([[-6, sd * 5], [-20, sd * 7], [-25, sd * 18], [-12, sd * 10]], pal.accent, pal.core, .9); poly([[5, sd * 5], [19, sd * 10], [8, sd * 2.5]], pal.accent, pal.core, .9) });
+          poly([[10, 0], [5, -7], [-7, -8], [-12, -3], [-12, 3], [-7, 8], [5, 7]], pal.bone, pal.core, 1.3);
+        },
+        ocean() {
+          [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(-2, sd * 5); c.quadraticCurveTo(-14, sd * 12, -31, sd * 29); c.quadraticCurveTo(-18, sd * 16, -6, sd * 7); c.closePath(); c.fillStyle = pal.core; c.fill(); c.strokeStyle = pal.glow; c.lineWidth = 1.3; c.stroke() });
+          c.beginPath(); c.ellipse(2, 0, 11, 6.8, 0, 0, TAU); c.fillStyle = pal.core; c.fill(); c.strokeStyle = pal.bone; c.lineWidth = 1.1; c.stroke();
+        },
+        venom() {
+          [-1, 1].forEach(sd => poly([[-3, sd * 5], [-16, sd * 12], [-6, sd * 2]], pal.accent, pal.core, .9));
+          c.beginPath(); c.ellipse(3, 0, 12, 9, 0, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.boneDark; c.lineWidth = 1.6; c.stroke();
+          [-1, 1].forEach(sd => { poly([[-2, sd * 6], [7, sd * 8], [5, sd * 4]], pal.boneDark); poly([[8, sd * 4], [13, sd * 12], [11, sd * 3.5]], '#fbffe6', pal.core, .6) });
+        },
+        fallen() {
+          c.beginPath(); c.moveTo(-4, -6); c.quadraticCurveTo(-20, -12, -24, -31); c.quadraticCurveTo(-27, -18, -12, -8); c.closePath(); c.fillStyle = pal.accent; c.fill(); c.strokeStyle = pal.core; c.lineWidth = 1; c.stroke();
+          poly([[-4, 6], [-12, 9], [-9, 13], [-4, 10]], pal.boneDark, pal.core, .8);
+          poly([[-2, -7], [-6, -18], [3, -8]], pal.accent, pal.core, .8);
+          poly([[10, -1], [6, -8], [-5, -8], [-11, -4], [-10, 3], [-4, 8], [7, 5]], pal.bone, pal.core, 1.2);
+          poly([[4, -5], [9, -15], [9, -4]], pal.accent, pal.core, .8);
+        },
+        bloodmoon() {
+          c.save(); c.beginPath(); c.arc(-6, 0, 23, Math.PI * .62, Math.PI * 1.38); c.strokeStyle = pal.glow; c.globalAlpha = ba * .35; c.lineWidth = 2.2; c.stroke(); c.restore();
+          [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(0, sd * 6); c.quadraticCurveTo(-8, sd * 30, -26, sd * 33); c.quadraticCurveTo(-14, sd * 23, -4, sd * 8); c.closePath(); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.glow; c.lineWidth = 1.4; c.stroke() });
+          c.beginPath(); c.ellipse(4, 0, 11, 7, 0, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.boneDark; c.lineWidth = 1.2; c.stroke();
+        },
+        generic() {
+          c.beginPath(); c.ellipse(4, 0, 11, 7, 0, 0, TAU); c.fillStyle = pal.bone; c.fill(); c.strokeStyle = pal.core; c.lineWidth = 1.2; c.stroke();
+        }
+      };
+      if (!isEmber) c.scale(1.3, 1.3);
+      if (!isEmber) (headParts[kind] || headParts.generic)();
+      // Anillos de crecimiento: dentro de la cabeza se dibujan en coordenadas locales (antes usaban P[0] del mundo y se desplazaban).
+      if (growthStacks > 0) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = Math.min(.72, .28 + growthStacks * .09); c.strokeStyle = '#ff8b45'; c.lineWidth = (2.5 + Math.min(3, growthStacks * .45)) / s; c.beginPath(); c.arc(0, 0, player.R[0] + (9 + Math.sin(t * .006) * 3) / s, 0, TAU); c.stroke(); c.globalAlpha *= .55; c.beginPath(); c.arc(0, 0, player.R[0] + (15 + Math.cos(t * .004) * 4) / s, 0, TAU); c.stroke(); c.restore() }
+      if (growthStacks >= 3) { c.save(); c.globalAlpha = .42 + Math.min(.4, growthStacks * .05); c.strokeStyle = '#d34b35'; c.lineWidth = 3 + Math.min(3, player.sc); c.beginPath(); c.moveTo(-7, -10); c.quadraticCurveTo(-38, -34, -48, -8); c.moveTo(-7, 10); c.quadraticCurveTo(-38, 34, -48, 8); c.stroke(); c.restore() }
+      if (cobra.phase === 1 || cobra.phase === 2) { c.save(); c.globalAlpha = .72; c.fillStyle = '#64131b'; c.strokeStyle = '#e45a42'; c.lineWidth = 2.2; c.beginPath(); c.moveTo(-8, -7); c.quadraticCurveTo(-24, -30, -42, -31); c.quadraticCurveTo(-37, -10, -19, 0); c.quadraticCurveTo(-37, 10, -42, 31); c.quadraticCurveTo(-24, 30, -8, 7); c.closePath(); c.fill(); c.stroke(); c.restore() }
+      if (evo > .12) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = .35 + evo * .4; c.strokeStyle = fury > 70 ? '#ffc15c' : '#a95cff'; c.lineWidth = 2; c.beginPath(); c.moveTo(-5, -7); c.lineTo(-15 - evo * 9, -18 - evo * 8); c.lineTo(-1, -10); c.moveTo(-5, 7); c.lineTo(-15 - evo * 9, 18 + evo * 8); c.lineTo(-1, 10); c.stroke(); c.restore() }
+      if (isEmber) [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(-1, sd * 8); c.quadraticCurveTo(-12, sd * 24, -34, sd * 14); c.strokeStyle = '#14070a'; c.lineWidth = 7; c.stroke(); c.strokeStyle = '#d9c7b0'; c.lineWidth = 3.4; c.stroke() });
+      const bitePmJaw = pm;
+      if (bitePmJaw > .05 || cobraOpen > .05) { const jaw = Math.max(bitePmJaw, cobraOpen); c.fillStyle = '#260006'; c.beginPath(); c.ellipse(11, 0, 15, Math.min(17, 2 + jaw * 11), 0, 0, TAU); c.fill(); c.fillStyle = '#8f1820'; c.beginPath(); c.ellipse(13, 0, 10, Math.max(1, jaw * 5), 0, 0, TAU); c.fill(); if (cobraOpen > .18) { c.strokeStyle = '#f4b2a0'; c.lineWidth = 2; c.beginPath(); c.moveTo(0, -5 - jaw * 5); c.quadraticCurveTo(10, -2, 23, -5 - jaw * 5); c.stroke(); c.fillStyle = '#fff0d8'; [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(7, sd * 5); c.lineTo(11, sd * (5 + jaw * 8)); c.lineTo(14, sd * 5); c.fill() }); c.strokeStyle = '#ff6c70'; c.lineWidth = 2; c.beginPath(); c.moveTo(17, 0); c.lineTo(24, 2); c.lineTo(29, -2); c.moveTo(24, 2); c.lineTo(28, 6); c.stroke() } }
+      // Mandíbulas
       [-1, 1].forEach(sd => {
-        c.save(); c.translate(2, 0); c.rotate(sd * pm * .5); c.beginPath(); c.moveTo(-7, 0); c.lineTo(-7, sd * 10.5); c.quadraticCurveTo(11, sd * 11, 18, 0); c.closePath(); c.fillStyle = '#22050a'; c.fill(); c.strokeStyle = skinPreview ? skinColor : '#b0242d'; c.lineWidth = 1.3; c.stroke();
-        c.fillStyle = skinPreview ? skinColor : '#d9c7b0';[5, 9, 12, 15].forEach((k, j) => { const hh = j % 2 ? 4.5 : 7; c.beginPath(); c.moveTo(k - 1.6, 0); c.lineTo(k + 1.6, 0); c.lineTo(k, -sd * hh); c.fill() }); c.restore()
+        c.save(); c.translate(2, 0); c.rotate(sd * pm * .5); c.beginPath(); c.moveTo(-7, 0); c.lineTo(-7, sd * 10.5); c.quadraticCurveTo(11, sd * 11, 18, 0); c.closePath(); c.fillStyle = isEmber ? '#22050a' : pal.core; c.fill(); c.strokeStyle = isEmber ? '#b0242d' : pal.glow; c.lineWidth = 1.3; c.stroke();
+        c.fillStyle = isEmber ? '#d9c7b0' : pal.bone; [5, 9, 12, 15].forEach((k, j) => { const hh = j % 2 ? 4.5 : 7; c.beginPath(); c.moveTo(k - 1.6, 0); c.lineTo(k + 1.6, 0); c.lineTo(k, -sd * hh); c.fill() }); c.restore()
       });
-      [-1, 1].forEach(sd => { c.save(); c.translate(4, sd * 6.4); c.rotate(-sd * .5); c.shadowColor = skinPreview ? skinColor : '#ff3b1f'; c.shadowBlur = 18; c.fillStyle = skinPreview ? skinColor : (pm > .5 ? '#ffb066' : '#ff3b1f'); c.beginPath(); c.ellipse(0, 0, 4.2, 2.3, 0, 0, TAU); c.fill(); c.shadowBlur = 0; c.fillStyle = '#0a0002'; c.beginPath(); c.ellipse(0, 0, .9, 2.2, 0, 0, TAU); c.fill(); c.restore() });
+      // Ojos
+      [-1, 1].forEach(sd => {
+        c.save(); c.translate(4, sd * 6.4); c.rotate(-sd * .5);
+        c.shadowColor = isEmber ? '#ff3b1f' : pal.glow; c.shadowBlur = isEmber ? 18 : (lowEnd ? 0 : 10);
+        c.fillStyle = isEmber ? (pm > .5 ? '#ffb066' : '#ff3b1f') : pal.eye; c.beginPath(); c.ellipse(0, 0, 4.2, 2.3, 0, 0, TAU); c.fill();
+        c.shadowBlur = 0; c.fillStyle = '#0a0002'; c.beginPath(); c.ellipse(0, 0, .9, 2.2, 0, 0, TAU); c.fill(); c.restore()
+      });
       c.restore(); c.globalAlpha = 1;
     }
     function drawTents(t) {

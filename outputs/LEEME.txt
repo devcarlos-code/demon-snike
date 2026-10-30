@@ -24,3 +24,15 @@ PRUEBAS
 PUBLICACIÓN
 - Publica la carpeta outputs con HTTPS para que el service worker y la instalación PWA funcionen.
 - Después de actualizar archivos, el service worker cambia de versión para forzar una caché nueva.
+
+CAMBIOS DE ESPECIES (caché v109)
+- Escarcha, Abismo, Veneno, Caído y Luna Sangrienta tienen anatomía propia en drawDemon (vértebras, costillas, cuernos, patas y garras diferentes). Carmesí conserva el dibujo original.
+- La vista previa usa la misma función y paleta que la partida. Lo que se ve en la tienda es lo que aparece en juego.
+- Cada especie tiene movimiento propio (SPECIES_MOTION). Caído añade un movimiento irregular.
+- Las tarjetas de la tienda muestran la criatura real de cada piel.
+- La forma y el movimiento son solo visuales: no cambian P, R, n, las colisiones ni las compras. Los ids de especie se mantienen.
+- Corrección: el id void se llama ahora Vacío (antes compartía nombre con Caído, id fallen). Abismo usa color violeta como en la lámina de referencia.
+- Corrección: los anillos de crecimiento se dibujan en coordenadas de la cabeza.
+- Corrección: el panel de nivel del HUD ya no queda debajo de los botones de pausa y sonido.
+- Corrección: los textos de los botones de la tienda no se cortan.
+
