@@ -1602,7 +1602,7 @@ body{background:
     }
 
 
-    /* HUD móvil: estadísticas con algo más de altura, radar protegido */
+    /* HUD móvil: estadísticas a la izquierda y panel más compacto, radar protegido */
     @media (pointer:coarse) {
       #hud {
         position:fixed !important;
@@ -1611,7 +1611,8 @@ body{background:
         right:calc(clamp(84px,22vw,112px) + env(safe-area-inset-right,0px) + 20px) !important;
         width:auto !important;
         display:flex !important;
-        align-items:stretch !important;
+        align-items:flex-start !important;
+        justify-content:flex-start !important;
         gap:6px !important;
       }
       #hud .bars {
@@ -1623,17 +1624,18 @@ body{background:
       }
       #hud #lv {
         position:static !important;
-        flex:1 1 72% !important;
-        width:auto !important;
-        max-width:none !important;
+        flex:0 1 62% !important;
+        width:62% !important;
+        max-width:62% !important;
         min-width:0 !important;
         min-height:56px !important;
         box-sizing:border-box !important;
         margin:0 !important;
-        padding:8px 8px !important;
+        padding:8px 6px !important;
         font-size:9px !important;
         line-height:1.3 !important;
         text-align:left !important;
+        align-self:flex-start !important;
         overflow-wrap:normal !important;
       }
       #hud #lv br { display:block !important; }
@@ -1651,6 +1653,11 @@ body{background:
     @media (pointer:coarse) and (orientation:landscape) {
       #hud {
         right:calc(clamp(76px,16vh,96px) + env(safe-area-inset-right,0px) + 20px) !important;
+      }
+      #hud #lv {
+        flex-basis:64% !important;
+        width:64% !important;
+        max-width:64% !important;
       }
       #radar {
         top:calc(env(safe-area-inset-top,0px) + 8px) !important;
