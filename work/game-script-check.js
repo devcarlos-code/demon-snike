@@ -1,4 +1,3 @@
-
     const cv = document.getElementById('c'), ctx = cv.getContext('2d'), $ = id => document.getElementById(id);
     const TAU = Math.PI * 2, wrap = a => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI, rnd = (a, b) => a + Math.random() * (b - a), dst = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const mobileMQ=matchMedia('(pointer: coarse)');
@@ -1314,4 +1313,3 @@ function renderCampaign(){
     let prev = performance.now(), fpsFrames = 0, fpsLast = performance.now(), fpsEl = null;
     function showRuntimeError(error,source='JUEGO'){const message=(error&&error.message)||String(error||'Error desconocido');console.error('Demon-Snike '+source+':',error);let panel=$('runtimeError');if(!panel){panel=document.createElement('div');panel.id='runtimeError';panel.innerHTML='<b>ERROR DEL MOTOR</b><p></p><small>La partida se pausó para proteger tu progreso.</small><button type="button">VOLVER AL MENÚ</button>';document.body.appendChild(panel);panel.querySelector('button').addEventListener('click',()=>{panel.style.display='none';goHome()})}panel.querySelector('p').textContent=source+': '+message;panel.style.display='flex';state='pause'}window.addEventListener('error',e=>showRuntimeError(e.error||e.message,'JAVASCRIPT'));window.addEventListener('unhandledrejection',e=>showRuntimeError(e.reason,'PROMESA'));function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; fpsFrames++; if (settings.fps && now - fpsLast >= 500) { if (!fpsEl) fpsEl = $('fpsMeter'); if (fpsEl) fpsEl.textContent = Math.round(fpsFrames * 1000 / (now - fpsLast)) + ' FPS'; fpsFrames = 0; fpsLast = now } else if (!settings.fps) { fpsFrames = 0; fpsLast = now } try { slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now) } catch(error) { showRuntimeError(error,'RENDER / ACTUALIZACIÓN') } requestAnimationFrame(loop) }
     applySettings();makePlayer();refreshHome();requestAnimationFrame(loop);
-  

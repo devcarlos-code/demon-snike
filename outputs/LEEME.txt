@@ -3,8 +3,10 @@ DEMON-SNIKE / ARENA DE SERPIENTES — NOTAS DEL PROYECTO
 ARCHIVO PRINCIPAL
 - El juego publicado se ejecuta desde outputs/index.html.
 - La página raíz del repositorio redirige a outputs/.
+- outputs/styles.css contiene todos los estilos y outputs/game.js todo el código del juego. Ambos están enlazados desde index.html.
 - outputs/service-worker.js administra la caché de la PWA. Su versión se incrementa al publicar cambios del juego.
 - outputs/manifest.webmanifest y outputs/icon.svg configuran la instalación como aplicación.
+- Si añades archivos nuevos, inclúyelos en la lista FILES del service worker para que funcionen sin conexión.
 
 CONTROLES
 - PC: ratón/teclas y botones de habilidades.
@@ -18,7 +20,8 @@ GUARDADO Y CUENTAS
 - No borres el almacenamiento del navegador hasta que la sincronización de la cuenta esté probada y se haya migrado el progreso.
 
 PRUEBAS
-- work/game-script-check.js contiene el JavaScript extraído del juego publicado para comprobar sintaxis con Node.js.
+- work/game-script-check.js es una copia de outputs/game.js para comprobar la sintaxis con Node.js. Se actualiza copiando el archivo.
+- work/validate-html.js revisa outputs/index.html: IDs duplicados, botones sin type, imágenes sin alt, balance de etiquetas y atributos repetidos. Se ejecuta con: node work/validate-html.js
 - Los archivos work/patch-*.ps1 son parches históricos que apuntaban a un archivo fuente antiguo no incluido en la carpeta publicada; no se ejecutan en producción.
 
 PUBLICACIÓN
