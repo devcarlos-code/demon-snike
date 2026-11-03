@@ -1266,17 +1266,18 @@ function renderCampaign(){
       b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();b.blur()});
     });
     addEventListener('keydown', e => {
-      const moveKey=e.key.toLowerCase();
+      if(e.target instanceof HTMLElement&&['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+      const moveKey=String(e.key||'').toLowerCase();
       if(['arrowup','arrowdown','arrowleft','arrowright'].includes(moveKey)){moveKeys.add(moveKey);if(!mobile)e.preventDefault()}
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      initAudio(); const k = e.key.toLowerCase();
+      initAudio(); const k = String(e.key||'').toLowerCase();
       if (k === 'p' || k === 'escape') { if (!e.repeat) togglePause(); return }
       if (k === 'c' && !e.repeat && cobra.phase === 4) { cancelCobra('MODO COBRA CANCELADO'); return }
       if (state === 'upg' && k.length === 1 && '1234567'.includes(k)) { pickUpg(+k - 1); return }
       if (k.length === 1 && 'asdf'.includes(k) && !e.repeat) { atk(k); e.preventDefault() }
       if ((k === 'enter' || k === ' ') && !e.repeat) { const hv=$('homeView'); if (state === 'title' && hv && hv.style.display !== 'none') startGame(); else if (state === 'over') restart() }
     });
-    addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
+    addEventListener('keyup',e=>{if(e.target instanceof HTMLElement&&['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;moveKeys.delete(String(e.key||'').toLowerCase())});addEventListener('blur',()=>moveKeys.clear());
     $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('homeContinue').addEventListener('click',()=>{const id=$('homeContinue').dataset.sessionId;if(id)continueSavedGame(id)});$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});
     $('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout();const touchEquip=e.target.closest('[data-touch-equip]');if(touchEquip){equipSkill(Number(touchEquip.dataset.touchSlot),touchEquip.dataset.touchEquip);touchSkillSelection='';renderLoadout();return}const item=e.target.closest('[data-skill-drag]');if(item&&hasTouchInput()&&!e.target.closest('[data-remove-slot]')){touchSkillSelection=touchSkillSelection===item.dataset.skillDrag?'':item.dataset.skillDrag;renderLoadout();return}const remove=e.target.closest('[data-remove-slot]');if(remove)equipSkill(Number(remove.dataset.removeSlot),'')});
     $('loadoutGrid').addEventListener('dragstart',e=>{const item=e.target.closest('[data-skill-drag]');if(!item)return;e.dataTransfer.setData('text/plain',item.dataset.skillDrag);e.dataTransfer.effectAllowed='move';item.classList.add('is-dragging')});
