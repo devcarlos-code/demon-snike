@@ -17,6 +17,7 @@ GUARDADO Y CUENTAS
 - El guardado sigue usando localStorage en este momento para proteger el progreso existente.
 - outputs/auth.js integra el inicio de sesión con Supabase por correo/contraseña y deja preparado el botón de Google.
 - El proveedor de Google debe activarse en Supabase con sus credenciales OAuth y una URL de redirección autorizada.
+- La URL de redirección oficial es https://devcarlos-code.github.io/demon-snike/outputs/. También debe estar en Supabase en Authentication > URL Configuration > Redirect URLs; el navegador local usa su propia ruta para desarrollo.
 - El guardado del juego sigue usando localStorage; la sincronización en la nube requiere una tabla de progreso y políticas RLS que aíslen cada usuario.
 - La tienda usa un catálogo filtrable por búsqueda y rango, con tarjetas compactas de dos columnas.
 - El arsenal usa drag-and-drop para mover habilidades desbloqueadas entre los espacios A, S, D y F.

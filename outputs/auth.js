@@ -3,6 +3,7 @@
 
   const SUPABASE_URL = 'https://qyadfoimsalesldohngq.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZN3kmoS6Y2VzsP2rGy1rWA_7pHqDHRQ';
+  const OFFICIAL_SITE = 'https://devcarlos-code.github.io/demon-snike/outputs/';
   const client = window.supabase && window.supabase.createClient
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
     : null;
@@ -18,6 +19,12 @@
   function showMessage(text, isError) {
     message.textContent = text;
     message.dataset.error = isError ? 'true' : 'false';
+  }
+
+  function authRedirectUrl() {
+    return window.location.hostname === 'devcarlos-code.github.io'
+      ? OFFICIAL_SITE
+      : window.location.origin + window.location.pathname;
   }
 
   function setUser(user) {
@@ -63,7 +70,7 @@
   $('accountGoogle').addEventListener('click', () => run(async () => {
     const { error } = await client.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + window.location.pathname }
+      options: { redirectTo: authRedirectUrl() }
     });
     if (error) throw error;
   }));
@@ -74,9 +81,16 @@
     showMessage('Sesión cerrada.', false);
   }));
 
+  const authError = new URLSearchParams(window.location.hash.slice(1)).get('error_description') || new URLSearchParams(window.location.search).get('error_description');
+  if (authError) {
+    let readableError = authError;
+    try { readableError = decodeURIComponent(authError.replace(/\+/g, ' ')); } catch (decodeError) { console.warn('No se pudo interpretar el error de autenticación', decodeError) }
+    showMessage('Google no pudo iniciar sesión: ' + readableError, true);
+  }
   client.auth.onAuthStateChange((_event, session) => setUser(session && session.user));
   client.auth.getSession().then(({ data, error }) => {
     if (error) return showMessage('No se pudo comprobar la sesión.', true);
     setUser(data.session && data.session.user);
+    if (window.location.hash.includes('access_token=') || window.location.hash.includes('error_description=')) history.replaceState(null, '', window.location.pathname + window.location.search);
   });
 })();

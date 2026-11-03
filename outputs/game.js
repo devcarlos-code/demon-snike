@@ -148,6 +148,7 @@
       }catch(error){console.warn('El respaldo de Supervivencia no se pudo leer',error)}
       return data;
     }
+    let touchSkillSelection='';
     let saveData=loadSave();campaignUnlocked=Math.max(1,Math.min(100,Number(saveData.campaignUnlocked)||1));campaignCompleted=!!saveData.campaignCompleted;campaignResults=saveData.campaignResults&&typeof saveData.campaignResults==='object'?saveData.campaignResults:{};
     let skillFragments=Math.max(0,Number(saveData.skillFragments)||0),skillMasteries=saveData.skillMasteries&&typeof saveData.skillMasteries==='object'?saveData.skillMasteries:{};best=Math.max(best,Number(saveData.best)||0);let coins=Math.max(0,Number(saveData.coins)||0),ownedSkills=[...new Set([...STARTER_LOADOUT,...(Array.isArray(saveData.ownedSkills)?saveData.ownedSkills:[])])],skillLoadout=Array.isArray(saveData.skillLoadout)?SLOT_KEYS.map((_,i)=>{const id=saveData.skillLoadout[i];return ownedSkills.includes(id)&&skillById(id)?id:''}):[...STARTER_LOADOUT];for(let i=0;i<skillLoadout.length;i++)if(skillLoadout[i]&&skillLoadout.indexOf(skillLoadout[i])!==i)skillLoadout[i]='';let shopBonusClaimed=!!(saveData.shopBonusClaimed||saveData.secretCodeUsed);
     let stats={runs:0,kills:0,bosses:0,totalScore:0,bestLevel:1,upgrades:0,bestCombo:1,...(saveData.stats||{})};
@@ -364,11 +365,13 @@ function renderCampaign(){
           (skill?'<div class="loadout-equipped" data-skill-drag="'+skill.id+'" draggable="true"><span class="loadout-equipped-icon">'+skill.icon+'</span><span><b>'+skill.name+'</b><small>'+skill.tier+'</small></span><button type="button" class="loadout-remove" data-remove-slot="'+i+'" aria-label="Quitar '+skill.name+'">×</button></div>':'<div class="loadout-drop"><b>+</b><span>SUELTA AQUÍ</span></div>')+
           '</div>';
       }).join('');
-      const available=ownedSkills.filter(id=>!skillLoadout.includes(id)).map(id=>{
+      const availableIds=ownedSkills.filter(id=>!skillLoadout.includes(id));
+      const available=availableIds.map(id=>{
         const skill=skillById(id);if(!skill)return '';
-        return '<button type="button" class="skill-pool-item" data-skill-drag="'+skill.id+'" draggable="true"><span class="skill-pool-icon">'+skill.icon+'</span><span><b>'+skill.name+'</b><small>'+skill.tier+'</small></span><i>ARRASTRAR</i></button>';
+        const quick=touchSkillSelection===skill.id?'<span class="skill-touch-actions"><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="0">A</button><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="1">S</button><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="2">D</button><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="3">F</button></span>':'';
+        return '<div class="skill-pool-item-wrap"><button type="button" class="skill-pool-item" data-skill-drag="'+skill.id+'" draggable="true"><span class="skill-pool-icon">'+skill.icon+'</span><span><b>'+skill.name+'</b><small>'+skill.tier+'</small></span><i>TOCA PARA EQUIPAR</i></button>'+quick+'</div>';
       }).join('');
-      grid.innerHTML='<div class="loadout-slots">'+slots+'</div><div class="skill-pool"><div class="skill-pool-heading"><b>HABILIDADES DESBLOQUEADAS</b><small>'+available.length+' disponibles para equipar</small></div><div class="skill-pool-list">'+(available||'<p class="skill-pool-empty">Desbloquea habilidades en la tienda para ampliar tu arsenal.</p>')+'</div></div><div class="loadout-actions"><button id="resetLoadout" type="button">RESTABLECER INICIALES</button><small>'+used+' de 4 espacios ocupados</small></div>';
+      grid.innerHTML='<div class="loadout-slots">'+slots+'</div><div class="skill-pool"><div class="skill-pool-heading"><b>HABILIDADES DESBLOQUEADAS</b><small>'+availableIds.length+' disponibles para equipar</small></div><div class="skill-pool-list">'+(available||'<p class="skill-pool-empty">Desbloquea habilidades en la tienda para ampliar tu arsenal.</p>')+'</div></div><div class="loadout-actions"><button id="resetLoadout" type="button">RESTABLECER INICIALES</button><small>'+used+' de 4 espacios ocupados</small></div>';
     }
     function renderMasteries(){
       const list=$('masteryList'),balance=$('fragmentBalance'),owned=$('ownedSkillList');
@@ -971,10 +974,17 @@ function renderCampaign(){
         const shade = i % 4 === 0 ? 'rgba(133,166,83,.095)' : (i % 3 === 0 ? 'rgba(3,13,7,.12)' : 'rgba(67,104,49,.075)');
         tg.fillStyle = shade; tg.beginPath(); tg.ellipse(x, y, r, r * (.4 + Math.random() * .65), Math.random() * Math.PI, 0, TAU); tg.fill();
       }
-      for (let i = 0, grassStrokes = lowEndDevice ? 460 : 900; i < grassStrokes; i++) {
+      for (let i = 0, grassStrokes = lowEndDevice ? 320 : 680; i < grassStrokes; i++) {
         const x = Math.random() * 256, y = Math.random() * 256, h = 2 + Math.random() * 5;
         tg.strokeStyle = i % 5 === 0 ? 'rgba(174,196,116,.25)' : (i % 2 ? 'rgba(4,17,8,.28)' : 'rgba(112,151,76,.19)');
         tg.lineWidth = .55 + Math.random() * .65; tg.beginPath(); tg.moveTo(x, y); tg.quadraticCurveTo(x + (Math.random() - .5) * 3, y - h * .55, x + (Math.random() - .5) * 4, y - h); tg.stroke();
+      }
+      const clumps=lowEndDevice?28:54;
+      for(let i=0;i<clumps;i++){
+        const x=Math.random()*256,y=Math.random()*256,lean=(Math.random()-.5)*4;
+        tg.save();tg.translate(x,y);tg.rotate((Math.random()-.5)*.35);
+        for(let j=0;j<5;j++){const h=5+Math.random()*8,w=(j-2)*1.5;tg.strokeStyle=j%2?'rgba(152,190,103,.34)':'rgba(24,70,34,.5)';tg.lineWidth=.8;tg.beginPath();tg.moveTo(w,2);tg.quadraticCurveTo(w+lean,-h*.5,w+lean*1.7,-h);tg.stroke()}
+        tg.restore();
       }
       for (let i = 0; i < 34; i++) {
         const x = Math.random() * 256, y = Math.random() * 256;
@@ -1268,7 +1278,7 @@ function renderCampaign(){
     });
     addEventListener('keyup',e=>moveKeys.delete(e.key.toLowerCase()));addEventListener('blur',()=>moveKeys.clear());
     $('re').addEventListener('click',restart);$('go').addEventListener('click',()=>startGame('survival'));$('homeContinue').addEventListener('click',()=>{const id=$('homeContinue').dataset.sessionId;if(id)continueSavedGame(id)});$('campaignGo').addEventListener('click',()=>showHomePage('campaignPage'));$('campaignGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-campaign-level]');if(!b||b.disabled)return;const level=Number(b.dataset.campaignLevel);if(level>campaignUnlocked)return;startGame('campaign',level)});
-    $('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout();const remove=e.target.closest('[data-remove-slot]');if(remove)equipSkill(Number(remove.dataset.removeSlot),'')});
+    $('loadoutGrid').addEventListener('click',e=>{if(e.target.closest('#resetLoadout'))resetLoadout();const touchEquip=e.target.closest('[data-touch-equip]');if(touchEquip){equipSkill(Number(touchEquip.dataset.touchSlot),touchEquip.dataset.touchEquip);touchSkillSelection='';renderLoadout();return}const item=e.target.closest('[data-skill-drag]');if(item&&hasTouchInput()&&!e.target.closest('[data-remove-slot]')){touchSkillSelection=touchSkillSelection===item.dataset.skillDrag?'':item.dataset.skillDrag;renderLoadout();return}const remove=e.target.closest('[data-remove-slot]');if(remove)equipSkill(Number(remove.dataset.removeSlot),'')});
     $('loadoutGrid').addEventListener('dragstart',e=>{const item=e.target.closest('[data-skill-drag]');if(!item)return;e.dataTransfer.setData('text/plain',item.dataset.skillDrag);e.dataTransfer.effectAllowed='move';item.classList.add('is-dragging')});
     $('loadoutGrid').addEventListener('dragend',e=>{const item=e.target.closest('[data-skill-drag]');if(item)item.classList.remove('is-dragging');document.querySelectorAll('.loadout-slot.is-drag-over').forEach(slot=>slot.classList.remove('is-drag-over'))});
     $('loadoutGrid').addEventListener('dragover',e=>{const slot=e.target.closest('.loadout-slot');if(!slot)return;e.preventDefault();e.dataTransfer.dropEffect='move';slot.classList.add('is-drag-over')});

@@ -72,6 +72,7 @@ También puedes publicar la carpeta `outputs/` en cualquier hosting estático (G
 
 Después de publicar, añade el dominio en **Authentication → URL Configuration** de Supabase.
 El botón de Google requiere activar Google en **Authentication → Providers** y configurar sus credenciales OAuth.
+Para esta publicación, añade exactamente `https://devcarlos-code.github.io/demon-snike/outputs/` en **Redirect URLs** y usa esa misma dirección como URL pública del sitio. En desarrollo local se conserva automáticamente la ruta local.
 
 ---
 
