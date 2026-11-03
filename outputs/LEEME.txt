@@ -15,8 +15,11 @@ CONTROLES
 
 GUARDADO Y CUENTAS
 - El guardado sigue usando localStorage en este momento para proteger el progreso existente.
-- El perfil y la navegación ya están en la interfaz, pero el inicio de sesión con Google y el guardado en la nube todavía no están activados.
-- Para activar la nube hace falta conectar un proyecto Supabase, configurar Google OAuth y aplicar una política de base de datos que aísle el progreso de cada usuario.
+- outputs/auth.js integra el inicio de sesión con Supabase por correo/contraseña y deja preparado el botón de Google.
+- El proveedor de Google debe activarse en Supabase con sus credenciales OAuth y una URL de redirección autorizada.
+- El guardado del juego sigue usando localStorage; la sincronización en la nube requiere una tabla de progreso y políticas RLS que aíslen cada usuario.
+- La tienda usa un catálogo filtrable por búsqueda y rango, con tarjetas compactas de dos columnas.
+- El arsenal usa drag-and-drop para mover habilidades desbloqueadas entre los espacios A, S, D y F.
 - No borres el almacenamiento del navegador hasta que la sincronización de la cuenta esté probada y se haya migrado el progreso.
 
 PRUEBAS
@@ -38,4 +41,3 @@ CAMBIOS DE ESPECIES (caché v109)
 - Corrección: los anillos de crecimiento se dibujan en coordenadas de la cabeza.
 - Corrección: el panel de nivel del HUD ya no queda debajo de los botones de pausa y sonido.
 - Corrección: los textos de los botones de la tienda no se cortan.
-

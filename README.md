@@ -45,6 +45,7 @@ demon-snike/
 ├─ outputs/
 │  ├─ index.html                  # Juego completo (HTML + CSS + JS en un solo archivo)
 │  ├─ service-worker.js           # Caché de la PWA (versión manual)
+│  ├─ auth.js                     # Inicio de sesión con Supabase
 │  ├─ manifest.webmanifest        # Metadatos de instalación
 │  ├─ icon.svg                    # Icono de la app
 │  └─ LEEME.txt                   # Notas internas del proyecto
@@ -68,6 +69,9 @@ python -m http.server 8000
 ```
 
 También puedes publicar la carpeta `outputs/` en cualquier hosting estático (GitHub Pages, Netlify, Vercel…).
+
+Después de publicar, añade el dominio en **Authentication → URL Configuration** de Supabase.
+El botón de Google requiere activar Google en **Authentication → Providers** y configurar sus credenciales OAuth.
 
 ---
 
@@ -97,5 +101,9 @@ HTML5 · CSS (Grid/Flexbox, `clamp()`, `backdrop-filter`) · JavaScript (Canvas 
 
 ## Estado / pendientes
 
-- Guardado en la nube (Supabase) y login con Google: **no activados** (el progreso vive en `localStorage`).
+- Login con Supabase activado en `outputs/auth.js` (correo/contraseña y botón de Google).
+- El progreso del juego sigue guardándose localmente por ahora; la sincronización de partidas requiere una tabla y políticas RLS adicionales.
+- La tienda tiene catálogo en dos columnas, búsqueda y filtro por rango.
+- El arsenal permite arrastrar habilidades desbloqueadas entre los cuatro espacios activos.
+- El diagnóstico de runtime captura errores JavaScript, promesas rechazadas y fallos del ciclo con ID, severidad, estado, modo, nivel, última acción y traza. Deduplica incidentes, protege el progreso pausando solo cuando la arena no es segura y permite copiar o descargar reportes sin incluir tokens.
 - Sin sistema de migración de datos entre dispositivos.

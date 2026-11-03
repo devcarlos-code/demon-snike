@@ -125,6 +125,27 @@
       </header>
       <div class="section-content">
         <div class="section-intro"><div class="home-kicker"><i></i> TU HISTORIA EN LA ARENA</div><h2 id="profilePageTitle">TU PERFIL</h2><p>Consulta tus estadísticas y progreso. Todo se guarda automáticamente en este dispositivo.</p></div>
+        <section class="account-panel" aria-labelledby="accountTitle">
+          <div class="settings-head">
+            <div class="settings-head-copy"><b id="accountTitle">CUENTA EN LA NUBE</b><small id="accountStatus">INICIA SESIÓN PARA SINCRONIZAR TU PROGRESO</small></div>
+          </div>
+          <div id="accountSignedOut">
+            <div class="account-fields">
+              <label>Correo electrónico<input id="accountEmail" type="email" autocomplete="email" placeholder="tu@correo.com"></label>
+              <label>Contraseña<input id="accountPassword" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></label>
+            </div>
+            <div class="account-actions">
+              <button type="button" id="accountSignIn">INICIAR SESIÓN</button>
+              <button type="button" id="accountSignUp" class="secondary">CREAR CUENTA</button>
+              <button type="button" id="accountGoogle" class="secondary">CONTINUAR CON GOOGLE</button>
+            </div>
+          </div>
+          <div id="accountSignedIn" hidden>
+            <p id="accountUser" class="account-user"></p>
+            <button type="button" id="accountSignOut" class="secondary">CERRAR SESIÓN</button>
+          </div>
+          <p id="accountMessage" class="account-message" role="status" aria-live="polite"></p>
+        </section>
         <div class="profile-grid">
           <article class="profile-card"><span>☠</span><small>RÉCORD</small><b id="profileBest">0</b></article>
           <article class="profile-card"><span>♛</span><small>JEFES DERROTADOS</small><b id="profileBosses">0</b></article>
@@ -221,9 +242,9 @@
       <div class="section-content">
         <div class="section-intro"><div class="home-kicker"><i></i> CONFIGURA TU ESTILO DE COMBATE</div><h2 id="skillsPageTitle">TU ARSENAL</h2><p>Asigna una habilidad a cada espacio. Combina tus poderes para desbloquear diferentes combos durante la partida.</p></div>
         <div class="section-panel skill-panel">
-          <div class="section-panel-heading"><div><b>ESPACIOS ACTIVOS</b><small>Cuatro habilidades disponibles durante el combate</small></div><span class="section-tag">LOADOUT 04</span></div>
+          <div class="section-panel-heading"><div><b>ESPACIOS ACTIVOS</b><small>Arrastra tus habilidades para construir tu estilo</small></div><span class="section-tag">LOADOUT 04</span></div>
           <div class="home-disclosure-body">
-              <p class="armory-note">Elige una habilidad por tecla. Puedes dejar espacios vacíos; las habilidades compradas se pueden intercambiar cuando quieras.</p>
+              <p class="armory-note">Arrastra una habilidad desbloqueada a cualquier espacio. Puedes moverla, sustituirla o devolverla al inventario.</p>
               <div id="loadoutGrid" class="loadout-grid"></div>
               <div id="ownedSkillList" class="owned-skill-list"></div><div class="mastery-heading"><b>FORJA DE HABILIDADES</b><span>◆ <strong id="fragmentBalance">0</strong> FRAGMENTOS</span></div><div id="masteryList" class="mastery-list"></div>
             </div>
@@ -239,7 +260,12 @@
       </header>
       <div class="section-content shop-content">
         <div class="section-intro"><div class="home-kicker"><i></i> FORJA TU PODER</div><h2 id="shopPageTitle">LA TIENDA</h2><p>Desbloquea nuevas habilidades, amplía tus posibilidades y prepara una combinación única para la arena.</p></div>
-        <div class="shop-banner"><span>✦</span><div><b>CATÁLOGO DE HABILIDADES</b><small>Gana monedas derrotando enemigos y superando oleadas. Cada artefacto tiene su propio coste y tiempo de recarga.</small></div><strong>20 <small>ARTÍCULOS</small></strong></div>
+        <div class="shop-banner"><span>✦</span><div><b>CATÁLOGO DE HABILIDADES</b><small>Explora por rango, compara estadísticas y desbloquea tu próxima pieza de arsenal.</small></div><strong>20 <small>ARTÍCULOS</small></strong></div>
+        <div class="shop-toolbar" role="search">
+          <label class="shop-search"><span aria-hidden="true">⌕</span><input id="shopSearch" type="search" placeholder="Buscar habilidad..." aria-label="Buscar habilidad"></label>
+          <label class="shop-filter"><span>RANGO</span><select id="shopTierFilter" aria-label="Filtrar por rango"><option value="all">Todos</option><option value="INICIAL">Inicial</option><option value="COMÚN">Común</option><option value="RARA">Rara</option><option value="ÉPICA">Épica</option><option value="LEGENDARIA">Legendaria</option><option value="MÍTICA">Mítica</option></select></label>
+          <span id="shopResultCount" class="shop-result-count"></span>
+        </div>
         <div id="shopList" class="shop-list section-shop-list"></div>
       </div>
     </section>
@@ -248,6 +274,8 @@
       <div class="section-content"><div class="section-intro"><div class="home-kicker"><i></i> ELIGE TU ESPECIE</div><h2 id="skinsPageTitle">ELIGE TU CRIATURA</h2><p>Desbloquea apariencias con monedas. Las pieles son cosméticas y no alteran el equilibrio del combate.</p></div><div id="skinGrid" class="skin-grid"></div><div id="skinPreviewModal" class="skin-preview-modal" hidden><div class="skin-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="skinPreviewTitle"><button type="button" class="skin-preview-close" data-close-skin-preview aria-label="Cerrar vista previa">×</button><div class="home-kicker"><i></i> VISTA PREVIA · SIN COSTO</div><div id="skinPreviewStage" class="skin-preview-stage"></div><h3 id="skinPreviewTitle">Piel</h3><p id="skinPreviewDescription">Así se verá tu criatura durante la partida.</p><div class="skin-preview-actions"><button type="button" data-close-skin-preview>VOLVER</button><button type="button" id="skinPreviewAction">DESBLOQUEAR</button></div></div></div></div>
     </section>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./auth.js"></script>
   <script src="./game.js"></script>
 
 </body>
