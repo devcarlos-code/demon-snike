@@ -16,6 +16,23 @@
 </head>
 
 <body data-s="title">
+  <div id="loader" role="status" aria-live="polite" aria-label="Cargando la arena">
+    <div class="ld-grid" aria-hidden="true"></div>
+    <div class="ld-scan" aria-hidden="true"></div>
+    <div class="ld-vignette" aria-hidden="true"></div>
+    <div class="ld-core" aria-hidden="true">
+      <span class="ld-ring a"></span><span class="ld-ring b"></span><span class="ld-ring c"></span>
+      <span class="ld-sigil">☠</span>
+    </div>
+    <div class="ld-copy">
+      <div class="ld-kicker">SISTEMA · INICIALIZANDO</div>
+      <h1 class="ld-title">ARENA DE SERPIENTES</h1>
+      <div class="ld-bar"><i id="loaderBarFill"></i></div>
+      <div class="ld-meta"><span id="loaderStatus">ENLAZANDO NÚCLEO…</span><b id="loaderPct">0%</b></div>
+      <div class="ld-log" id="loaderLog" aria-hidden="true"></div>
+      <div class="ld-hint">TOCA PARA ENTRAR ▸</div>
+    </div>
+  </div>
   <canvas id="c"></canvas>
   <canvas id="radar" width="200" height="200" aria-label="Minimapa: posición del jugador y enemigos"></canvas>
   <div id="hud">

@@ -50,3 +50,19 @@ ariaLabelledby.forEach(a => {
   if (!new RegExp(' id="' + id + '"').test(h)) missing.push(id);
 });
 console.log('aria-labelledby sin destino: ' + (missing.length ? missing.join(', ') : 'ninguno'));
+
+// 7) Recursos externos y sintaxis del JavaScript
+['./styles.css', './game.js'].forEach(ref => {
+  console.log(ref + ' referenciado en el HTML: ' + (h.includes(ref) ? 'sí' : 'NO'));
+});
+try {
+  const js = fs.readFileSync('C:/Users/Corel/OneDrive/Desktop/html/demon-snike/outputs/game.js', 'utf8');
+  try {
+    new Function(js);
+    console.log('game.js sintaxis: OK (' + js.split('\n').length + ' líneas)');
+  } catch (e) {
+    console.log('game.js SINTAXIS ERROR: ' + e.message);
+  }
+} catch (e) {
+  console.log('game.js no encontrado: ' + e.message);
+}

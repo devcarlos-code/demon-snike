@@ -49,10 +49,17 @@
       want(l, lead) { const a = this.A[l.i], g = a + l.s * Math.PI / 2, fw = (l.i < this.n * .3 ? 10 : -4) * this.sc + lead, p = this.P[l.i]; return { x: p.x + Math.cos(a) * fw + Math.cos(g) * 27 * this.sc, y: p.y + Math.sin(a) * fw + Math.sin(g) * 27 * this.sc } }
       move(tx, ty, spd, turn, dt) {
         const hd = this.P[0], P = this.P;
-        if(this.k==='p'&&(cobra.phase===1||cobra.phase===4||cobra.phase===5)){
-          const a=cobra.angle,ax=Math.cos(a),ay=Math.sin(a),cx=cobra.anchorX,cy=cobra.anchorY;
-          this.h=a;this.A[0]=a;hd.x=cx+ax*42*this.sc;hd.y=cy+ay*42*this.sc;
-          for(let i=1;i<this.n;i++){if(i<=5){P[i].x=hd.x-ax*i*7.2*this.sc;P[i].y=hd.y-ay*i*7.2*this.sc;this.A[i]=a}else{const j=i-5,theta=a+Math.PI+j*.62,rad=(12+j*.58)*this.sc;P[i].x=cx+Math.cos(theta)*rad;P[i].y=cy+Math.sin(theta)*rad;this.A[i]=theta+Math.PI/2}}
+        if(this.k==='p'&&(cobra.phase===1||cobra.phase===5)){
+          const a=cobra.angle,ax=Math.cos(a),ay=Math.sin(a),cx=cobra.anchorX,cy=cobra.anchorY,s=this.sc,pz=cobraPose();
+          const reach=(34+pz.ext*44)*s,coilR=12*s,seg=Math.max(4*s,(Math.max(coilR+6*s,reach)-coilR)/6);
+          this.h=a;this.A[0]=a;hd.x=cx+ax*reach;hd.y=cy+ay*reach;
+          for(let i=1;i<this.n;i++){
+            if(i<=6){
+              const k=i/6,flick=cobra.phase===5?Math.cos(cobra.t*16):1;
+              const und=Math.sin(k*Math.PI*1.4)*(1.1+pz.neck*1.3)*s*(1-k*.4)*flick;
+              P[i].x=hd.x-ax*seg*i-ay*und;P[i].y=hd.y-ay*seg*i+ax*und;this.A[i]=a+und*.05/s;
+            }else{const j=i-6,theta=a+Math.PI+j*.6,rad=coilR+j*.55*s;P[i].x=cx+Math.cos(theta)*rad;P[i].y=cy+Math.sin(theta)*rad;this.A[i]=theta+Math.PI/2}
+          }
           this.legs.forEach(l=>{if(l.f){l.f.x=P[l.i].x;l.f.y=P[l.i].y}});
           return;
         }
@@ -450,7 +457,7 @@ function renderCampaign(){
     }
     function newGame(resume=false,sessionId=null){
       if(!resume){growthStacks=0;cobra={phase:0,t:0,target:null,angle:0,hit:false,requested:false};if(gameMode==='campaign'){campaignLevelTime=0;campaignLevelKills=0;campaignResultShown=false}}
-      const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];fields.length=0;meteors.length=0;bossDue=false;bossSpawned=false;lvl=cp?cp.level:(gameMode==='campaign'?campaignStartLevel-1:0);score=cp?cp.score:0;U=cp&&cp.U?{...U0,...cp.U}:{...U0};growthStacks=cp?Math.max(0,Number(cp.growthStacks)||0):0;maxHp=cp?Math.max(100,Number(cp.maxHp)||100):100;hp=cp?Math.min(maxHp,cp.hp):maxHp; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
+      const cp=resume?saveData.checkpoint:null;if(resume&&cp?.mode)gameMode=cp.mode; en=[];shots=[];parts=[];tents=[];spawnQ=[];fields.length=0;meteors.length=0;bossDue=false;bossSpawned=false;lvl=cp?cp.level:(gameMode==='campaign'?campaignStartLevel-1:0);score=cp?cp.score:0;U=cp&&cp.U?{...U0,...cp.U}:{...U0};growthStacks=cp?Math.max(0,Number(cp.growthStacks)||0):0;cobra={phase:growthStacks>=3?4:0,t:0,target:null,angle:0,hit:false,requested:false};maxHp=cp?Math.max(100,Number(cp.maxHp)||100):100;hp=cp?Math.min(maxHp,cp.hp):maxHp; comet = 0; bh = null; pools = []; fury = 0; inv = 0; dash = 0; breath = 0; nova = null; cd.a = cd.s = cd.d = cd.f = 0;guard=guardFlash=0;clearT = 0;
       rf=wf=shake=0;pops=[];streak=streakT=0;slow=1;lastK=null;fury=cp?cp.fury:0;makePlayer();if(resume&&cp&&cp.player){pl=Object.assign(new Snake(cp.player.P[0].x,cp.player.P[0].y,{n:cp.player.n,hp:cp.player.max,col:activeSkin().color,v:0,s:1.2},'p'),cp.player);pl.col=activeSkin().color;const sameBuild=!Array.isArray(cp.loadout)||SLOT_KEYS.every((key,i)=>cp.loadout[i]===skillLoadout[i]);guard=sameBuild?(cp.guard||0):0;cd.a=sameBuild?(cp.cooldowns?.a||0):0;cd.s=sameBuild?(cp.cooldowns?.s||0):0;cd.d=sameBuild?(cp.cooldowns?.d||0):0;cd.f=sameBuild?(cp.cooldowns?.f||0):0}state='play'; $('over').style.display='none';$('pz').style.display='none';$('title').style.display='none';if(!resume){saveData.checkpoint=null;if(sessionId){activeSessionId=sessionId;const existing=sessions.find(x=>x.id===sessionId);if(existing){existing.checkpoint=null;existing.ended=false;existing.updatedAt=Date.now()}}else{stats.runs++;if(gameMode==='survival'){let survivalSlot=sessions.find(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival');if(survivalSlot){activeSessionId=survivalSlot.id;survivalSlot.name='Supervivencia';survivalSlot.mode='survival';survivalSlot.createdAt=survivalSlot.createdAt||Date.now();survivalSlot.updatedAt=Date.now();survivalSlot.level=1;survivalSlot.score=0;survivalSlot.checkpoint=null;survivalSlot.ended=false}else{activeSessionId='survival-'+Date.now().toString(36);sessions.unshift({id:activeSessionId,name:'Supervivencia',mode:'survival',createdAt:Date.now(),updatedAt:Date.now(),level:1,score:0,checkpoint:null,ended:false})}}}}if(resume&&cp&&Array.isArray(cp.enemies)&&Array.isArray(cp.spawnQ)){en=cp.enemies.map(raw=>Object.assign(new Snake(raw.P[0].x,raw.P[0].y,{...CF[raw.k],hp:raw.max},raw.k),raw));spawnQ=cp.spawnQ}else{if(resume&&cp)lvl=Math.max(0,cp.level-1);nextLevel()}persist(true);
     }
     function hurt(e, d, kx, ky, quiet) {
@@ -666,7 +673,7 @@ function renderCampaign(){
       emb.forEach(e => { e.y -= e.v * dt / H; if (e.y < -.03) { e.y = 1.03; e.x = Math.random() } });
       if(state==='title'){updateCamera();const h=pl.P[0],d=Math.hypot(ptr.x-h.x,ptr.y-h.y); pl.move(ptr.x, ptr.y, d < 14 ? 0 : Math.min(280 * sc, d * 5), 7, dt); return }
       if(state!=='play')return;
-      if(cobra.phase===1){cobra.t-=dt;if(cobra.t<=0){cobra.phase=4;cobra.t=0;toast('COBRA ANCESTRAL · SELECCIONA UNA PRESA')}}else if(cobra.phase===2){cobra.t-=dt;if(cobra.target&&!cobra.target.dead){const h=pl.P[0],e=cobra.target.P[0],u=Math.max(0,Math.min(1,1-cobra.t/.5)),ease=u*u*(3-2*u),dx=Math.cos(cobra.angle),dy=Math.sin(cobra.angle),mx=h.x+dx*(58-18*ease)*pl.sc,my=h.y+dy*(58-18*ease)*pl.sc,pull=Math.min(1,dt*(3+ease*8));e.x+=(mx-e.x)*pull;e.y+=(my-e.y)*pull;}if(cobra.t<=0){const target=cobra.target;if(target&&!target.dead&&dst(pl.P[0],target.P[0])<145*pl.sc+target.R[0]*target.sc){cobra.phase=5;cobra.t=.48;cobra.swallowed=false;SFX.roar()}else{cobra.phase=3;cobra.t=.38;cobra.failed=true;cobra.swallowed=false;toast('LA PRESA ESCAPÓ')}}}else if(cobra.phase===5){cobra.t-=dt;const target=cobra.target;if(target&&!target.dead){const h=pl.P[0],e=target.P[0],u=Math.max(0,Math.min(1,1-cobra.t/.48)),ease=u*u*(3-2*u),mx=h.x+Math.cos(cobra.angle)*24*pl.sc,my=h.y+Math.sin(cobra.angle)*24*pl.sc,pull=Math.min(1,dt*(5+ease*17));e.x+=(mx-e.x)*pull;e.y+=(my-e.y)*pull;target.devourScale=1-.94*ease;target.devourAngle=Math.atan2(h.y-e.y,h.x-e.x);target.devourSpin=(target.devourSpin||0)+dt*(4+ease*20);target.devourWobble=Math.sin(target.devourSpin*1.7)*(1-ease)*.13;}if(cobra.t<=0){if(target&&!target.dead&&['basic','spitter','mini'].includes(target.k)){hurt(target,99999,Math.cos(cobra.angle)*260,Math.sin(cobra.angle)*260);growPlayer(4,.045);pop(pl.P[0].x,pl.P[0].y-35,'¡DEVORADO!','#ffcf75',true);cobra.swallowed=true}else{cobra.swallowed=false;cobra.failed=true}cobra.phase=3;cobra.t=.48}}else if(cobra.phase===3){cobra.t-=dt;if(cobra.t<=0){cobra.target=null;cobra.anchorX=pl.P[0].x-Math.cos(cobra.angle)*24*pl.sc;cobra.anchorY=pl.P[0].y-Math.sin(cobra.angle)*24*pl.sc;if(cobra.failed){cobra.phase=6;cobra.t=8;toast('COBRA ENFRIÁNDOSE')}else{cobra.phase=4;cobra.t=0;toast('COBRA LISTA · ELIGE OTRA PRESA')}cobra.failed=false}}else if(cobra.phase===6){cobra.t-=dt;if(cobra.t<=0){cobra.phase=4;cobra.t=0;toast('INSTINTO COBRA RECUPERADO')}}
+      if(cobra.phase===1){cobra.t-=dt;if(cobra.t<=0){cobra.phase=4;cobra.t=0;toast('COBRA ANCESTRAL · SELECCIONA UNA PRESA')}}else if(cobra.phase===2){cobra.t-=dt;if(cobra.target&&!cobra.target.dead){const h=pl.P[0],e=cobra.target.P[0],u=Math.max(0,Math.min(1,1-cobra.t/.5)),ease=u*u*(3-2*u),dx=Math.cos(cobra.angle),dy=Math.sin(cobra.angle),mx=h.x+dx*(58-18*ease)*pl.sc,my=h.y+dy*(58-18*ease)*pl.sc,pull=Math.min(1,dt*(3+ease*8));e.x+=(mx-e.x)*pull;e.y+=(my-e.y)*pull;}if(cobra.t<=0){const target=cobra.target;if(target&&!target.dead&&dst(pl.P[0],target.P[0])<145*pl.sc+target.R[0]*target.sc){cobra.phase=5;cobra.t=.48;cobra.swallowed=false;SFX.roar()}else{cobra.phase=3;cobra.t=.38;cobra.failed=true;cobra.swallowed=false;toast('LA PRESA ESCAPÓ')}}}else if(cobra.phase===5){cobra.t-=dt;const target=cobra.target;if(target&&!target.dead){const h=pl.P[0],e=target.P[0],u=Math.max(0,Math.min(1,1-cobra.t/.48)),ease=u*u*(3-2*u),mx=h.x+Math.cos(cobra.angle)*24*pl.sc,my=h.y+Math.sin(cobra.angle)*24*pl.sc,pull=Math.min(1,dt*(5+ease*17));e.x+=(mx-e.x)*pull;e.y+=(my-e.y)*pull;target.devourScale=1-.94*ease;target.devourAngle=Math.atan2(h.y-e.y,h.x-e.x);target.devourSpin=(target.devourSpin||0)+dt*(4+ease*20);target.devourWobble=Math.sin(target.devourSpin*1.7)*(1-ease)*.13;}if(cobra.t<=0){if(target&&!target.dead&&['basic','spitter','mini'].includes(target.k)){hurt(target,99999,Math.cos(cobra.angle)*260,Math.sin(cobra.angle)*260);growPlayer(4,.045);pop(pl.P[0].x,pl.P[0].y-35,'¡DEVORADO!','#ffcf75',true);cobra.swallowed=true}else{cobra.swallowed=false;cobra.failed=true}cobra.phase=3;cobra.t=.48}}else if(cobra.phase===3){cobra.t-=dt;if(cobra.t<=0){cobra.target=null;cobra.anchorX=pl.P[0].x-Math.cos(cobra.angle)*24*pl.sc;cobra.anchorY=pl.P[0].y-Math.sin(cobra.angle)*24*pl.sc;if(cobra.failed){cobra.phase=6;cobra.t=8;toast('COBRA ENFRIÁNDOSE')}else{cobra.phase=4;cobra.t=0;toast('COBRA LISTA · ELIGE OTRA PRESA')}cobra.failed=false}}else if(cobra.phase===4){cobra.t+=dt;if(!cobraPreyExists()){if(cobra.t>2.6){cobra.phase=6;cobra.t=8;cobra.target=null;toast('COBRA EN REPOSO · SIN PRESAS')}}else cobra.t=0}else if(cobra.phase===6){cobra.t-=dt;if(cobra.t<=0){cobra.phase=4;cobra.t=0;toast('COBRA LISTA · TOCA UNA PRESA')}}
       saveTick-=dt;if(saveTick<=0){saveTick=3;persist(true)}
       const h=pl.P[0];let moveMag=0;
       if(joy.active){moveMag=Math.min(1,Math.hypot(joy.dx,joy.dy));const a=Math.atan2(joy.dy,joy.dx);ptr.x=h.x+Math.cos(a)*Math.max(1,Math.min(W,H)*.55);ptr.y=h.y+Math.sin(a)*Math.max(1,Math.min(W,H)*.55)}
@@ -676,7 +683,7 @@ function renderCampaign(){
       for(const k in cd) cd[k] = Math.max(0, cd[k] - dt); inv = Math.max(0, inv - dt); pm = Math.max(0, pm - dt * 3); streakT -= dt; if (streakT <= 0) streak = 0;
       let spd = moveMag ? 280 * sc * U.spd * moveMag : (d < 18 ? 0 : Math.min(280 * sc * U.spd, d * 3.2)), turn = moveMag ? 9 : 5.8;
       if(growthStacks>=3&&cobra.phase===0&&cobra.requested){const head=pl.P[0];cobra={phase:1,t:.55,target:null,angle:pl.A[0],anchorX:head.x-Math.cos(pl.A[0])*24*pl.sc,anchorY:head.y-Math.sin(pl.A[0])*24*pl.sc,hit:false};cobra.requested=false;shake=Math.max(shake,2);SFX.roar()}
-      if(cobra.phase===1||cobra.phase===4||cobra.phase===5){spd=0;turn=0;ptr.x=pl.P[0].x;ptr.y=pl.P[0].y;pm=Math.max(pm,cobra.phase===1?.35:.18)}else if(cobra.phase===2){spd=1450*sc;turn=0;ptr.x=pl.P[0].x+Math.cos(cobra.angle)*230*pl.sc;ptr.y=pl.P[0].y+Math.sin(cobra.angle)*230*pl.sc;pm=1}
+      if(cobra.phase===1||cobra.phase===5){spd=0;turn=0;ptr.x=pl.P[0].x;ptr.y=pl.P[0].y;pm=Math.max(pm,cobra.phase===1?.35:.18)}else if(cobra.phase===2){spd=1450*sc;turn=0;ptr.x=pl.P[0].x+Math.cos(cobra.angle)*230*pl.sc;ptr.y=pl.P[0].y+Math.sin(cobra.angle)*230*pl.sc;pm=1}
       if (dash > 0) {
         dash -= dt; spd = 1000 * sc; turn = 0; pm = Math.max(pm, .7);
         en.forEach(e => { if (!dashHit.has(e) && !e.dead && dst(h, e.P[0]) < 30 * pl.sc + e.R[0] * e.sc) { dashHit.add(e); const a = pl.A[0]; hurt(e, (e.k === 'armor' ? 12 : 42) * U.dA, Math.cos(a) * 500, Math.sin(a) * 500); shake = Math.max(shake, 5) } })
@@ -858,11 +865,10 @@ function renderCampaign(){
 
       // 5) Cabeza (espacio local: +x hacia adelante, unidades de cabeza escaladas por s)
       c.save(); c.translate(h.x, h.y); c.rotate(motionAngle(0)); c.scale(s, s);
-      const bitePulse = cobra.phase === 2 ? Math.sin(Math.min(1, 1-cobra.t/.5) * Math.PI) : cobra.phase === 5 ? Math.sin((1-cobra.t/.48)*Math.PI) : 0;
-      const cobraOpen = cobra.phase === 2 ? .25+bitePulse*1.1 : cobra.phase === 5 ? .45+bitePulse*1.25 : cobra.phase === 3 && cobra.swallowed ? Math.max(0,cobra.t/.48)*.9 : cobra.phase===1||cobra.phase===4 ? .12 : 0;
-      const recoil = cobra.phase === 1 ? Math.sin((1-cobra.t/.65)*Math.PI)*.16 : cobra.phase === 2 ? bitePulse*.34 : cobra.phase === 5 ? bitePulse*.2 : cobra.phase === 3 ? Math.sin(cobra.t*25)*.05 : 0;
-      const swallowPulse = cobra.phase === 5 ? Math.sin((1-cobra.t/.48)*Math.PI*3)*.09 : 0;
-      c.translate(-Math.max(0, recoil) * 15, 0); c.scale(1 + Math.max(0, recoil) * .18 + swallowPulse, 1 - Math.max(0, recoil) * .08 - swallowPulse * .45);
+      const cp = cobraPose();
+      const cobraOpen = cp.open;
+      const recoil = Math.max(0, -cp.ext), stretch = Math.max(0, cp.ext), swallowPulse = cp.swallow * .1;
+      c.translate(-recoil * 13 + stretch * 14, 0); c.rotate(cp.bob * .012); c.scale(1 + stretch * .16 + swallowPulse, 1 - recoil * .05 - stretch * .08 - swallowPulse * .4);
       const headParts = {
         frost() {
           [-1, 1].forEach(sd => { poly([[-3, sd * 6], [-14, sd * 12], [-31, sd * 31], [-17, sd * 13], [-8, sd * 9]], pal.bone, pal.core, 1.1); poly([[-6, sd * 5], [-20, sd * 7], [-25, sd * 18], [-12, sd * 10]], pal.accent, pal.core, .9); poly([[5, sd * 5], [19, sd * 10], [8, sd * 2.5]], pal.accent, pal.core, .9) });
@@ -898,22 +904,24 @@ function renderCampaign(){
       // Anillos de crecimiento: dentro de la cabeza se dibujan en coordenadas locales (antes usaban P[0] del mundo y se desplazaban).
       if (growthStacks > 0) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = Math.min(.72, .28 + growthStacks * .09); c.strokeStyle = '#ff8b45'; c.lineWidth = (2.5 + Math.min(3, growthStacks * .45)) / s; c.beginPath(); c.arc(0, 0, player.R[0] + (9 + Math.sin(t * .006) * 3) / s, 0, TAU); c.stroke(); c.globalAlpha *= .55; c.beginPath(); c.arc(0, 0, player.R[0] + (15 + Math.cos(t * .004) * 4) / s, 0, TAU); c.stroke(); c.restore() }
       if (growthStacks >= 3) { c.save(); c.globalAlpha = .42 + Math.min(.4, growthStacks * .05); c.strokeStyle = '#d34b35'; c.lineWidth = 3 + Math.min(3, player.sc); c.beginPath(); c.moveTo(-7, -10); c.quadraticCurveTo(-38, -34, -48, -8); c.moveTo(-7, 10); c.quadraticCurveTo(-38, 34, -48, 8); c.stroke(); c.restore() }
-      if ([1,2,4,5].includes(cobra.phase)) { const hoodOpen=cobra.phase===1?Math.min(1,(.65-cobra.t)/.65):cobra.phase===2?1:cobra.phase===5?.9:.82;c.save();c.globalAlpha=.92;c.fillStyle='#512018';c.strokeStyle='#d8a34f';c.lineWidth=2.1;c.shadowColor='#c88b3c';c.shadowBlur=lowEnd?2:8;c.beginPath();c.moveTo(-7,-6);c.quadraticCurveTo(-22,-(17+hoodOpen*18),-47,-(20+hoodOpen*20));c.quadraticCurveTo(-43,-5,-19,0);c.quadraticCurveTo(-43,5,-47,20+hoodOpen*20);c.quadraticCurveTo(-22,17+hoodOpen*18,-7,6);c.closePath();c.fill();c.stroke();c.shadowBlur=0;c.strokeStyle='#f0c875';c.globalAlpha=.7;c.lineWidth=1.1;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-13,sd*5);c.quadraticCurveTo(-28,sd*(12+hoodOpen*12),-40,sd*(17+hoodOpen*15));c.stroke()});c.restore() }
+      if ([1,2,3,4,5].includes(cobra.phase)) { const hoodOpen=Math.max(0,Math.min(1.2,cp.hood)),flap=Math.sin(t*.016)*.05*hoodOpen;c.save();c.globalAlpha=.92;c.fillStyle='#4a1d16';c.strokeStyle='#d8a34f';c.lineWidth=2.1;c.shadowColor='#c88b3c';c.shadowBlur=lowEnd?2:8;c.beginPath();c.moveTo(-7,-6);c.quadraticCurveTo(-22,-(17+hoodOpen*18+flap*12),-47,-(20+hoodOpen*20+flap*9));c.quadraticCurveTo(-43,-5,-19,0);c.quadraticCurveTo(-43,5,-47,20+hoodOpen*20+flap*9);c.quadraticCurveTo(-22,17+hoodOpen*18+flap*12,-7,6);c.closePath();c.fill();c.stroke();c.shadowBlur=0;c.strokeStyle='#f0c875';c.globalAlpha=.7;c.lineWidth=1.1;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-13,sd*5);c.quadraticCurveTo(-28,sd*(12+hoodOpen*12),-40,sd*(17+hoodOpen*15));c.stroke()});c.restore() }
       if (evo > .12) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = .35 + evo * .4; c.strokeStyle = fury > 70 ? '#ffc15c' : '#a95cff'; c.lineWidth = 2; c.beginPath(); c.moveTo(-5, -7); c.lineTo(-15 - evo * 9, -18 - evo * 8); c.lineTo(-1, -10); c.moveTo(-5, 7); c.lineTo(-15 - evo * 9, 18 + evo * 8); c.lineTo(-1, 10); c.stroke(); c.restore() }
       if (isEmber) [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(-1, sd * 8); c.quadraticCurveTo(-12, sd * 24, -34, sd * 14); c.strokeStyle = '#14070a'; c.lineWidth = 7; c.stroke(); c.strokeStyle = '#d9c7b0'; c.lineWidth = 3.4; c.stroke() });
       const bitePmJaw = pm;
-      if (bitePmJaw > .05 || cobraOpen > .05) { const jaw = Math.max(bitePmJaw, cobraOpen); c.fillStyle = '#260006'; c.beginPath(); c.ellipse(11, 0, 15, Math.min(17, 2 + jaw * 11), 0, 0, TAU); c.fill(); c.fillStyle = '#8f1820'; c.beginPath(); c.ellipse(13, 0, 10, Math.max(1, jaw * 5), 0, 0, TAU); c.fill(); if (cobraOpen > .18) { c.strokeStyle = '#f4b2a0'; c.lineWidth = 2; c.beginPath(); c.moveTo(0, -5 - jaw * 5); c.quadraticCurveTo(10, -2, 23, -5 - jaw * 5); c.stroke(); c.fillStyle = '#fff0d8'; [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(7, sd * 5); c.lineTo(11, sd * (5 + jaw * 8)); c.lineTo(14, sd * 5); c.fill() }); c.strokeStyle = '#ff6c70'; c.lineWidth = 2; c.beginPath(); c.moveTo(17, 0); c.lineTo(24, 2); c.lineTo(29, -2); c.moveTo(24, 2); c.lineTo(28, 6); c.stroke() } }
+      if (bitePmJaw > .05 || cobraOpen > .05) { const jaw = Math.max(bitePmJaw, cobraOpen), fangExt = Math.max(bitePmJaw, cp.fang); c.fillStyle = '#1b0005'; c.beginPath(); c.ellipse(11, 0, 15, Math.min(17, 2 + jaw * 11), 0, 0, TAU); c.fill(); c.save(); c.globalAlpha = Math.min(1, ba * .92); const gth = c.createRadialGradient(17, 0, 1, 15, 0, 13); gth.addColorStop(0, '#ff5a4a'); gth.addColorStop(1, '#5e0c14'); c.fillStyle = gth; c.beginPath(); c.ellipse(14, 0, 9 + 4 * jaw, Math.max(1, jaw * 5.5), 0, 0, TAU); c.fill(); c.restore(); if (cobraOpen > .15) { c.strokeStyle = '#f4b2a0'; c.lineWidth = 2; c.beginPath(); c.moveTo(0, -5 - jaw * 5); c.quadraticCurveTo(10, -2, 23, -5 - jaw * 5); c.stroke(); c.fillStyle = '#fff4e2'; [-1, 1].forEach(sd => { const base = sd * (5 + jaw * 1.6), len = 7 + fangExt * 11; c.beginPath(); c.moveTo(7, base - 2); c.lineTo(9.5, base + sd * len); c.lineTo(12.5, base - 2); c.closePath(); c.fill(); c.beginPath(); c.moveTo(9, base * .8 - 1.4); c.lineTo(10.6, base * .8 + sd * (3.5 + fangExt * 4.5)); c.lineTo(12.4, base * .8 - 1.4); c.closePath(); c.fill() }); const tl = cp.tongue * 20; if (tl > 2) { c.strokeStyle = '#ff6c70'; c.lineWidth = 2; c.beginPath(); c.moveTo(15, 0); c.quadraticCurveTo(15 + tl * .6, Math.sin(t * .02) * 1.6, 15 + tl, 0); c.stroke(); c.lineWidth = 1.6; [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(15 + tl * .82, 0); c.lineTo(15 + tl, sd * (2.5 + cp.tongue * 3)); c.stroke() }) } } }
       // Mandíbulas
+      const jawOpen = Math.max(pm, cobraOpen);
       [-1, 1].forEach(sd => {
-        c.save(); c.translate(2, 0); c.rotate(sd * pm * .5); c.beginPath(); c.moveTo(-7, 0); c.lineTo(-7, sd * 10.5); c.quadraticCurveTo(11, sd * 11, 18, 0); c.closePath(); c.fillStyle = isEmber ? '#22050a' : pal.core; c.fill(); c.strokeStyle = isEmber ? '#b0242d' : pal.glow; c.lineWidth = 1.3; c.stroke();
-        c.fillStyle = isEmber ? '#d9c7b0' : pal.bone; [5, 9, 12, 15].forEach((k, j) => { const hh = j % 2 ? 4.5 : 7; c.beginPath(); c.moveTo(k - 1.6, 0); c.lineTo(k + 1.6, 0); c.lineTo(k, -sd * hh); c.fill() }); c.restore()
+        c.save(); c.translate(2, 0); c.rotate(sd * jawOpen * .55); c.beginPath(); c.moveTo(-7, 0); c.lineTo(-7, sd * 10.5); c.quadraticCurveTo(11, sd * 11, 18, 0); c.closePath(); c.fillStyle = isEmber ? '#22050a' : pal.core; c.fill(); c.strokeStyle = isEmber ? '#b0242d' : pal.glow; c.lineWidth = 1.3; c.stroke();
+        c.fillStyle = isEmber ? '#d9c7b0' : pal.bone; [5, 9, 12, 15].forEach((k, j) => { const hh = (j % 2 ? 4.5 : 7) * (1 + jawOpen * .35); c.beginPath(); c.moveTo(k - 1.6, 0); c.lineTo(k + 1.6, 0); c.lineTo(k, -sd * hh); c.fill() }); c.restore()
       });
       // Ojos
+      const eyeConstrict = 1 - Math.max(0, cp.eye) * .4;
       [-1, 1].forEach(sd => {
         c.save(); c.translate(4, sd * 6.4); c.rotate(-sd * .5);
         c.shadowColor = isEmber ? '#ff3b1f' : pal.glow; c.shadowBlur = isEmber ? 18 : (lowEnd ? 0 : 10);
-        c.fillStyle = isEmber ? (pm > .5 ? '#ffb066' : '#ff3b1f') : pal.eye; c.beginPath(); c.ellipse(0, 0, 4.2, 2.3, 0, 0, TAU); c.fill();
-        c.shadowBlur = 0; c.fillStyle = '#0a0002'; c.beginPath(); c.ellipse(0, 0, .9, 2.2, 0, 0, TAU); c.fill(); c.restore()
+        c.fillStyle = isEmber ? (Math.max(pm, cobraOpen) > .5 ? '#ffb066' : '#ff3b1f') : pal.eye; c.beginPath(); c.ellipse(0, 0, 4.2, 2.3 * eyeConstrict, 0, 0, TAU); c.fill();
+        c.shadowBlur = 0; c.fillStyle = '#0a0002'; c.beginPath(); c.ellipse(0, 0, .9 * eyeConstrict, 2.2 * eyeConstrict, 0, 0, TAU); c.fill(); c.restore()
       });
       c.restore(); c.globalAlpha = 1;
     }
@@ -1204,7 +1212,31 @@ function renderCampaign(){
       CH.forEach(el=>{const pair=el.dataset.pair;if(!pair)return;const keys=pair.split('');el.classList.toggle('on',keys.every(key=>!!skillForSlot(key))&&keys.every(key=>cd[key]<=0))});
     }
     const setP=e=>{const r=cv.getBoundingClientRect();ptr.x=(e.clientX-r.left)/cameraZoom+camX;ptr.y=(e.clientY-r.top)/cameraZoom+camY};
-    function chooseCobraTarget(e){if(growthStacks<3||cobra.phase!==4)return;setP(e);let target=null,best=Infinity,blocked=false;for(const enemy of en){if(enemy.dead||enemy.boss)continue;let near=Infinity;for(let i=0;i<enemy.n;i+=2){const q=enemy.P[i],d=Math.hypot(q.x-ptr.x,q.y-ptr.y);if(d<near)near=d}const hitRadius=Math.max(30*sc,enemy.R[0]*enemy.sc+18*sc);if(near<=hitRadius){if(!['basic','spitter','mini'].includes(enemy.k)){blocked=true;continue}if(near<best){best=near;target=enemy}}}if(!target){toast(blocked?'OBJETIVO DEMASIADO FUERTE':'TOCA SOBRE UNA PRESA');return}cobra.target=target;cobra.angle=Math.atan2(target.P[0].y-pl.P[0].y,target.P[0].x-pl.P[0].x);cobra.phase=2;cobra.t=.5;cobra.hit=false;cobra.failed=false;cobra.swallowed=false;shake=Math.max(shake,4);SFX.dash()}
+    const COBRA_PREY=['basic','spitter','mini'];
+    function cobraPreyExists(){for(let i=0;i<en.length;i++){const e=en[i];if(!e.dead&&!e.boss&&COBRA_PREY.includes(e.k))return true}return false}
+    function cancelCobra(msg){cobra.phase=6;cobra.t=8;cobra.target=null;cobra.failed=false;cobra.swallowed=false;if(msg)toast(msg)}
+    function cobraPose(){
+      const p=cobra.phase,t=cobra.t,now=performance.now(),cl=x=>x<0?0:x>1?1:x;
+      const o={ext:0,neck:0,open:0,hood:0,fang:0,tongue:0,swallow:0,bob:0,eye:0};
+      if(p===1){
+        const u=cl(1-t/.55),e=u*u*(3-2*u);
+        o.ext=-.55*e;o.neck=1.1*e;o.hood=.35+.6*e;o.open=.05+.1*e;o.fang=.28*e;
+        o.tongue=u>.45?Math.max(0,Math.sin((u-.45)*8)):.4;o.bob=Math.sin(u*Math.PI)*1.5;o.eye=.5*e;
+      }else if(p===2){
+        const u=cl(1-t/.5),s2=Math.sin(u*Math.PI);
+        o.ext=1.3*s2;o.neck=-.45*s2;o.hood=1;o.open=.32+s2*1.05;o.fang=s2;o.eye=.75*s2;
+      }else if(p===3){
+        const u=cl(1-t/.48);
+        o.ext=-.24*(1-u);o.hood=.5+.3*u;o.open=cobra.swallowed?u*.95:(1-u)*.4;o.swallow=cobra.swallowed?u:0;o.bob=Math.sin(u*Math.PI)*.6;
+      }else if(p===4){
+        o.hood=.88;o.open=.08;o.bob=Math.sin(now*.004)*1.2;o.tongue=(Math.sin(now*.006)+1)*.5;
+      }else if(p===5){
+        const u=cl(1-t/.48);
+        o.ext=1.3;o.hood=.9;o.open=.45+Math.sin(u*Math.PI*2)*.5;o.swallow=u;o.bob=Math.sin(u*Math.PI*3)*.9;
+      }
+      return o;
+    }
+    function chooseCobraTarget(e){if(growthStacks<3||cobra.phase!==4)return;setP(e);let target=null,best=Infinity,blocked=false;for(const enemy of en){if(enemy.dead||enemy.boss)continue;let near=Infinity;for(let i=0;i<enemy.n;i+=2){const q=enemy.P[i],d=Math.hypot(q.x-ptr.x,q.y-ptr.y);if(d<near)near=d}const hitRadius=Math.max(30*sc,enemy.R[0]*enemy.sc+18*sc);if(near<=hitRadius){if(!COBRA_PREY.includes(enemy.k)){blocked=true;continue}if(near<best){best=near;target=enemy}}}if(!target){cancelCobra(blocked?'OBJETIVO DEMASIADO FUERTE · COBRA EN REPOSO':'MODO COBRA CANCELADO');return}cobra.target=target;cobra.angle=Math.atan2(target.P[0].y-pl.P[0].y,target.P[0].x-pl.P[0].x);cobra.phase=2;cobra.t=.5;cobra.hit=false;cobra.failed=false;cobra.swallowed=false;shake=Math.max(shake,4);SFX.dash()}
     if(!mobile)addEventListener('pointermove',setP);
     cv.addEventListener('pointerdown',e=>{setP(e);initAudio();chooseCobraTarget(e)});const je=$('joystick'),jk=$('joyknob');function ju(e){const r=je.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,m=Math.hypot(dx,dy)||1,k=Math.min(1,m/(r.width*.36));joy.dx=dx/m*k;joy.dy=dy/m*k;jk.style.left=(50+joy.dx*36)+'%';jk.style.top=(50+joy.dy*36)+'%'}je.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;je.setPointerCapture(e.pointerId);ju(e);initAudio()});je.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)ju(e)});const jeEnd=e=>{if(e.pointerId===joy.id){joy.active=false;joy.dx=joy.dy=0;jk.style.left=jk.style.top='50%'}};je.addEventListener('pointerup',jeEnd);je.addEventListener('pointercancel',jeEnd);
     document.querySelectorAll('.k').forEach(b => {
@@ -1218,6 +1250,7 @@ function renderCampaign(){
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       initAudio(); const k = e.key.toLowerCase();
       if (k === 'p' || k === 'escape') { if (!e.repeat) togglePause(); return }
+      if (k === 'c' && !e.repeat && cobra.phase === 4) { cancelCobra('MODO COBRA CANCELADO'); return }
       if (state === 'upg' && k.length === 1 && '1234567'.includes(k)) { pickUpg(+k - 1); return }
       if (k.length === 1 && 'asdf'.includes(k) && !e.repeat) { atk(k); e.preventDefault() }
       if ((k === 'enter' || k === ' ') && !e.repeat) { const hv=$('homeView'); if (state === 'title' && hv && hv.style.display !== 'none') startGame(); else if (state === 'over') restart() }
@@ -1238,7 +1271,7 @@ function renderCampaign(){
       {id:'area',name:'🌌 Dominio expansivo',desc:'Aumenta el radio de las habilidades de área un 16% por elección.',apply:()=>U.area=(U.area||1)*1.16},
       {id:'cool',name:'⏳ Flujo abisal',desc:'Reduce los enfriamientos un 9% por elección.',apply:()=>U.cd=Math.max(.48,U.cd*.91)},
       {id:'vital',name:'❤ Corazón colosal',desc:'+22 de vida máxima y recupera 35 al instante.',apply:()=>{maxHp+=22;hp=Math.min(maxHp,hp+35)}},
-      {id:'growth',name:'🐍 Evolución titánica',desc:'Añade segmentos y aumenta el tamaño. Al conseguirla 3 veces despiertas la mordida cobra.',apply:()=>{growthStacks++;growPlayer(9,.12);if(growthStacks===3){cobra.requested=true;toast('INSTINTO COBRA DESBLOQUEADO · ¡ACTÍVALO!')}}},
+      {id:'growth',name:'🐍 Evolución titánica',desc:'Añade segmentos y aumenta el tamaño. Al conseguirla 3 veces despiertas la mordida cobra.',apply:()=>{growthStacks++;growPlayer(9,.12);if(growthStacks===3){cobra.requested=true;toast('INSTINTO COBRA DESBLOQUEADO · TOCA UNA PRESA')}}},
       {id:'speed',name:'⚡ Instinto depredador',desc:'Aumenta la velocidad de movimiento un 9% por elección.',apply:()=>U.spd=Math.min(1.65,U.spd*1.09)},
       {id:'fury',name:'🔥 Furia acumulada',desc:'Generas un 18% más de furia al dañar enemigos.',apply:()=>U.fury=Math.min(2.4,U.fury*1.18)},
       {id:'dash',name:'⚡ Ruptura de cometa',desc:'Embestida: +24% de daño y +12% de alcance.',skill:'dash',apply:()=>{U.dA*=1.24;U.area=(U.area||1)*1.12}},
@@ -1312,4 +1345,25 @@ function renderCampaign(){
     RM_MQ.addEventListener?.('change',()=>{RM=RM_MQ.matches||settings.reduceMotion});
     let prev = performance.now(), fpsFrames = 0, fpsLast = performance.now(), fpsEl = null;
     function showRuntimeError(error,source='JUEGO'){const message=(error&&error.message)||String(error||'Error desconocido');console.error('Demon-Snike '+source+':',error);let panel=$('runtimeError');if(!panel){panel=document.createElement('div');panel.id='runtimeError';panel.innerHTML='<b>ERROR DEL MOTOR</b><p></p><small>La partida se pausó para proteger tu progreso.</small><button type="button">VOLVER AL MENÚ</button>';document.body.appendChild(panel);panel.querySelector('button').addEventListener('click',()=>{panel.style.display='none';goHome()})}panel.querySelector('p').textContent=source+': '+message;panel.style.display='flex';state='pause'}window.addEventListener('error',e=>showRuntimeError(e.error||e.message,'JAVASCRIPT'));window.addEventListener('unhandledrejection',e=>showRuntimeError(e.reason,'PROMESA'));function loop(now) { const dt = Math.max(0, Math.min(.05, (now - prev) / 1000)); prev = now; fpsFrames++; if (settings.fps && now - fpsLast >= 500) { if (!fpsEl) fpsEl = $('fpsMeter'); if (fpsEl) fpsEl.textContent = Math.round(fpsFrames * 1000 / (now - fpsLast)) + ' FPS'; fpsFrames = 0; fpsLast = now } else if (!settings.fps) { fpsFrames = 0; fpsLast = now } try { slow = Math.min(1, slow + dt * .7); step(dt * slow); draw(now) } catch(error) { showRuntimeError(error,'RENDER / ACTUALIZACIÓN') } requestAnimationFrame(loop) }
-    applySettings();makePlayer();refreshHome();requestAnimationFrame(loop);
+    // ── Pantalla de carga "Sistema" (se muestra antes de entrar a la arena) ──
+    function runLoader(){
+      const el=$('loader');if(!el||el.dataset.ready==='1')return;el.dataset.ready='1';
+      const fill=$('loaderBarFill'),pct=$('loaderPct'),statusEl=$('loaderStatus'),logEl=$('loaderLog');
+      const steps=[['ENLAZANDO NÚCLEO DEMONÍACO',true],['CALIBRANDO SENSORES DE LA ARENA'],['DESPERTANDO INSTINTOS DE CAZA'],['INVOCANDO HORDAS Y GUARDIANES',true],['SINCRONIZANDO BESTIARIO Y HABILIDADES'],['ACCESO CONCEDIDO',true]];
+      const dur=RM?1100:2500,t0=performance.now();let done=false,logged=-1;
+      function finish(){
+        if(done)return;done=true;fill.style.width='100%';pct.textContent='100%';statusEl.textContent='ACCESO CONCEDIDO';
+        setTimeout(()=>{el.classList.add('done');setTimeout(()=>el.remove(),700)},RM?140:360);
+      }
+      function tick(now){
+        const k=Math.min(1,(now-t0)/dur),p=Math.round(k*100);
+        fill.style.width=p+'%';pct.textContent=p+'%';
+        const idx=Math.min(steps.length-1,Math.floor(k*steps.length));
+        if(idx!==logged){logged=idx;statusEl.textContent=steps[idx][0]+'…';const row=document.createElement('span');row.innerHTML='&gt; '+steps[idx][0]+(steps[idx][1]?' <b>[OK]</b>':'');logEl.appendChild(row);while(logEl.children.length>4)logEl.removeChild(logEl.firstChild)}
+        if(k<1)requestAnimationFrame(tick);else finish();
+      }
+      requestAnimationFrame(tick);
+      el.addEventListener('click',()=>finish());
+      addEventListener('keydown',()=>finish(),{once:true});
+    }
+    applySettings();makePlayer();refreshHome();runLoader();requestAnimationFrame(loop);
