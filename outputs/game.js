@@ -781,7 +781,19 @@ function renderCampaign(){
     function drawDemon(t, targetCtx, targetPlayer) {
       const c = targetCtx || ctx, player = targetPlayer || pl;
       if (!player) return;
-      const s = player.sc, P = player.P, A = player.A, n = player.n;
+      const n = Number.isFinite(player.n) ? Math.max(1, Math.min(80, Math.floor(player.n))) : 1;
+      const P = Array.isArray(player.P) ? player.P : (player.P = []);
+      const A = Array.isArray(player.A) ? player.A : (player.A = []);
+      const radii = Array.isArray(player.R) ? player.R : (player.R = []);
+      const baseScale = Number.isFinite(player.sc) && player.sc > 0 ? player.sc : Math.max(.65, sc || 1);
+      if (!Number.isFinite(player.sc) || player.sc <= 0) player.sc = baseScale;
+      for (let i = 0; i < n; i++) {
+        const previous = i ? P[i - 1] : { x: WORLD_W * .5 || 0, y: WORLD_H * .5 || 0 };
+        if (!P[i] || !Number.isFinite(P[i].x) || !Number.isFinite(P[i].y)) P[i] = { x: previous.x, y: previous.y };
+        if (!Number.isFinite(A[i])) A[i] = i ? (A[i - 1] || 0) : 0;
+        if (!Number.isFinite(radii[i]) || radii[i] < 0) radii[i] = i ? (radii[i - 1] || 4) : 12;
+      }
+      const s = baseScale;
       const speciesId = player.previewSkin === true ? (player.previewSpeciesId || 'ember') : (player === pl ? selectedSkin : 'ember');
       const kind = SPECIES_KIND[speciesId] || 'generic';
       const isEmber = kind === 'ember';
