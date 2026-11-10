@@ -21,6 +21,10 @@ GUARDADO Y CUENTAS
 - El guardado del juego sigue usando localStorage; la sincronización en la nube requiere una tabla de progreso y políticas RLS que aíslen cada usuario.
 - La tienda usa un catálogo filtrable por búsqueda y rango, con tarjetas compactas de dos columnas.
 - El arsenal usa drag-and-drop para mover habilidades desbloqueadas entre los espacios A, S, D y F.
+- En móvil, las serpientes y los enemigos tienen siluetas y trayectorias menos uniformes; la cobra incluye preparación, ataque curvo, retroceso y engullida.
+- El terreno usa textura procedural precalculada con suelo, piedras y matas, limitada por la calidad gráfica del dispositivo.
+- outputs/auth.js valida formato de correo, requiere 8 caracteres al registrar, da mensajes de autenticación más claros y retira parámetros temporales OAuth de la URL después de procesarlos.
+- La revisión de seguridad de la implementación actual no reportó vulnerabilidades explotables.
 - No borres el almacenamiento del navegador hasta que la sincronización de la cuenta esté probada y se haya migrado el progreso.
 
 PRUEBAS

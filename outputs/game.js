@@ -39,8 +39,9 @@
 
     class Snake {
       constructor(x, y, o, k) {
-        Object.assign(this, { k, sc: (o.s || 1) * sc, n: o.n, hp: o.hp, max: o.hp, v: o.v, col: o.col, bossType:o.bossType??0,bossName:o.bossName||'',bossGlow:o.bossGlow||o.col, R: [], SP: [], P: [], A: [], ph: 0, stun: 0, burn: 0, vuln: 0, chill: 0, flash: 0, cd: rnd(1, 2.5), st: 0, stT: 0, tel: 0, vx: 0, vy: 0, bc: 0, h: Math.random() * TAU, dead: false, lock: 0, boss: k === 'boss', pp: 1, ang: 0 });
-        for (let i = 0; i < this.n; i++)this.R[i] = i ? 2 + 6.5 * Math.pow(1 - i / this.n, .9) + (i > 1 && i < 8 ? 1.4 * Math.sin((i - 2) / 6 * Math.PI) : 0) : 12;
+        Object.assign(this, { k, sc: (o.s || 1) * sc, n: o.n, hp: o.hp, max: o.hp, v: o.v, col: o.col, bossType:o.bossType??0,bossName:o.bossName||'',bossGlow:o.bossGlow||o.col, bioSeed:Math.random()*TAU, R: [], SP: [], P: [], A: [], ph: 0, stun: 0, burn: 0, vuln: 0, chill: 0, flash: 0, cd: rnd(1, 2.5), st: 0, stT: 0, tel: 0, vx: 0, vy: 0, bc: 0, h: Math.random() * TAU, dead: false, lock: 0, boss: k === 'boss', pp: 1, ang: 0 });
+        const silhouette=this.k==='boss'?.19:this.k==='armor'?.17:this.k==='dasher'?.13:.11;
+        for (let i = 0; i < this.n; i++)this.R[i] = i ? (2 + 6.5 * Math.pow(1 - i / this.n, .9) + (i > 1 && i < 8 ? 1.4 * Math.sin((i - 2) / 6 * Math.PI) : 0)) * (1 + silhouette * Math.sin(i * 1.73 + this.bioSeed) + silhouette * .4 * Math.sin(i * .61 + this.bioSeed * 1.7)) : 12;
         for (let i = 1; i < this.n; i++)this.SP[i] = (this.R[i] + this.R[i - 1]) * .41;
         let px = x, py = y; for (let i = 0; i < this.n; i++) { if (i) { px -= Math.cos(this.h) * this.SP[i] * this.sc; py -= Math.sin(this.h) * this.SP[i] * this.sc } this.P.push({ x: px, y: py }); this.A.push(this.h) }
         const a = Math.round(this.n * .18), b = Math.round(this.n * .45);
@@ -55,17 +56,22 @@
           this.h=a;this.A[0]=a;hd.x=cx+ax*reach;hd.y=cy+ay*reach;
           for(let i=1;i<this.n;i++){
             if(i<=6){
-              const k=i/6,flick=cobra.phase===5?Math.cos(cobra.t*16):1;
-              const und=Math.sin(k*Math.PI*1.4)*(1.1+pz.neck*1.3)*s*(1-k*.4)*flick;
+              const k=i/6,flick=cobra.phase===5?Math.cos(cobra.t*16):Math.sin(performance.now()*.007);
+              const und=(Math.sin(k*Math.PI*1.4+cobra.t*2.2)+Math.sin(k*Math.PI*2.3-cobra.t*1.4)*.24)*(1.1+pz.neck*1.3)*s*(1-k*.4)*flick;
               P[i].x=hd.x-ax*seg*i-ay*und;P[i].y=hd.y-ay*seg*i+ax*und;this.A[i]=a+und*.05/s;
-            }else{const j=i-6,theta=a+Math.PI+j*.6,rad=coilR+j*.55*s;P[i].x=cx+Math.cos(theta)*rad;P[i].y=cy+Math.sin(theta)*rad;this.A[i]=theta+Math.PI/2}
+            }else{const j=i-6,theta=a+Math.PI+j*.6+Math.sin(j*.72+cobra.t*2)*.08,rad=coilR+j*.55*s+Math.sin(j*.53+cobra.t)*.8*s;P[i].x=cx+Math.cos(theta)*rad;P[i].y=cy+Math.sin(theta)*rad;this.A[i]=theta+Math.PI/2}
           }
           this.legs.forEach(l=>{if(l.f){l.f.x=P[l.i].x;l.f.y=P[l.i].y}});
           return;
         }
+        if(this.k==='p'&&cobra.phase===2&&cobra.target&&!cobra.target.dead){
+          const prey=cobra.target.P[0],desired=Math.atan2(prey.y-hd.y,prey.x-hd.x),turnRate=10;
+          cobra.angle=wrap(cobra.angle+Math.max(-turnRate*dt,Math.min(turnRate*dt,wrap(desired-cobra.angle))));
+          tx=hd.x+Math.cos(cobra.angle)*230*this.sc;ty=hd.y+Math.sin(cobra.angle)*230*this.sc;
+        }
         const df = wrap(Math.atan2(ty - hd.y, tx - hd.x) - this.h);
         this.h += Math.max(-turn * dt, Math.min(turn * dt, df)); this.ph += spd * dt * .045;
-        const A0 = this.h + Math.sin(this.ph * 2) * .4 * Math.min(1, spd / 150), dc = Math.pow(.02, dt); this.vx *= dc; this.vy *= dc;
+        const A0 = this.h + Math.sin(this.ph * 2 + this.bioSeed) * .4 * Math.min(1, spd / 150) + Math.sin(this.ph * .71 + this.bioSeed * 1.9) * .055 * Math.min(1,spd/90), dc = Math.pow(.02, dt); this.vx *= dc; this.vy *= dc;
         hd.x = Math.max(20, Math.min(WORLD_W-20,hd.x+ (Math.cos(A0) * spd + this.vx) * dt)); hd.y = Math.max(20, Math.min(WORLD_H-20,hd.y+ (Math.sin(A0) * spd + this.vy) * dt));
         this.A[0] = A0;
         for (let i = 1; i < this.n; i++) { const an = Math.atan2(P[i - 1].y - P[i].y, P[i - 1].x - P[i].x), df2 = Math.max(-.3, Math.min(.3, wrap(an - this.A[i - 1]))); this.A[i] = this.A[i - 1] + df2; P[i].x = P[i - 1].x - Math.cos(this.A[i]) * this.SP[i] * this.sc; P[i].y = P[i - 1].y - Math.sin(this.A[i]) * this.SP[i] * this.sc }
@@ -95,7 +101,7 @@
         c.save(); c.translate(hd.x, hd.y); c.rotate(this.devourAngle==null?this.A[0]+devourSpin*.12:this.devourAngle); c.scale(s*devour*(1+(this.devourWobble||0)),s*devour*(1-(this.devourWobble||0)*.55));
         if (this.boss) {c.save();c.globalAlpha=.22+Math.sin(performance.now()*.006)*.08;c.strokeStyle=this.bossGlow;c.lineWidth=3*sc;c.shadowColor=this.bossGlow;c.shadowBlur=26*sc;c.beginPath();c.arc(hd.x,hd.y,(34+Math.sin(performance.now()*.004)*4)*this.sc,0,TAU);c.stroke();c.restore();[-1, 1].forEach(sd => { c.beginPath(); c.moveTo(-2, sd * 9); c.lineTo(-14, sd * 18); c.moveTo(4, sd * 10); c.lineTo(0, sd * 20); c.stroke() });}
         const tl = this.tel > 0,attackPulse=Math.max(0,Math.min(1,(this.attackT||0)/.22)); this.attackT=Math.max(0,(this.attackT||0)-1/60); c.shadowColor = tl ? this.boss?(this.bossGlow||'#ff2a1a'):'#ff2a1a' : this.col; c.shadowBlur = lowEndDevice?(tl?2:0):(tl?14:6); c.fillStyle = tl ? (this.bossGlow||'#ff2a1a') : this.col; if(this.boss&&attackPulse>.05){c.save();c.globalAlpha=attackPulse*.55;c.strokeStyle=this.bossGlow;c.lineWidth=lowEndDevice?1.5:2.5;c.beginPath();c.arc(0,0,(22+attackPulse*12),-.7,.7);c.stroke();c.restore()}
-        [-1, 1].forEach(sd => { c.beginPath(); c.arc(3.5, sd * 6.2, tl ? 3.2 : 1.8, 0, TAU); c.fill() });
+        [-1, 1].forEach((sd,index) => { const eyeBias=Math.sin(this.bioSeed+index*2.7);c.beginPath();c.ellipse(3.5+eyeBias*1.4,sd*6.2*(index?.9:1.13),tl?3.2:1.8,tl?2.2:1.35,eyeBias*.12,0,TAU);c.fill() });
         c.restore();
         if (this.hp < this.max && !this.boss) { const w = 34 * s; c.fillStyle = '#200'; c.fillRect(hd.x - w / 2, hd.y - 24 * s, w, 3); c.fillStyle = this.col; c.fillRect(hd.x - w / 2, hd.y - 24 * s, w * Math.max(0, this.hp / this.max), 3) }
       }
@@ -360,7 +366,7 @@ function renderCampaign(){
       const used=skillLoadout.filter(Boolean).length;if(count)count.textContent=String(used).padStart(2,'0')+'/04';
       const slots=SLOT_KEYS.map((key,i)=>{
         const id=skillLoadout[i],skill=skillById(id);
-        return '<div class="loadout-slot '+(skill?'is-filled':'is-empty')+'" data-slot="'+i+'" data-key="'+key+'" tabindex="0" aria-label="Espacio '+key.toUpperCase()+', arrastra una habilidad aquí">'+
+        return '<div class="loadout-slot '+(skill?'is-filled':'is-empty')+'" data-tier="'+(skill?skill.tier:'VACÍO')+'" data-slot="'+i+'" data-key="'+key+'" tabindex="0" aria-label="Espacio '+key.toUpperCase()+', arrastra una habilidad aquí">'+
           '<div class="loadout-slot-head"><span class="slot-key">'+key.toUpperCase()+'</span><small>TECLA '+key.toUpperCase()+'</small></div>'+
           (skill?'<div class="loadout-equipped" data-skill-drag="'+skill.id+'" draggable="true"><span class="loadout-equipped-icon">'+skill.icon+'</span><span><b>'+skill.name+'</b><small>'+skill.tier+'</small></span><button type="button" class="loadout-remove" data-remove-slot="'+i+'" aria-label="Quitar '+skill.name+'">×</button></div>':'<div class="loadout-drop"><b>+</b><span>SUELTA AQUÍ</span></div>')+
           '</div>';
@@ -369,7 +375,7 @@ function renderCampaign(){
       const available=availableIds.map(id=>{
         const skill=skillById(id);if(!skill)return '';
         const quick=touchSkillSelection===skill.id?'<span class="skill-touch-actions"><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="0">A</button><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="1">S</button><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="2">D</button><button type="button" data-touch-equip="'+skill.id+'" data-touch-slot="3">F</button></span>':'';
-        return '<div class="skill-pool-item-wrap"><button type="button" class="skill-pool-item" data-skill-drag="'+skill.id+'" draggable="true"><span class="skill-pool-icon">'+skill.icon+'</span><span><b>'+skill.name+'</b><small>'+skill.tier+'</small></span><i>TOCA PARA EQUIPAR</i></button>'+quick+'</div>';
+        return '<div class="skill-pool-item-wrap" data-tier="'+skill.tier+'"><button type="button" class="skill-pool-item" data-skill-drag="'+skill.id+'" draggable="true"><span class="skill-pool-icon">'+skill.icon+'</span><span><b>'+skill.name+'</b><small>'+skill.tier+'</small></span><i>TOCA PARA EQUIPAR</i></button>'+quick+'</div>';
       }).join('');
       grid.innerHTML='<div class="loadout-slots">'+slots+'</div><div class="skill-pool"><div class="skill-pool-heading"><b>HABILIDADES DESBLOQUEADAS</b><small>'+availableIds.length+' disponibles para equipar</small></div><div class="skill-pool-list">'+(available||'<p class="skill-pool-empty">Desbloquea habilidades en la tienda para ampliar tu arsenal.</p>')+'</div></div><div class="loadout-actions"><button id="resetLoadout" type="button">RESTABLECER INICIALES</button><small>'+used+' de 4 espacios ocupados</small></div>';
     }
@@ -549,6 +555,7 @@ function renderCampaign(){
         else if (e.st === 2) { spd = sp0 * (e.boss ? 5 : 7); tx = h.x + Math.cos(e.lock) * 100; ty = h.y + Math.sin(e.lock) * 100; turn = 0; e.stT -= dt; if (e.stT <= 0) { e.st = 3; e.stT = .8 } }
         else if (e.st === 3) { spd = sp0 * .3; e.stT -= dt; if (e.stT <= 0) { e.st = 0; e.cd = rnd(1.5, 3) } }
       }
+      if(!e.boss&&e.st!==2){const flank=Math.sin(e.ph*.72+e.bioSeed)*(k==='spitter'?40:26)*sc;tx-=dy/d*flank;ty+=dx/d*flank}
       e.move(tx, ty, spd, turn, dt);
       if (e.bc <= 0 && state === 'play') {
         const rr = e.R[0] * e.sc + 9 * pl.sc, q = e.P[0];
@@ -802,8 +809,9 @@ function renderCampaign(){
       const lowEnd = !!lowEndDevice, last = Math.max(1, n - 1);
       const mph = (player.ph || 0) * .55;
       const jitAt = i => mp && mp.jit ? Math.sin(mph * mp.jitSpeed + t * .0009 + i * 2.7) * mp.jit * s * (i / last) : 0;
-      const motionOffsetX = i => mp ? -Math.sin(A[i]) * (Math.sin(mph * mp.speed + t * mp.drift - i * mp.wave) * mp.amp * s * (i / last) + jitAt(i)) : 0;
-      const motionOffsetY = i => mp ? Math.cos(A[i]) * (Math.sin(mph * mp.speed - i * mp.wave) * mp.amp * s * (i / last) + jitAt(i)) : 0;
+      const asymmetry = i => (Math.sin(i * 1.41 + (player.bioSeed||0)) * .78 + Math.sin(i * .47 + (player.bioSeed||0) * 2) * .38) * s * (i / last);
+      const motionOffsetX = i => (mp ? -Math.sin(A[i]) * (Math.sin(mph * mp.speed + t * mp.drift - i * mp.wave) * mp.amp * s * (i / last) + jitAt(i)) : 0) - Math.sin(A[i] + Math.PI/2) * asymmetry(i);
+      const motionOffsetY = i => (mp ? Math.cos(A[i]) * (Math.sin(mph * mp.speed - i * mp.wave) * mp.amp * s * (i / last) + jitAt(i)) : 0) + Math.cos(A[i] + Math.PI/2) * asymmetry(i);
       const motionAngle = i => A[i] + (mp ? Math.cos(mph * mp.speed + t * mp.drift - i * mp.wave) * (i === 0 ? mp.head : mp.bend * i / last) + (mp.jit ? Math.sin(mph * mp.jitSpeed + i * 2.7) * .08 * (i / last) : 0) : 0);
       // Marco local de cada segmento: x = hacia la cabeza, y = lateral (+ = lado izquierdo del cuerpo).
       const F = i => ({ x: P[i].x + motionOffsetX(i), y: P[i].y + motionOffsetY(i), a: motionAngle(i), r: player.R[i] * s, u: i / n });
@@ -981,6 +989,11 @@ function renderCampaign(){
       const turfBase = tg.createLinearGradient(0, 0, 256, 256);
       turfBase.addColorStop(0, '#29492c'); turfBase.addColorStop(.48, '#1e3a25'); turfBase.addColorStop(1, '#183020');
       tg.fillStyle = turfBase; tg.fillRect(0, 0, 256, 256);
+      for(let i=0;i<(lowEndDevice?9:16);i++){
+        const x=Math.random()*256,y=Math.random()*256,r=14+Math.random()*28,soil=tg.createRadialGradient(x,y,1,x,y,r);
+        soil.addColorStop(0,'rgba(91,67,39,.085)');soil.addColorStop(.58,'rgba(77,63,38,.035)');soil.addColorStop(1,'rgba(77,63,38,0)');
+        tg.fillStyle=soil;tg.fillRect(x-r,y-r,r*2,r*2);
+      }
       for (let i = 0; i < 58; i++) {
         const x = Math.random() * 256, y = Math.random() * 256, r = 9 + Math.random() * 30;
         const shade = i % 4 === 0 ? 'rgba(133,166,83,.095)' : (i % 3 === 0 ? 'rgba(3,13,7,.12)' : 'rgba(67,104,49,.075)');
@@ -998,6 +1011,12 @@ function renderCampaign(){
         for(let j=0;j<5;j++){const h=5+Math.random()*8,w=(j-2)*1.5;tg.strokeStyle=j%2?'rgba(152,190,103,.34)':'rgba(24,70,34,.5)';tg.lineWidth=.8;tg.beginPath();tg.moveTo(w,2);tg.quadraticCurveTo(w+lean,-h*.5,w+lean*1.7,-h);tg.stroke()}
         tg.restore();
       }
+      for(let i=0;i<(lowEndDevice?12:24);i++){
+        const x=Math.random()*256,y=Math.random()*256,rx=1.5+Math.random()*4,ry=1+Math.random()*2.2,a=Math.random()*TAU;
+        tg.save();tg.translate(x,y);tg.rotate(a);tg.fillStyle=i%3?'rgba(26,35,27,.56)':'rgba(128,130,94,.35)';
+        tg.beginPath();tg.moveTo(-rx,-ry*.25);tg.quadraticCurveTo(-rx*.7,-ry*1.3,0,-ry);tg.quadraticCurveTo(rx*1.2,-ry*.4,rx,ry*.25);tg.quadraticCurveTo(rx*.4,ry*1.1,-rx,ry*.25);tg.fill();
+        tg.strokeStyle='rgba(190,183,130,.18)';tg.lineWidth=.6;tg.beginPath();tg.moveTo(-rx*.65,0);tg.lineTo(rx*.6,0);tg.stroke();tg.restore();
+      }
       for (let i = 0; i < 34; i++) {
         const x = Math.random() * 256, y = Math.random() * 256;
         tg.save(); tg.translate(x, y); tg.rotate(Math.random() * TAU);
@@ -1011,6 +1030,12 @@ function renderCampaign(){
         const x = Math.random() * 256, y = Math.random() * 256;
         tg.fillStyle = i % 3 ? 'rgba(5,14,8,.3)' : 'rgba(151,157,99,.13)';
         tg.beginPath(); tg.ellipse(x, y, 1 + Math.random() * 2.2, .7 + Math.random() * 1.2, Math.random() * TAU, 0, TAU); tg.fill();
+      }
+      for(let i=0;i<(lowEndDevice?9:18);i++){
+        const x=Math.random()*256,y=Math.random()*256,r=1.2+Math.random()*2.2;
+        tg.fillStyle=i%4?'rgba(181,199,139,.24)':'rgba(34,48,31,.6)';
+        tg.beginPath();tg.arc(x,y,r,0,TAU);tg.fill();
+        tg.strokeStyle='rgba(236,232,193,.14)';tg.lineWidth=.55;tg.beginPath();tg.arc(x-r*.2,y-r*.2,r*.46,0,Math.PI);tg.stroke();
       }
       groundPattern = g.createPattern(turf, 'repeat');
       // Overlay precalculado: el sombreado no crea gradientes nuevos en cada fotograma.
@@ -1249,23 +1274,27 @@ function renderCampaign(){
     function cobraPreyExists(){for(let i=0;i<en.length;i++){const e=en[i];if(!e.dead&&!e.boss&&COBRA_PREY.includes(e.k))return true}return false}
     function cancelCobra(msg){cobra.phase=6;cobra.t=8;cobra.target=null;cobra.failed=false;cobra.swallowed=false;if(msg)toast(msg)}
     function cobraPose(){
-      const p=cobra.phase,t=cobra.t,now=performance.now(),cl=x=>x<0?0:x>1?1:x;
+      const p=cobra.phase,t=cobra.t,now=performance.now(),cl=x=>Math.max(0,Math.min(1,x)),flick=(v,rate)=>Math.pow(Math.max(0,Math.sin(v*rate)),8);
       const o={ext:0,neck:0,open:0,hood:0,fang:0,tongue:0,swallow:0,bob:0,eye:0};
       if(p===1){
         const u=cl(1-t/.55),e=u*u*(3-2*u);
-        o.ext=-.55*e;o.neck=1.1*e;o.hood=.35+.6*e;o.open=.05+.1*e;o.fang=.28*e;
-        o.tongue=u>.45?Math.max(0,Math.sin((u-.45)*8)):.4;o.bob=Math.sin(u*Math.PI)*1.5;o.eye=.5*e;
+        o.ext=-.62*e;o.neck=1.15*e;o.hood=.28+.72*e;o.open=.04+.13*e;o.fang=.24*e;
+        o.tongue=flick(now*.001,10)*(.45+.55*e);o.bob=Math.sin(u*Math.PI)*2.1;o.eye=.58*e;
       }else if(p===2){
-        const u=cl(1-t/.5),s2=Math.sin(u*Math.PI);
-        o.ext=1.3*s2;o.neck=-.45*s2;o.hood=1;o.open=.32+s2*1.05;o.fang=s2;o.eye=.75*s2;
+        const u=cl(1-t/.5),strike=Math.sin(u*Math.PI),snap=Math.sin(u*Math.PI*2);
+        o.ext=1.38*strike;o.neck=-.52*strike;o.hood=1;o.open=.3+strike*.95;o.fang=Math.min(1,strike*1.2);o.eye=.8*strike;
+        o.tongue=flick(u,14);o.bob=snap*2.4;
       }else if(p===3){
         const u=cl(1-t/.48);
-        o.ext=-.24*(1-u);o.hood=.5+.3*u;o.open=cobra.swallowed?u*.95:(1-u)*.4;o.swallow=cobra.swallowed?u:0;o.bob=Math.sin(u*Math.PI)*.6;
+        const recoil=Math.exp(-u*5);
+        o.ext=-.32*recoil;o.neck=.25*recoil;o.hood=.72-.22*u;o.open=cobra.swallowed?u*.9:(1-u)*.36;o.swallow=cobra.swallowed?u:0;o.bob=Math.sin(u*Math.PI*2)*1.1*recoil;
+        o.tongue=cobra.swallowed?0:flick(now*.001,8)*.35;
       }else if(p===4){
-        o.hood=.88;o.open=.08;o.bob=Math.sin(now*.004)*1.2;o.tongue=(Math.sin(now*.006)+1)*.5;
+        const breath=1+Math.sin(now*.0021)*.045;
+        o.hood=.84*breath;o.open=.07;o.bob=Math.sin(now*.0032)*1.1;o.tongue=flick(now*.001,7)*.9;
       }else if(p===5){
-        const u=cl(1-t/.48);
-        o.ext=1.3;o.hood=.9;o.open=.45+Math.sin(u*Math.PI*2)*.5;o.swallow=u;o.bob=Math.sin(u*Math.PI*3)*.9;
+        const u=cl(1-t/.48),chew=Math.abs(Math.sin(u*Math.PI*3));
+        o.ext=1.18+chew*.12;o.hood=.9;o.open=.18+chew*.48;o.swallow=u;o.bob=Math.sin(u*Math.PI*3)*1.4;o.fang=.4+chew*.45;
       }
       return o;
     }

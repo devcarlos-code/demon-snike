@@ -2185,3 +2185,39 @@ body{background:
 .account-message{min-height:1.2em;margin:12px 0 0;color:#a6e8b0}
 .account-message[data-error=true]{color:#ff9b9b}
 @media(max-width:640px){.account-fields{grid-template-columns:1fr}}
+
+/* ARENA HUD // Interfaz de combate */
+#title.home-page::after{content:"";position:fixed;inset:0;z-index:8;pointer-events:none;opacity:.13;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(116,213,255,.16) 4px,transparent 5px),linear-gradient(90deg,transparent 49.9%,rgba(95,228,255,.08) 50%,transparent 50.1%);mix-blend-mode:screen}
+#title.home-page{background-image:radial-gradient(ellipse at 50% 0%,rgba(65,180,255,.12),transparent 46%),linear-gradient(145deg,#050811,#0a1220 48%,#070910)!important}
+.home-header{position:relative;border-bottom:1px solid rgba(95,228,255,.25)!important}
+.home-header::after{content:"SYS / ARENA NETWORK";position:absolute;right:0;bottom:-7px;padding:0 8px;background:#080d17;color:rgba(95,228,255,.68);font:700 8px var(--sys-mono);letter-spacing:.16em}
+.home-mark,.section-brand>span{position:relative;isolation:isolate}
+.home-mark::after,.section-brand>span::after{content:"";position:absolute;inset:-5px;border:1px solid rgba(95,228,255,.26);border-radius:inherit;animation:corePulse 3s ease-in-out infinite;pointer-events:none}
+@keyframes corePulse{50%{transform:scale(1.11);opacity:.28}}
+.top-nav button,.home-drawer-link,.section-back{transition:color .18s,border-color .18s,background .18s,box-shadow .18s!important}
+.top-nav button:hover,.top-nav button.is-active{box-shadow:inset 0 -2px var(--sys-cyan),0 0 15px rgba(95,228,255,.12)!important}
+.home-hero h1{text-shadow:0 0 34px rgba(95,228,255,.16),0 7px 25px #000!important}
+.home-showcase,.section-panel,.account-panel{position:relative;isolation:isolate}
+.home-showcase::before,.section-panel::before,.account-panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;background:linear-gradient(135deg,rgba(95,228,255,.075),transparent 32%,transparent 72%,rgba(155,123,255,.07))}
+.showcase-code,.showcase-live,.section-tag,.section-wallet{font-family:var(--sys-mono)!important}
+.home-actions>button,.shop-card,.mastery-card,.skin-card,.loadout-slot{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.home-actions>button:hover,.shop-card:hover,.mastery-card:hover,.skin-card:hover{box-shadow:0 0 22px rgba(95,228,255,.15),0 12px 30px rgba(0,0,0,.4)!important}
+.loadout-slot[data-tier="COMÚN"]{--tier-color:#5fe4ff}
+.loadout-slot[data-tier="RARA"]{--tier-color:#66e8bf}
+.loadout-slot[data-tier="ÉPICA"]{--tier-color:#9b7bff}
+.loadout-slot[data-tier="LEGENDARIA"]{--tier-color:#ffd76b}
+.loadout-slot[data-tier="MÍTICA"]{--tier-color:#ff7aa8}
+.loadout-slot.is-filled{box-shadow:inset 3px 0 var(--tier-color,var(--sys-cyan)),inset 0 1px #fff1,0 8px 20px #0005!important}
+.skill-pool-item-wrap[data-tier="COMÚN"] .skill-pool-icon{border-color:#5fe4ff77;color:#8cecff}
+.skill-pool-item-wrap[data-tier="RARA"] .skill-pool-icon{border-color:#66e8bf77;color:#8ff0ce}
+.skill-pool-item-wrap[data-tier="ÉPICA"] .skill-pool-icon{border-color:#9b7bff77;color:#baa8ff}
+.skill-pool-item-wrap[data-tier="LEGENDARIA"] .skill-pool-icon{border-color:#ffd76b77;color:#ffe39a}
+.skill-pool-item-wrap[data-tier="MÍTICA"] .skill-pool-icon{border-color:#ff7aa877;color:#ff9eb9}
+.skill-pool-item-wrap[data-tier="LEGENDARIA"],.skill-pool-item-wrap[data-tier="MÍTICA"]{filter:drop-shadow(0 0 8px rgba(255,215,107,.08))}
+.k{border-color:var(--skill-color,#8bd4ed)!important;background:radial-gradient(circle at 30% 18%,color-mix(in srgb,var(--skill-color,#5fe4ff) 40%,#101826),#10131c 62%,#070a12 100%)!important;box-shadow:inset 0 0 12px color-mix(in srgb,var(--skill-color,#5fe4ff) 18%,transparent),0 0 15px color-mix(in srgb,var(--skill-color,#5fe4ff) 25%,transparent)!important}
+.k b{text-shadow:0 0 12px var(--skill-color,#5fe4ff)!important}
+.k[data-tier="INICIAL"]{--skill-color:#a6d9e8}.k[data-tier="COMÚN"]{--skill-color:#5fe4ff}.k[data-tier="RARA"]{--skill-color:#66e8bf}.k[data-tier="ÉPICA"]{--skill-color:#9b7bff}.k[data-tier="LEGENDARIA"]{--skill-color:#ffd76b}.k[data-tier="MÍTICA"]{--skill-color:#ff7aa8}
+.k.rdy{animation:skillReady 1.8s ease-in-out infinite alternate}
+@keyframes skillReady{to{box-shadow:inset 0 0 18px color-mix(in srgb,var(--skill-color,#5fe4ff) 40%,transparent),0 0 24px color-mix(in srgb,var(--skill-color,#5fe4ff) 44%,transparent)}}
+@media(prefers-reduced-motion:reduce){#title.home-page::after,.home-mark::after,.section-brand>span::after,.k.rdy{animation:none!important}}
+body.reduce-motion #title.home-page::after,body.reduce-motion .home-mark::after,body.reduce-motion .section-brand>span::after,body.reduce-motion .k.rdy{animation:none!important}

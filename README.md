@@ -107,4 +107,7 @@ HTML5 · CSS (Grid/Flexbox, `clamp()`, `backdrop-filter`) · JavaScript (Canvas 
 - La tienda tiene catálogo en dos columnas, búsqueda y filtro por rango.
 - El arsenal permite arrastrar habilidades desbloqueadas entre los cuatro espacios activos.
 - El diagnóstico de runtime captura errores JavaScript, promesas rechazadas y fallos del ciclo con ID, severidad, estado, modo, nivel, última acción y traza. Deduplica incidentes, protege el progreso pausando solo cuando la arena no es segura y permite copiar o descargar reportes sin incluir tokens.
+- El login valida el correo, requiere contraseñas de 8 caracteres para crear cuentas, da mensajes de error comprensibles y limpia los parámetros temporales de OAuth al restaurar la sesión. La revisión de seguridad no encontró vulnerabilidades explotables.
+- Las serpientes y enemigos tienen siluetas y movimientos menos uniformes; la cobra presenta preparación, embestida, retroceso y engullida con movimiento ondulante. El terreno añade suelo, piedras y matas procedurales usando una textura precalculada.
+- La interfaz de combate usa indicadores de habilidad por rareza y un acabado HUD tecnológico, con respeto por la preferencia de movimiento reducido.
 - Sin sistema de migración de datos entre dispositivos.
