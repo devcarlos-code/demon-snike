@@ -1,0 +1,30 @@
+name: Validate Demon-Snike
+
+on:
+  push:
+    paths:
+      - 'outputs/**'
+      - 'work/game-script-check.js'
+      - '.github/workflows/validate.yml'
+  pull_request:
+    paths:
+      - 'outputs/**'
+      - 'work/game-script-check.js'
+      - '.github/workflows/validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate JavaScript, HTML, CSS, PWA and local assets
+        run: node work/game-script-check.js
