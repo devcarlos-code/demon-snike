@@ -76,23 +76,28 @@ Para esta publicación, añade exactamente `https://devcarlos-code.github.io/dem
 
 ---
 
-## Desarrollo
+## Desarrollo y validación
 
-- **JavaScript de validación**: `work/game-script-check.js` se regenera extrayendo el bloque `<script>` de `outputs/index.html` y comprobando su sintaxis con Node.js:
+El código del juego está separado por responsabilidad:
+
+- `outputs/index.html`: estructura y carga de recursos.
+- `outputs/styles.css`: estilos y diseño adaptable.
+- `outputs/game.js`: motor, controles, combate, guardado y progreso.
+- `outputs/auth.js`: autenticación de cuenta.
+- `outputs/service-worker.js`: caché y funcionamiento PWA.
+- `work/game-script-check.js`: validador estático del proyecto.
+
+Antes de publicar cambios, ejecuta desde la raíz:
 
 ```bash
-node -e "const fs=require('fs');const h=fs.readFileSync('outputs/index.html','utf8');const i=h.lastIndexOf('<script>');const j=h.indexOf('</script>',i);const s=h.slice(i+8,j);fs.writeFileSync('work/game-script-check.js',s);new Function(s);console.log('OK',s.split('\n').length)"
+node work/game-script-check.js
 ```
 
-- **Cada vez que modifiques `outputs/index.html`**, incrementa la versión de la caché en `outputs/service-worker.js`:
+El validador comprueba la sintaxis de los tres archivos JavaScript, IDs HTML duplicados, referencias locales, orden de carga de scripts, recursos del Service Worker, balance de llaves CSS y JSON del manifiesto. GitHub Actions ejecuta las mismas comprobaciones en cada push o Pull Request relevante.
 
-```js
-const CACHE = 'arena-serpientes-v124'; // ← sube el número
-```
+Cada cambio en los recursos de `outputs/` debe incrementar la versión de caché en `outputs/service-worker.js` para que los navegadores reciban el paquete actualizado.
 
-Así los usuarios reciben los cambios en lugar de la versión cacheada.
-
----
+La validación estática no sustituye las pruebas visuales y funcionales en navegador, móvil y PC.
 
 ## Tecnología
 

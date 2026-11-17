@@ -13,8 +13,13 @@
   const signedIn = $('accountSignedIn');
   const status = $('accountStatus');
   const message = $('accountMessage');
+  const accountUser = $('accountUser');
+  const signInButton = $('accountSignIn');
+  const signUpButton = $('accountSignUp');
+  const googleButton = $('accountGoogle');
+  const signOutButton = $('accountSignOut');
 
-  if (!signedOut || !signedIn || !message) return;
+  if (!signedOut || !signedIn || !status || !message) return;
 
   function showMessage(text, isError) {
     message.textContent = text;
@@ -50,11 +55,11 @@
     signedIn.hidden = !user;
     if (user) {
       status.textContent = 'SESIÓN ACTIVA · PROGRESO LISTO PARA SINCRONIZAR';
-      $('accountUser').textContent = user.email || 'Cuenta conectada';
+      if (accountUser) accountUser.textContent = user.email || 'Cuenta conectada';
       showMessage('Sesión iniciada correctamente.', false);
     } else {
       status.textContent = 'INICIA SESIÓN PARA SINCRONIZAR TU PROGRESO';
-      $('accountUser').textContent = '';
+      if (accountUser) accountUser.textContent = '';
     }
   }
 
@@ -73,10 +78,11 @@
     return;
   }
 
-  $('accountSignIn').addEventListener('click', () => run(async () => {
+  if (signInButton) signInButton.addEventListener('click', () => run(async () => {
     const emailInput = $('accountEmail');
-    const email = emailInput.value.trim();
     const passwordInput = $('accountPassword');
+    if (!emailInput || !passwordInput) return showMessage('El formulario de acceso no está disponible. Recarga la página.', true);
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
     passwordInput.autocomplete = 'current-password';
     if (!email || !emailInput.validity.valid) return showMessage('Escribe un correo electrónico válido.', true);
@@ -85,10 +91,11 @@
     if (error) throw error;
   }));
 
-  $('accountSignUp').addEventListener('click', () => run(async () => {
+  if (signUpButton) signUpButton.addEventListener('click', () => run(async () => {
     const emailInput = $('accountEmail');
-    const email = emailInput.value.trim();
     const passwordInput = $('accountPassword');
+    if (!emailInput || !passwordInput) return showMessage('El formulario de registro no está disponible. Recarga la página.', true);
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
     passwordInput.autocomplete = 'new-password';
     if (!email || !emailInput.validity.valid || password.length < 8) return showMessage('Usa un correo válido y una contraseña de al menos 8 caracteres.', true);
@@ -97,7 +104,7 @@
     showMessage(data.session ? 'Cuenta creada y sesión iniciada.' : 'Cuenta creada. Revisa tu correo para confirmar la cuenta.', false);
   }));
 
-  $('accountGoogle').addEventListener('click', () => run(async () => {
+  if (googleButton) googleButton.addEventListener('click', () => run(async () => {
     const { error } = await client.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: authRedirectUrl() }
@@ -105,7 +112,7 @@
     if (error) throw error;
   }));
 
-  $('accountSignOut').addEventListener('click', () => run(async () => {
+  if (signOutButton) signOutButton.addEventListener('click', () => run(async () => {
     const { error } = await client.auth.signOut();
     if (error) throw error;
     showMessage('Sesión cerrada.', false);
