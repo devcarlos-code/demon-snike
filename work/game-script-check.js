@@ -37,7 +37,7 @@ function checkServiceWorker() {
   }
   const filesMatch = worker.match(/const FILES\s*=\s*(\[[\s\S]*?\]);/);
   if (!filesMatch) throw new Error('No se encontró la lista FILES del Service Worker');
-  const files = JSON.parse(filesMatch[1]);
+  const files = [...filesMatch[1].matchAll(/'([^']+)'/g)].map(match => match[1]);
   for (const file of files) {
     if (file === './') continue;
     read(path.posix.join('outputs', file.replace(/^\.\//, '')));
