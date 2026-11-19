@@ -29,6 +29,18 @@ function checkHtml() {
   console.log('OK HTML: ' + ids.length + ' IDs únicos; ' + localAssets.length + ' referencias locales válidas');
 }
 
+function checkGameDomReferences() {
+  const html = read('outputs/index.html');
+  const game = read('outputs/game.js');
+  const htmlIds = new Set([...html.matchAll(/\\bid=["']([^"']+)["']/g)].map(match => match[1]));
+  const referencedIds = new Set([...game.matchAll(/\\$\\(['"]([^'"]+)['"]\\)/g)].map(match => match[1]));
+  // Estos IDs se crean al abrir una vista o son opcionales por diseño.
+  const dynamicOrOptionalIds = new Set(['skinPreviewCanvas', 'runtimeError', 'tbest']);
+  const missing = [...referencedIds].filter(id => !htmlIds.has(id) && !dynamicOrOptionalIds.has(id));
+  if (missing.length) throw new Error('El juego referencia IDs que no existen en el HTML: ' + missing.join(', '));
+  console.log('OK DOM: ' + referencedIds.size + ' referencias; sin IDs obligatorios ausentes');
+}
+
 function checkServiceWorker() {
   const worker = read('outputs/service-worker.js');
   const match = worker.match(/const CACHE\s*=\s*'([^']+)'/);
@@ -63,6 +75,7 @@ try {
   checkJavaScript('outputs/auth.js');
   checkJavaScript('outputs/service-worker.js');
   checkHtml();
+  checkGameDomReferences();
   checkServiceWorker();
   checkCss();
   checkManifest();
