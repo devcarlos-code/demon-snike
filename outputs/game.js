@@ -941,7 +941,32 @@ function renderCampaign(){
       // Anillos de crecimiento: dentro de la cabeza se dibujan en coordenadas locales (antes usaban P[0] del mundo y se desplazaban).
       if (growthStacks > 0) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = Math.min(.72, .28 + growthStacks * .09); c.strokeStyle = '#ff8b45'; c.lineWidth = (2.5 + Math.min(3, growthStacks * .45)) / s; c.beginPath(); c.arc(0, 0, player.R[0] + (9 + Math.sin(t * .006) * 3) / s, 0, TAU); c.stroke(); c.globalAlpha *= .55; c.beginPath(); c.arc(0, 0, player.R[0] + (15 + Math.cos(t * .004) * 4) / s, 0, TAU); c.stroke(); c.restore() }
       if (growthStacks >= 3) { c.save(); c.globalAlpha = .42 + Math.min(.4, growthStacks * .05); c.strokeStyle = '#d34b35'; c.lineWidth = 3 + Math.min(3, player.sc); c.beginPath(); c.moveTo(-7, -10); c.quadraticCurveTo(-38, -34, -48, -8); c.moveTo(-7, 10); c.quadraticCurveTo(-38, 34, -48, 8); c.stroke(); c.restore() }
-      if ([1,2,3,4,5].includes(cobra.phase)) { const hoodOpen=Math.max(0,Math.min(1.2,cp.hood)),flap=Math.sin(t*.016)*.05*hoodOpen;c.save();c.globalAlpha=.92;c.fillStyle='#4a1d16';c.strokeStyle='#d8a34f';c.lineWidth=2.1;c.shadowColor='#c88b3c';c.shadowBlur=lowEnd?2:8;c.beginPath();c.moveTo(-7,-6);c.quadraticCurveTo(-22,-(17+hoodOpen*18+flap*12),-47,-(20+hoodOpen*20+flap*9));c.quadraticCurveTo(-43,-5,-19,0);c.quadraticCurveTo(-43,5,-47,20+hoodOpen*20+flap*9);c.quadraticCurveTo(-22,17+hoodOpen*18+flap*12,-7,6);c.closePath();c.fill();c.stroke();c.shadowBlur=0;c.strokeStyle='#f0c875';c.globalAlpha=.7;c.lineWidth=1.1;[-1,1].forEach(sd=>{c.beginPath();c.moveTo(-13,sd*5);c.quadraticCurveTo(-28,sd*(12+hoodOpen*12),-40,sd*(17+hoodOpen*15));c.stroke()});c.restore() }
+      if ([1,2,3,4,5].includes(cobra.phase)) {
+        // Capucha de cobra: abanico ovalado y continuo, sin apéndices puntiagudos que parezcan orejas.
+        const hoodOpen=Math.max(0,Math.min(1.15,cp.hood)),breath=Math.sin(t*.012)*.035*hoodOpen;
+        c.save();c.globalAlpha=.96;c.shadowColor='#d68a35';c.shadowBlur=lowEnd?1:7;
+        const hoodGrad=c.createLinearGradient(-58,0,-7,0);hoodGrad.addColorStop(0,'#24100f');hoodGrad.addColorStop(.48,'#71321f');hoodGrad.addColorStop(1,'#3b1714');
+        c.fillStyle=hoodGrad;c.strokeStyle='#e0a34c';c.lineWidth=2.2;
+        c.beginPath();c.moveTo(-7,-5);
+        c.bezierCurveTo(-20,-13-hoodOpen*8,-29,-31-hoodOpen*8-breath*12,-43,-32-hoodOpen*10);
+        c.bezierCurveTo(-59,-35-hoodOpen*8,-63,-15,-61,0);
+        c.bezierCurveTo(-63,15,-59,35+hoodOpen*8,-43,32+hoodOpen*10);
+        c.bezierCurveTo(-29,31+hoodOpen*8+breath*12,-20,13+hoodOpen*8,-7,5);
+        c.closePath();c.fill();c.stroke();
+        c.shadowBlur=0;
+        // Nervaduras simétricas que nacen junto al cuello y recorren la capucha.
+        c.strokeStyle='rgba(246,195,112,.82)';c.lineWidth=1.15;
+        [-1,1].forEach(sd=>{
+          c.beginPath();c.moveTo(-11,sd*4);
+          c.quadraticCurveTo(-30,sd*(15+hoodOpen*8),-48,sd*(23+hoodOpen*7));c.stroke();
+          c.beginPath();c.moveTo(-14,sd*5);
+          c.quadraticCurveTo(-34,sd*(12+hoodOpen*8),-57,sd*(8+hoodOpen*5));c.stroke();
+        });
+        // Ocelos discretos: patrón dorsal, no cuernos ni orejas.
+        c.fillStyle='rgba(235,174,89,.8)';
+        [-1,1].forEach(sd=>{c.beginPath();c.ellipse(-39,sd*(12+hoodOpen*3),4.2,7.2,sd*.18,0,TAU);c.fill();c.strokeStyle='rgba(35,12,12,.8)';c.lineWidth=1;c.stroke()});
+        c.restore();
+      }
       if (evo > .12) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = .35 + evo * .4; c.strokeStyle = fury > 70 ? '#ffc15c' : '#a95cff'; c.lineWidth = 2; c.beginPath(); c.moveTo(-5, -7); c.lineTo(-15 - evo * 9, -18 - evo * 8); c.lineTo(-1, -10); c.moveTo(-5, 7); c.lineTo(-15 - evo * 9, 18 + evo * 8); c.lineTo(-1, 10); c.stroke(); c.restore() }
       if (isEmber) [-1, 1].forEach(sd => { c.beginPath(); c.moveTo(-1, sd * 8); c.quadraticCurveTo(-12, sd * 24, -34, sd * 14); c.strokeStyle = '#14070a'; c.lineWidth = 7; c.stroke(); c.strokeStyle = '#d9c7b0'; c.lineWidth = 3.4; c.stroke() });
       const bitePmJaw = pm;
@@ -1285,7 +1310,7 @@ function renderCampaign(){
         o.tongue=flick(now*.001,10)*(.45+.55*e);o.bob=Math.sin(u*Math.PI)*2.1;o.eye=.58*e;
       }else if(p===2){
         const u=cl(1-t/.5),strike=Math.sin(u*Math.PI),snap=Math.sin(u*Math.PI*2);
-        o.ext=1.38*strike;o.neck=-.52*strike;o.hood=1;o.open=.3+strike*.95;o.fang=Math.min(1,strike*1.2);o.eye=.8*strike;
+        o.ext=.18*strike;o.neck=.18*strike;o.hood=1;o.open=.3+strike*.95;o.fang=Math.min(1,strike*1.2);o.eye=.8*strike;
         o.tongue=flick(u,14);o.bob=snap*2.4;
       }else if(p===3){
         const u=cl(1-t/.48);
@@ -1297,7 +1322,7 @@ function renderCampaign(){
         o.hood=.84*breath;o.open=.07;o.bob=Math.sin(now*.0032)*1.1;o.tongue=flick(now*.001,7)*.9;
       }else if(p===5){
         const u=cl(1-t/.48),chew=Math.abs(Math.sin(u*Math.PI*3));
-        o.ext=1.18+chew*.12;o.hood=.9;o.open=.18+chew*.48;o.swallow=u;o.bob=Math.sin(u*Math.PI*3)*1.4;o.fang=.4+chew*.45;
+        o.ext=.16+chew*.08;o.neck=.12;o.hood=.94;o.open=.18+chew*.48;o.swallow=u;o.bob=Math.sin(u*Math.PI*3)*1.4;o.fang=.4+chew*.45;
       }
       return o;
     }
