@@ -507,7 +507,7 @@ function renderCampaign(){
     const fields=[],meteors=[];
     function addField(type,x,y,r,d,opts){if(fields.length>10)fields.shift();fields.push(Object.assign({type,x,y,r0:r,r:0,t:0,d},opts||{}))}
     function addMeteor(x,y,tx,ty,d,r,dmg,kind){if(meteors.length>12)meteors.shift();meteors.push({x,y,tx,ty,t:0,d,r,dmg,kind:kind||'meteor'})}
-    function addSkillFx(type,x,y,angle=0){if(skillFx.length>18)skillFx.shift();const duration=type==='void_rift'?1.5:((type==='cataclysm'||type==='meteor_swarm'||type==='eclipse'||type==='soul_reaper')?1.05:0.72);skillFx.push({type,x,y,angle,t:0,d:duration});}
+    function addSkillFx(type,x,y,angle=0){if(skillFx.length>18)skillFx.shift();const duration=type==='frost_bloom'?5.4:type==='eclipse'?6.2:type==='void_rift'?1.5:((type==='cataclysm'||type==='meteor_swarm'||type==='soul_reaper')?1.05:0.72);skillFx.push({type,x,y,angle,t:0,d:duration});}
     function chooseTarget(e){
        const h=e.P[0];
        e.targetTimer=(e.targetTimer||0)-aiStepDt;
@@ -1180,7 +1180,27 @@ function renderCampaign(){
         const q=skillFx[i],u=Math.min(1,q.t/q.d),fade=(1-u)*(.88+.12*Math.sin(now*.012+i)),r=(70+u*230)*sc*(1+(lowEndDevice?.012:.035)*Math.sin(now*.009+i));
         const palette={boss_death:'#ffb36b',enemy_death:'#ff6a4a',dash:'#b77aff',breath:'#ff762d',shadows:'#9a5cff',nova:'#a9efff',soul_lance:'#8cecff',iron_ward:'#a9eaff',ember_ring:'#ff6a25',void_chain:'#a77bff',void_rift:'#b46aff',cataclysm:'#ff9c48',frost_bloom:'#8beaff',venom_storm:'#8bff83',blood_siphon:'#ff456f',gravity_well:'#b57aff',meteor_swarm:'#ffad58',dragon_beam:'#ffb34d',rune_prison:'#7edcff',mirror_skin:'#9deaff',soul_reaper:'#c7a2ff',eclipse:'#8d5bff'};
         const c=palette[q.type]||'#fff';ctx.globalAlpha=fade;ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=(q.type==='void_chain'?4:3)*sc;ctx.shadowColor=c;ctx.shadowBlur=lowEndDevice?0:12;
-        if(q.type==='breath'||q.type==='soul_lance'||q.type==='dash'||q.type==='dragon_beam'){
+        if(q.type==='frost_bloom'){
+           // Floración Glaciar: flor cristalina, sello rúnico y corona orbital.
+           const p=Math.max(0,Math.min(1,u/.72)),seal=Math.max(0,Math.min(1,(u-.12)/.48)),crown=Math.max(0,Math.min(1,(u-.32)/.34));
+           const rot=now*.00022,petals=8,flowerR=112*sc,sealR=(120+seal*790)*sc,orbitR=(65+crown*205)*sc;
+           ctx.save();ctx.globalAlpha=fade*.92;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowBlur=lowEndDevice?0:14;ctx.shadowColor='#8beaff';
+           if(seal>0){ctx.globalAlpha=fade*.58;ctx.strokeStyle='#9ceeff';ctx.lineWidth=2.2*sc;ctx.beginPath();ctx.arc(q.x,q.y,sealR,0,TAU);ctx.stroke();ctx.globalAlpha=fade*.36;ctx.lineWidth=1.1*sc;ctx.beginPath();ctx.arc(q.x,q.y,sealR*.86,-rot,TAU-rot);ctx.stroke();const marks=lowEndDevice?8:16;for(let n=0;n<marks;n++){const a=n*TAU/marks+rot;const ix=q.x+Math.cos(a)*sealR*.91,iy=q.y+Math.sin(a)*sealR*.91,ox=q.x+Math.cos(a)*sealR,oy=q.y+Math.sin(a)*sealR;ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(ox,oy);ctx.stroke();if(!lowEndDevice&&n%2===0){ctx.beginPath();ctx.arc(q.x+Math.cos(a)*sealR*.78,q.y+Math.sin(a)*sealR*.78,3.2*sc,0,TAU);ctx.stroke()}}}
+           ctx.globalAlpha=fade*(.45+.48*p);ctx.fillStyle='rgba(115,222,255,.13)';ctx.strokeStyle='#b9f5ff';ctx.lineWidth=2.4*sc;
+           for(let n=0;n<petals;n++){const a=n*TAU/petals+rot*.42,open=.42+.58*p;ctx.save();ctx.translate(q.x,q.y);ctx.rotate(a);ctx.beginPath();ctx.ellipse(flowerR*.57*open,0,flowerR*.68*open,flowerR*.27*open,0,0,TAU);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(flowerR*.55*open,-flowerR*.2*open,flowerR*1.2*open,0);ctx.stroke();ctx.restore()}
+           ctx.globalAlpha=fade;ctx.fillStyle='#e8fcff';ctx.beginPath();ctx.arc(q.x,q.y,Math.max(5,18*sc*(.7+.3*Math.sin(now*.008))),0,TAU);ctx.fill();ctx.strokeStyle='#79dcff';ctx.lineWidth=2*sc;ctx.beginPath();ctx.arc(q.x,q.y,25*sc,rot,rot+Math.PI*1.7);ctx.stroke();
+           if(crown>0){const count=lowEndDevice?6:10;ctx.globalAlpha=fade*(.55+.4*crown);ctx.strokeStyle='#d5faff';ctx.fillStyle='rgba(111,211,255,.18)';ctx.lineWidth=2.2*sc;for(let n=0;n<count;n++){const a=n*TAU/count-rot*1.8,rr=orbitR*(.82+.18*Math.sin(now*.002+n)),cx=q.x+Math.cos(a)*rr,cy=q.y+Math.sin(a)*rr,size=(17+(n%3)*5)*sc;ctx.save();ctx.translate(cx,cy);ctx.rotate(a+.35);ctx.beginPath();ctx.moveTo(0,-size*1.7);ctx.lineTo(size*.48,0);ctx.lineTo(0,size*1.7);ctx.lineTo(-size*.48,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}}
+           ctx.restore();continue;
+         }else if(q.type==='eclipse'){
+           // Eclipse Absoluto: disco celestial, vórtice y corona expansiva.
+           const celestial=Math.max(0,Math.min(1,u/.22)),vortex=Math.max(0,Math.min(1,(u-.12)/.42)),corona=Math.max(0,Math.min(1,(u-.34)/.42));
+           const rot=now*.00032,discR=145*sc*(.55+.45*celestial),ringR=(90+corona*940)*sc;
+           ctx.save();ctx.lineCap='round';ctx.globalAlpha=fade*.86;ctx.shadowBlur=lowEndDevice?0:18;ctx.shadowColor='#a875ff';
+           ctx.fillStyle='rgba(10,3,24,.72)';ctx.beginPath();ctx.arc(q.x,q.y-34*sc,discR,0,TAU);ctx.fill();ctx.strokeStyle='#bd91ff';ctx.lineWidth=(lowEndDevice?3:5)*sc;ctx.beginPath();ctx.arc(q.x,q.y-34*sc,discR*1.12,rot,rot+TAU*.94);ctx.stroke();ctx.globalAlpha=fade*.48;ctx.strokeStyle='#f0d9ff';ctx.lineWidth=1.5*sc;ctx.beginPath();ctx.arc(q.x,q.y-34*sc,discR*1.22,-rot*.7,-rot*.7+Math.PI*1.45);ctx.stroke();
+           if(vortex>0){ctx.globalAlpha=fade*.62;ctx.strokeStyle='#9e70ff';ctx.lineWidth=(lowEndDevice?1.5:2.4)*sc;const arms=lowEndDevice?2:4;for(let arm=0;arm<arms;arm++){ctx.beginPath();for(let step=0;step<=30;step++){const z=step/30,angle=rot*2+arm*TAU/arms+z*TAU*1.35,rr=(35+z*310*vortex)*sc,x=q.x+Math.cos(angle)*rr,y=q.y+Math.sin(angle)*rr;if(step===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()}}
+           if(corona>0){ctx.globalAlpha=fade*.7;ctx.strokeStyle='#c59aff';ctx.lineWidth=(lowEndDevice?2:3.2)*sc;ctx.beginPath();ctx.arc(q.x,q.y,ringR,0,TAU);ctx.stroke();ctx.globalAlpha=fade*.34;ctx.strokeStyle='#f0d9ff';ctx.lineWidth=1.4*sc;ctx.beginPath();ctx.arc(q.x,q.y,ringR*.94,-rot,TAU-rot);ctx.stroke();const rays=lowEndDevice?8:16;for(let n=0;n<rays;n++){const a=n*TAU/rays+rot*.45,inner=ringR*.88,outer=ringR*(1+.035*Math.sin(now*.003+n));ctx.beginPath();ctx.moveTo(q.x+Math.cos(a)*inner,q.y+Math.sin(a)*inner);ctx.lineTo(q.x+Math.cos(a)*outer,q.y+Math.sin(a)*outer);ctx.stroke()}}
+           ctx.restore();continue;
+         }else if(q.type==='breath'||q.type==='soul_lance'||q.type==='dash'||q.type==='dragon_beam'){
           const wide=q.type==='dragon_beam'?1.5:1;ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.angle);ctx.beginPath();ctx.moveTo(0,-12*sc*wide);ctx.lineTo(r*2.1,-r*.42*wide);ctx.lineTo(r*2.55,0);ctx.lineTo(r*2.1,r*.42*wide);ctx.lineTo(0,12*sc*wide);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(r*2.25,0);ctx.stroke();ctx.restore();
         }else if(q.type==='soul_reaper'){
           // Guadaña: arco de siega en el sentido de avance.
