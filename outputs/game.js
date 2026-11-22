@@ -654,7 +654,7 @@ function renderCampaign(){
         case 'meteor_swarm': {const targets=en.filter(e=>!e.dead).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0])).slice(0,lowEndDevice?3:6);if(!targets.length)return false;cdset(k);targets.forEach((e,j)=>{const q=e.P[0];addMeteor(q.x+rnd(-70,70),q.y-640*sc,q.x,q.y,.5+j*.17,250*sc*(U.area||1),170*skillTierPower(k),'swarm')});fx('LLUVIA DE METEOROS');return true}
         case 'mirror_skin': {cdset(k);guard=18;guardFlash=1;inv=Math.max(inv,2.4);en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<240*sc){hurt(e,110*U.dD*skillTierPower(k),0,0,true);e.stun=Math.max(e.stun,.8)}});fx('PIEL DE ESPEJO');return true}
         case 'soul_reaper': {const a=pl.A[0],range=520*sc*(U.area||1);let hit=0;for(let i=0;i<en.length;i++){const e=en[i];if(!e||e.dead)continue;const q=e.P[0],ex=q.x-h.x,ey=q.y-h.y;if(Math.hypot(ex,ey)>range||Math.abs(wrap(Math.atan2(ey,ex)-a))>1.2)continue;const damage=e.boss?e.max*.22:(e.hp<=e.max*.35?e.hp*1.2:Math.min(e.hp*.88,900));hurt(e,damage*U.dA*(e.boss?1:skillTierPower(k)),0,0,true);e.burn=Math.max(e.burn,4);e.stun=Math.max(e.stun,e.boss?0:.4);hit++}if(!hit)return false;cdset(k);for(let n=0;n<(lowEndDevice?8:18);n++){const ang=a+rnd(-1.2,1.2),rr=rnd(60,range);part(h.x+Math.cos(ang)*rr,h.y+Math.sin(ang)*rr,rnd(-140,140),rnd(-140,140),.55,3,'#c7a2ff',true)}shake=Math.max(shake,9);SFX.tent();fx('SEGADOR DE ALMAS');return true}
-        case 'eclipse': {if(!en.some(e=>!e.dead))return false;cdset(k);addField('eclipse',h.x,h.y,Math.max(WORLD_W,WORLD_H)*.9,1.7,{power:skillTierPower(k),hit:new Set()});shake=24;wf=.7;fx('ECLIPSE ABSOLUTO');return true}
+        case 'eclipse': {if(!en.some(e=>!e.dead))return false;cdset(k);addField('eclipse',h.x,h.y,Math.max(WORLD_W,WORLD_H)*.9,11.8,{power:skillTierPower(k),hit:new Set()});shake=24;wf=.7;SFX.roar();fx('ECLIPSE ABSOLUTO');return true}
         case 'dragon_beam': {
           const a=pl.A[0],range=900*sc;let hit=0;
           for(let i=0;i<en.length;i++){const e=en[i];if(!e||e.dead)continue;const q=e.P[0],dx=q.x-h.x,dy=q.y-h.y,along=dx*Math.cos(a)+dy*Math.sin(a),side=Math.abs(-dx*Math.sin(a)+dy*Math.cos(a));if(along>0&&along<range&&side<42*sc+e.R[0]*e.sc){hurt(e,205*U.dA*skillTierPower(k),Math.cos(a)*360,Math.sin(a)*360,true);e.burn=Math.max(e.burn,3.5);hit++}}
@@ -741,7 +741,7 @@ function renderCampaign(){
       for(let i=0;i<fields.length;i++){
         const f=fields[i];f.t+=dt;const u=Math.min(1,f.t/f.d);
         if(f.type==='ember')f.r=f.r0*Math.min(1,.2+u*1.5);
-        else if(f.type==='eclipse')f.r=f.r0*Math.min(1,u/.7);
+        else if(f.type==='eclipse')f.r=f.r0*Math.min(1,f.t/1.35);
         else f.r=f.r0;
         for(let j=0;j<en.length;j++){
           const e=en[j];if(e.dead)continue;const ep=e.P[0],dd=Math.hypot(ep.x-f.x,ep.y-f.y);
@@ -749,7 +749,23 @@ function renderCampaign(){
           else if(f.type==='frost'){if(dd<f.r){hurt(e,f.dmg*dt,0,0,true);e.chill=Math.max(e.chill,.32);e.vuln=Math.max(e.vuln,.32)}}
           else if(f.type==='venom'){if(dd<f.r){hurt(e,f.dmg*dt,0,0,true);e.chill=Math.max(e.chill,.25);e.burn=Math.max(e.burn,1.2)}}
           else if(f.type==='gravity'){if(dd<f.r&&dd>1){const a=Math.atan2(f.y-ep.y,f.x-ep.x),force=(e.boss?.25:1)*1100*dt;e.vx+=Math.cos(a)*force;e.vy+=Math.sin(a)*force;hurt(e,f.dmg*dt,0,0,true);e.vuln=Math.max(e.vuln,.32)}}
-          else if(f.type==='eclipse'){if(!f.hit.has(e)&&dd<f.r){f.hit.add(e);hurt(e,(e.boss?e.max*.24:420)*U.dA*f.power,0,0,true);e.burn=Math.max(e.burn,6);e.stun=Math.max(e.stun,e.boss?1.2:2.1)}}
+          else if(f.type==='eclipse'){
+            if(dd<f.r&&dd>1){
+              const nx=(f.x-ep.x)/dd,ny=(f.y-ep.y)/dd;
+              const orbit=Math.max(0,1-Math.abs(dd-f.r*.34)/(f.r*.28));
+              const strength=(e.boss?.22:1)*(250+220*Math.min(1,f.t/2.4))*dt;
+              e.vx+=nx*strength-ny*strength*orbit*.72;
+              e.vy+=ny*strength+nx*strength*orbit*.72;
+              const maxPull=e.boss?185:430,speed=Math.hypot(e.vx,e.vy);
+              if(speed>maxPull){e.vx=e.vx/speed*maxPull;e.vy=e.vy/speed*maxPull}
+              if(!f.hit.has(e)){
+                f.hit.add(e);
+                hurt(e,(e.boss?e.max*.24:420)*U.dA*f.power,0,0,true);
+                e.burn=Math.max(e.burn,6);
+                e.stun=Math.max(e.stun,e.boss?1.2:2.1);
+              }
+            }
+          }
         }
         if(f.type==='gravity'){for(let j=0;j<shots.length;j++){const s=shots[j];if(Math.hypot(s.x-f.x,s.y-f.y)<f.r*.65)s.l=0}}
         if(f.t<f.d)fields[aliveFields++]=f;
@@ -1133,7 +1149,7 @@ function renderCampaign(){
         ctx.globalAlpha=Math.max(0,fade);
         const grd=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r);
         if(f.type==='gravity'){grd.addColorStop(0,'rgba(6,0,18,.9)');grd.addColorStop(.45,'rgba(70,25,150,.5)');grd.addColorStop(1,'rgba(150,90,255,0)')}
-        else{grd.addColorStop(0,'rgba(12,0,26,.4)');grd.addColorStop(.75,'rgba(60,10,110,.26)');grd.addColorStop(1,'rgba(0,0,0,0)')}
+        else{grd.addColorStop(0,'rgba(0,0,0,.96)');grd.addColorStop(.22,'rgba(8,4,12,.78)');grd.addColorStop(.48,'rgba(92,34,10,.28)');grd.addColorStop(.72,'rgba(205,112,38,.13)');grd.addColorStop(1,'rgba(0,0,0,0)')}
         ctx.fillStyle=grd;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,TAU);ctx.fill();
       }
       ctx.restore();
@@ -1165,10 +1181,19 @@ function renderCampaign(){
           ctx.strokeStyle='rgba(186,130,255,.9)';ctx.shadowColor='#a04bff';ctx.lineWidth=2.5*sc;
           for(let k=0;k<5;k++){const a=now/220+k*TAU/5;ctx.beginPath();ctx.arc(f.x,f.y,r*(.2+k*.17),a,a+2.4);ctx.stroke()}
         }else if(f.type==='eclipse'){
-          ctx.strokeStyle='rgba(150,100,255,.95)';ctx.shadowColor='#8d5bff';ctx.lineWidth=Math.max(2,(6-4*u))*sc;
-          ctx.beginPath();ctx.arc(f.x,f.y,r,0,TAU);ctx.stroke();
-          ctx.strokeStyle='rgba(235,215,255,.8)';ctx.lineWidth=1.5*sc;
-          ctx.beginPath();ctx.arc(f.x,f.y,r*.94,0,TAU);ctx.stroke();
+          const spin=now*.00019,core=118*sc,progress=Math.min(1,f.t/2.2);
+          ctx.globalAlpha=fade*.92;ctx.shadowColor='#ff9a42';ctx.shadowBlur=lowEndDevice?0:22;
+          const disk=ctx.createRadialGradient(f.x,f.y-28*sc,core*.48,f.x,f.y-28*sc,Math.max(core*2.2,r*.32));
+          disk.addColorStop(0,'rgba(0,0,0,.98)');disk.addColorStop(.48,'rgba(9,5,9,.92)');disk.addColorStop(.62,'rgba(255,190,105,.35)');disk.addColorStop(.72,'rgba(255,112,35,.16)');disk.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=disk;ctx.beginPath();ctx.arc(f.x,f.y,r*.42,0,TAU);ctx.fill();
+          ctx.strokeStyle='rgba(255,205,145,.9)';ctx.lineWidth=(lowEndDevice?2:4)*sc;
+          ctx.beginPath();ctx.ellipse(f.x,f.y-28*sc,core*1.75,core*.43,spin,0,TAU);ctx.stroke();
+          ctx.strokeStyle='rgba(255,247,224,.92)';ctx.lineWidth=1.5*sc;
+          ctx.beginPath();ctx.ellipse(f.x,f.y-28*sc,core*1.38,core*.25,-spin*.72,0,TAU*.86);ctx.stroke();
+          const arcs=lowEndDevice?2:4;
+          ctx.strokeStyle='rgba(255,176,92,.56)';ctx.lineWidth=2*sc;
+          for(let n=0;n<arcs;n++){const a=spin+n*TAU/arcs;ctx.beginPath();ctx.ellipse(f.x,f.y, r*(.18+n*.055),r*(.07+n*.018),a,0,TAU*.82);ctx.stroke()}
+          if(progress>.25){ctx.globalAlpha=fade*.3;ctx.strokeStyle='rgba(255,232,195,.8)';ctx.lineWidth=1.2*sc;ctx.beginPath();ctx.arc(f.x,f.y,r*.82,spin,spin+TAU*.72);ctx.stroke()}
         }
       }
       ctx.restore();
@@ -1199,20 +1224,44 @@ function renderCampaign(){
            ctx.globalAlpha=fade*.34;ctx.strokeStyle='#e8fcff';const gusts=lowEndDevice?3:6;for(let n=0;n<gusts;n++){const angle=spin*2+n*TAU/gusts;ctx.beginPath();ctx.ellipse(q.x,q.y,wideRing*.62,wideRing*.22,angle,0,TAU*.78);ctx.stroke()}
            ctx.restore();continue;
          }else if(q.type==='eclipse'){
-           // Eclipse Absoluto: disco celestial, vórtice y corona expansiva.
-           const celestial=Math.max(0,Math.min(1,u/.22)),vortex=Math.max(0,Math.min(1,(u-.12)/.42)),corona=Math.max(0,Math.min(1,(u-.34)/.42));
-           const rot=now*.00032,discR=145*sc*(.55+.45*celestial),ringR=(90+corona*940)*sc;
-           ctx.save();ctx.lineCap='round';ctx.globalAlpha=fade*.86;ctx.shadowBlur=lowEndDevice?0:18;ctx.shadowColor='#a875ff';
-           ctx.fillStyle='rgba(10,3,24,.72)';ctx.beginPath();ctx.arc(q.x,q.y-34*sc,discR,0,TAU);ctx.fill();ctx.strokeStyle='#bd91ff';ctx.lineWidth=(lowEndDevice?3:5)*sc;ctx.beginPath();ctx.arc(q.x,q.y-34*sc,discR*1.12,rot,rot+TAU*.94);ctx.stroke();ctx.globalAlpha=fade*.48;ctx.strokeStyle='#f0d9ff';ctx.lineWidth=1.5*sc;ctx.beginPath();ctx.arc(q.x,q.y-34*sc,discR*1.22,-rot*.7,-rot*.7+Math.PI*1.45);ctx.stroke();
-           if(vortex>0){ctx.globalAlpha=fade*.62;ctx.strokeStyle='#9e70ff';ctx.lineWidth=(lowEndDevice?1.5:2.4)*sc;const arms=lowEndDevice?2:4;for(let arm=0;arm<arms;arm++){ctx.beginPath();for(let step=0;step<=30;step++){const z=step/30,angle=rot*2+arm*TAU/arms+z*TAU*1.35,rr=(35+z*310*vortex)*sc,x=q.x+Math.cos(angle)*rr,y=q.y+Math.sin(angle)*rr;if(step===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()}}
-           if(corona>0){ctx.globalAlpha=fade*.7;ctx.strokeStyle='#c59aff';ctx.lineWidth=(lowEndDevice?2:3.2)*sc;ctx.beginPath();ctx.arc(q.x,q.y,ringR,0,TAU);ctx.stroke();ctx.globalAlpha=fade*.34;ctx.strokeStyle='#f0d9ff';ctx.lineWidth=1.4*sc;ctx.beginPath();ctx.arc(q.x,q.y,ringR*.94,-rot,TAU-rot);ctx.stroke();const rays=lowEndDevice?8:16;for(let n=0;n<rays;n++){const a=n*TAU/rays+rot*.45,inner=ringR*.88,outer=ringR*(1+.035*Math.sin(now*.003+n));ctx.beginPath();ctx.moveTo(q.x+Math.cos(a)*inner,q.y+Math.sin(a)*inner);ctx.lineTo(q.x+Math.cos(a)*outer,q.y+Math.sin(a)*outer);ctx.stroke()}}
-           // Fase cinematográfica sostenida: disco de acreción, espirales y filamentos.
-           const eclipseTime=q.t,eclipseSpin=now*.00016,halo=(230+Math.min(1,eclipseTime/5)*640)*sc;
-           ctx.globalAlpha=fade*.62;ctx.strokeStyle='#b98aff';ctx.lineWidth=(lowEndDevice?2:4)*sc;
-           ctx.beginPath();ctx.ellipse(q.x,q.y-34*sc,discR*1.55,discR*.38,eclipseSpin,0,TAU);ctx.stroke();
-           ctx.globalAlpha=fade*.38;ctx.strokeStyle='#f0dcff';ctx.beginPath();ctx.ellipse(q.x,q.y-34*sc,discR*1.82,discR*.22,-eclipseSpin*.7,0,TAU*.86);ctx.stroke();
-           const tendrils=lowEndDevice?5:10;ctx.globalAlpha=fade*.55;ctx.strokeStyle='#7544bd';ctx.lineWidth=(lowEndDevice?2:4)*sc;for(let n=0;n<tendrils;n++){const angle=n*TAU/tendrils-eclipseSpin*2,len=(170+40*Math.sin(eclipseTime*1.4+n))*sc;ctx.beginPath();ctx.moveTo(q.x+Math.cos(angle)*discR*.8,q.y+Math.sin(angle)*discR*.8);ctx.bezierCurveTo(q.x+Math.cos(angle+.5)*len,q.y+Math.sin(angle+.5)*len,q.x+Math.cos(angle-.35)*len*1.5,q.y+Math.sin(angle-.35)*len*1.5,q.x+Math.cos(angle)*len*2,q.y+Math.sin(angle)*len*2);ctx.stroke()}
-           ctx.globalAlpha=fade*.25;ctx.strokeStyle='#d8bdff';ctx.beginPath();ctx.arc(q.x,q.y,halo,eclipseSpin,eclipseSpin+TAU*.72);ctx.stroke();ctx.beginPath();ctx.arc(q.x,q.y,halo*.88,-eclipseSpin,TAU-eclipseSpin);ctx.stroke();
+           // ECLIPSE ABSOLUTO · horizonte de sucesos + disco de acreción cinematográfico.
+           const t=q.t,awakening=Math.max(0,Math.min(1,t/1.15)),diskOpen=Math.max(0,Math.min(1,(t-.65)/2.1)),lens=Math.max(0,Math.min(1,(t-1.1)/2.2)),collapse=Math.max(0,Math.min(1,(t-9.4)/2.1));
+           const spin=now*.00034,core=(112+18*Math.sin(now*.002))*sc*(.62+.38*awakening),diskRx=(core*2.75)*(0.35+.65*diskOpen),diskRy=core*.62,halo=(260+lens*780)*sc;
+           ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+           // Sombra gravitacional: oscurece el centro sin tapar el resto de la arena.
+           const shadow=ctx.createRadialGradient(q.x,q.y,core*.35,q.x,q.y,halo);
+           shadow.addColorStop(0,'rgba(0,0,0,.98)');shadow.addColorStop(.16,'rgba(3,2,5,.94)');shadow.addColorStop(.38,'rgba(20,8,12,.42)');shadow.addColorStop(.7,'rgba(12,5,18,.13)');shadow.addColorStop(1,'rgba(0,0,0,0)');
+           ctx.globalAlpha=fade*.9;ctx.fillStyle=shadow;ctx.beginPath();ctx.arc(q.x,q.y,halo,0,TAU);ctx.fill();
+           // Disco de acreción: varias capas cálidas y un núcleo blanco incandescente.
+           ctx.globalCompositeOperation='lighter';
+           ctx.globalAlpha=fade*(.34+.5*diskOpen);ctx.shadowColor='#ff9b42';ctx.shadowBlur=lowEndDevice?0:26;
+           ctx.strokeStyle='rgba(255,116,35,.62)';ctx.lineWidth=(lowEndDevice?10:18)*sc;
+           ctx.beginPath();ctx.ellipse(q.x,q.y-26*sc,diskRx*1.12,diskRy*1.22,spin*.38,0,TAU);ctx.stroke();
+           ctx.strokeStyle='rgba(255,188,104,.88)';ctx.lineWidth=(lowEndDevice?5:9)*sc;
+           ctx.beginPath();ctx.ellipse(q.x,q.y-26*sc,diskRx,diskRy,spin*.38,0,TAU);ctx.stroke();
+           ctx.strokeStyle='rgba(255,246,220,.94)';ctx.lineWidth=(lowEndDevice?2:4)*sc;
+           ctx.beginPath();ctx.ellipse(q.x,q.y-26*sc,diskRx*.82,diskRy*.52,spin*.38,0,TAU*.92);ctx.stroke();
+           // Lente gravitacional: arcos desplazados por encima y debajo del horizonte.
+           ctx.globalAlpha=fade*(.42+.3*lens);ctx.strokeStyle='rgba(255,224,180,.8)';ctx.lineWidth=2*sc;
+           ctx.beginPath();ctx.ellipse(q.x,q.y-26*sc,core*1.72,core*.9,-spin*.24,Math.PI*1.02,Math.PI*1.98);ctx.stroke();
+           ctx.strokeStyle='rgba(255,151,76,.58)';ctx.beginPath();ctx.ellipse(q.x,q.y-26*sc,core*2.18,core*1.08,spin*.22,Math.PI*.08,Math.PI*.92);ctx.stroke();
+           // Filamentos curvados que caen hacia el horizonte.
+           const filaments=lowEndDevice?5:10;
+           ctx.globalAlpha=fade*.62;ctx.strokeStyle='rgba(255,176,105,.72)';ctx.lineWidth=(lowEndDevice?1.2:2.2)*sc;ctx.shadowBlur=lowEndDevice?0:12;
+           for(let n=0;n<filaments;n++){const a=n*TAU/filaments-spin*1.45,outer=core*(2.2+(n%3)*.48),inner=core*(.82+(n%2)*.12);ctx.beginPath();ctx.moveTo(q.x+Math.cos(a)*outer*1.7,q.y+Math.sin(a)*outer*.92);ctx.bezierCurveTo(q.x+Math.cos(a+.72)*outer*1.2,q.y+Math.sin(a+.72)*outer*1.2,q.x+Math.cos(a-.55)*inner*1.6,q.y+Math.sin(a-.55)*inner*1.6,q.x+Math.cos(a)*inner,q.y+Math.sin(a)*inner);ctx.stroke()}
+           // Espirales orbitales y anillos exteriores a escala de arena.
+           const arms=lowEndDevice?2:4;
+           ctx.globalAlpha=fade*(.48+.25*lens);ctx.strokeStyle='rgba(255,194,132,.68)';ctx.lineWidth=(lowEndDevice?1.3:2.4)*sc;
+           for(let arm=0;arm<arms;arm++){ctx.beginPath();for(let step=0;step<=34;step++){const z=step/34,a=spin+arm*TAU/arms+z*TAU*1.65,rr=(core*1.4+z*halo*.72)*(1-.22*collapse),x=q.x+Math.cos(a)*rr,y=q.y+Math.sin(a)*rr*.72;if(step===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()}
+           ctx.globalAlpha=fade*.34;ctx.strokeStyle='rgba(255,232,202,.8)';ctx.lineWidth=1.4*sc;
+           ctx.beginPath();ctx.ellipse(q.x,q.y,halo*(.94-.18*collapse),halo*.34,spin*.18,0,TAU);ctx.stroke();
+           // Horizonte de sucesos: disco negro nítido y anillo luminoso fino.
+           ctx.globalAlpha=fade;ctx.shadowBlur=lowEndDevice?0:24;ctx.shadowColor='#ffb66c';
+           ctx.fillStyle='#020204';ctx.beginPath();ctx.arc(q.x,q.y,core,0,TAU);ctx.fill();
+           ctx.strokeStyle='rgba(255,220,174,.96)';ctx.lineWidth=(lowEndDevice?2:3.5)*sc;ctx.beginPath();ctx.arc(q.x,q.y,core*1.055,spin,spin+TAU*.94);ctx.stroke();
+           ctx.strokeStyle='rgba(255,130,58,.72)';ctx.lineWidth=2*sc;ctx.beginPath();ctx.arc(q.x,q.y,core*1.14,-spin*.7,-spin*.7+TAU*.78);ctx.stroke();
+           // Pulso final: contracción visual, sin una explosión que altere el daño.
+           if(collapse>0){ctx.globalAlpha=fade*collapse*.72;ctx.strokeStyle='rgba(255,220,176,.9)';ctx.lineWidth=2*sc;ctx.beginPath();ctx.arc(q.x,q.y,halo*(1-collapse*.72),0,TAU);ctx.stroke()}
            ctx.restore();continue;
          }else if(q.type==='breath'||q.type==='soul_lance'||q.type==='dash'||q.type==='dragon_beam'){
           const wide=q.type==='dragon_beam'?1.5:1;ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.angle);ctx.beginPath();ctx.moveTo(0,-12*sc*wide);ctx.lineTo(r*2.1,-r*.42*wide);ctx.lineTo(r*2.55,0);ctx.lineTo(r*2.1,r*.42*wide);ctx.lineTo(0,12*sc*wide);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(r*2.25,0);ctx.stroke();ctx.restore();
