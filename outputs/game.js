@@ -654,7 +654,7 @@ function renderCampaign(){
         case 'meteor_swarm': {const targets=en.filter(e=>!e.dead).sort((a,b)=>dst(h,a.P[0])-dst(h,b.P[0])).slice(0,lowEndDevice?3:6);if(!targets.length)return false;cdset(k);targets.forEach((e,j)=>{const q=e.P[0];addMeteor(q.x+rnd(-70,70),q.y-640*sc,q.x,q.y,.5+j*.17,250*sc*(U.area||1),170*skillTierPower(k),'swarm')});fx('LLUVIA DE METEOROS');return true}
         case 'mirror_skin': {cdset(k);guard=18;guardFlash=1;inv=Math.max(inv,2.4);en.forEach(e=>{if(!e.dead&&dst(h,e.P[0])<240*sc){hurt(e,110*U.dD*skillTierPower(k),0,0,true);e.stun=Math.max(e.stun,.8)}});fx('PIEL DE ESPEJO');return true}
         case 'soul_reaper': {const a=pl.A[0],range=520*sc*(U.area||1);let hit=0;for(let i=0;i<en.length;i++){const e=en[i];if(!e||e.dead)continue;const q=e.P[0],ex=q.x-h.x,ey=q.y-h.y;if(Math.hypot(ex,ey)>range||Math.abs(wrap(Math.atan2(ey,ex)-a))>1.2)continue;const damage=e.boss?e.max*.22:(e.hp<=e.max*.35?e.hp*1.2:Math.min(e.hp*.88,900));hurt(e,damage*U.dA*(e.boss?1:skillTierPower(k)),0,0,true);e.burn=Math.max(e.burn,4);e.stun=Math.max(e.stun,e.boss?0:.4);hit++}if(!hit)return false;cdset(k);for(let n=0;n<(lowEndDevice?8:18);n++){const ang=a+rnd(-1.2,1.2),rr=rnd(60,range);part(h.x+Math.cos(ang)*rr,h.y+Math.sin(ang)*rr,rnd(-140,140),rnd(-140,140),.55,3,'#c7a2ff',true)}shake=Math.max(shake,9);SFX.tent();fx('SEGADOR DE ALMAS');return true}
-        case 'eclipse': {if(!en.some(e=>!e.dead))return false;cdset(k);addField('eclipse',h.x,h.y,Math.max(WORLD_W,WORLD_H)*.9,11.8,{power:skillTierPower(k),hit:new Set()});shake=24;wf=.7;SFX.roar();fx('ECLIPSE ABSOLUTO');return true}
+        case 'eclipse': {if(!en.some(e=>!e.dead))return false;cdset(k);addField('eclipse',WORLD_W*.5,WORLD_H*.5,Math.max(WORLD_W,WORLD_H)*.9,11.8,{power:skillTierPower(k),hit:new Set()});shake=24;wf=.7;SFX.roar();fx('ECLIPSE ABSOLUTO');return true}
         case 'dragon_beam': {
           const a=pl.A[0],range=900*sc;let hit=0;
           for(let i=0;i<en.length;i++){const e=en[i];if(!e||e.dead)continue;const q=e.P[0],dx=q.x-h.x,dy=q.y-h.y,along=dx*Math.cos(a)+dy*Math.sin(a),side=Math.abs(-dx*Math.sin(a)+dy*Math.cos(a));if(along>0&&along<range&&side<42*sc+e.R[0]*e.sc){hurt(e,205*U.dA*skillTierPower(k),Math.cos(a)*360,Math.sin(a)*360,true);e.burn=Math.max(e.burn,3.5);hit++}}
@@ -672,7 +672,7 @@ function renderCampaign(){
       if (state !== 'play') return; initAudio();
       const now = performance.now(), pair = lastK && lastK !== k ? [lastK, k].sort().join('') : '';
       if (pair && skillForSlot(lastK) && skillForSlot(k) && now - lastT < 380 && COMBOS[pair] && tryCombo(pair, k)) { lastK = null; return }
-      if (single(k)) { const h=pl.P[0],skill=skillForSlot(k);addSkillFx(skill?.effect||'nova',h.x,h.y,pl.A[0]);lastK = k; lastT = now }
+      if (single(k)) { const h=pl.P[0],skill=skillForSlot(k),center=skill?.effect==='eclipse';addSkillFx(skill?.effect||'nova',center?WORLD_W*.5:h.x,center?WORLD_H*.5:h.y,pl.A[0]);lastK = k; lastT = now }
     }
     function fireTick(dt) {
       once('fire', 90, SFX.fire);
@@ -684,7 +684,7 @@ function renderCampaign(){
       });
       shake = Math.max(shake, 2);
     }
-    let cameraReady=false;function updateCamera(dt=1/60){const desiredZoom=Math.max(.72,1-Math.max(0,pl.sc-1)*.22-Math.max(0,growthStacks-2)*.025);cameraZoom+=(desiredZoom-cameraZoom)*(1-Math.exp(-dt*2.8));const viewW=W/cameraZoom,viewH=H/cameraZoom,tx=Math.max(0,Math.min(WORLD_W-viewW,pl.P[0].x-viewW/2)),ty=Math.max(0,Math.min(WORLD_H-viewH,pl.P[0].y-viewH/2));if(!cameraReady){camX=tx;camY=ty;cameraReady=true;return}const k=1-Math.exp(-dt*13);camX+=(tx-camX)*k;camY+=(ty-camY)*k}
+    let cameraReady=false;function updateCamera(dt=1/60){const normalZoom=Math.max(.72,1-Math.max(0,pl.sc-1)*.22-Math.max(0,growthStacks-2)*.025);let eclipse=null;for(let i=fields.length-1;i>=0;i--)if(fields[i].type==='eclipse'){eclipse=fields[i];break}let cinematic=0;if(eclipse){const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)},pull=smooth(eclipse.t/3.8),returning=smooth((eclipse.t-10.35)/1.45);cinematic=pull*(1-returning)}const fitZoom=Math.min(W/WORLD_W,H/WORLD_H)*.9,desiredZoom=normalZoom+(fitZoom-normalZoom)*cinematic;cameraZoom+=(desiredZoom-cameraZoom)*(1-Math.exp(-dt*(cinematic>.02?3.8:2.8)));const viewW=W/cameraZoom,viewH=H/cameraZoom,cx=WORLD_W*.5*cinematic+pl.P[0].x*(1-cinematic),cy=WORLD_H*.5*cinematic+pl.P[0].y*(1-cinematic),tx=Math.max(0,Math.min(WORLD_W-viewW,cx-viewW/2)),ty=Math.max(0,Math.min(WORLD_H-viewH,cy-viewH/2));if(!cameraReady){camX=tx;camY=ty;cameraReady=true;return}const k=1-Math.exp(-dt*(cinematic>.02?3.6:13));camX+=(tx-camX)*k;camY+=(ty-camY)*k}
      function step(dt) {
       if (state === 'pause') return;
       if(state==='play'&&gameMode==='campaign')campaignLevelTime+=dt;
@@ -741,7 +741,7 @@ function renderCampaign(){
       for(let i=0;i<fields.length;i++){
         const f=fields[i];f.t+=dt;const u=Math.min(1,f.t/f.d);
         if(f.type==='ember')f.r=f.r0*Math.min(1,.2+u*1.5);
-        else if(f.type==='eclipse')f.r=f.r0*Math.min(1,f.t/1.35);
+        else if(f.type==='eclipse')f.r=f.r0*(1-Math.pow(1-Math.min(1,f.t/4.1),3));
         else f.r=f.r0;
         for(let j=0;j<en.length;j++){
           const e=en[j];if(e.dead)continue;const ep=e.P[0],dd=Math.hypot(ep.x-f.x,ep.y-f.y);
