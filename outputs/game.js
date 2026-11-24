@@ -243,6 +243,7 @@
          const checkpointStoredInSession=!!(cp&&activeSessionId&&sessions.some(x=>x.id===activeSessionId&&x.checkpoint===cp));
          const buildSave=()=>({version:2,best,coins,campaignUnlocked,ownedSkills:[...ownedSkills],skillLoadout:[...skillLoadout],shopBonusClaimed,stats:{...stats},sessions:sessions.filter(x=>(x.mode||x.checkpoint?.mode||'survival')==='survival').sort((a,b)=>(Number(b.updatedAt)||Number(b.createdAt)||0)-(Number(a.updatedAt)||Number(a.createdAt)||0)).slice(0,10),activeSessionId,campaignCompleted,campaignResults,skillFragments,skillMasteries,achievements:[...achievementsUnlocked],checkpoint:checkpointStoredInSession?null:cp,savedAt:Date.now()});
          saveData=buildSave();
+         if(!writeProfileBackup(saveData)&&!profileBackupWarningShown){profileBackupWarningShown=true;toast('PERFIL GUARDADO · RESPALDO EXTRA NO DISPONIBLE')}
          try{writeMainSave(saveData)}
          catch(storageError){
            let saved=false;
@@ -268,7 +269,6 @@
              toast('PARTIDA GUARDADA · DATOS OPTIMIZADOS');
            }else toast('GUARDADO OPTIMIZADO · SE LIBERÓ ESPACIO');
          }
-         if(!writeProfileBackup(saveData)&&!profileBackupWarningShown){profileBackupWarningShown=true;toast('PERFIL GUARDADO · RESPALDO EXTRA NO DISPONIBLE')}
          if(gameMode==='survival'&&cp&&!writeSurvivalBackup(cp)){toast('GUARDADO PRINCIPAL OK · RESPALDO DE PARTIDA NO VERIFICADO');return false}
          try{localStorage.setItem('arena_serpientes_best',String(best))}catch(secondarySaveError){}
          try{refreshHome()}catch(homeRefreshError){}
@@ -474,7 +474,7 @@ function renderCampaign(){
         toast('ERROR AL INICIAR · '+(error?.message||'REINTENTA'));
       }
     }
-    function continueSavedGame(id){const session=sessions.find(x=>x.id===id);if(!session)return;gameMode=session.mode||session.checkpoint?.mode||'survival';campaignStartLevel=gameMode==='campaign'?Math.max(1,Math.min(campaignUnlocked,session.checkpoint?.level||session.level||1)):1;activeSessionId=session.id;saveData.checkpoint=session.checkpoint||null;$('title').style.display='none';initAudio();try{if(session.checkpoint)newGame(true);else newGame(false,session.id);tryFullscreen()}catch(error){state='title';$('title').style.display='grid';toast('NO SE PUDO ABRIR LA PARTIDA · '+(error?.message||'REINTENTA'));console.error('Error al continuar partida:',error)}}
+    function continueSavedGame(id){const session=sessions.find(x=>x.id===id);if(!session)return;gameMode=session.mode||session.checkpoint?.mode||'survival';campaignStartLevel=gameMode==='campaign'?Math.max(1,Math.min(campaignUnlocked,session.checkpoint?.level||session.level||1)):1;activeSessionId=session.checkpoint?session.id:null;saveData.checkpoint=session.checkpoint||null;$('title').style.display='none';initAudio();try{if(session.checkpoint)newGame(true);else newGame(false);tryFullscreen()}catch(error){state='title';$('title').style.display='grid';toast('NO SE PUDO ABRIR LA PARTIDA · '+(error?.message||'REINTENTA'));console.error('Error al continuar partida:',error)}}
     function goHome(){if(state==='play'||state==='pause'||state==='upg')persist(gameMode!=='campaign');state='title';$('title').style.display='grid';$('over').style.display='none';$('pz').style.display='none';$('upg').style.display='none';refreshHome()}
      function saveAndExitSurvival(){if(gameMode!=='survival'||!['pause','play','upg'].includes(state)){toast('SOLO DISPONIBLE EN SUPERVIVENCIA');return}if(state!=='pause'){state='pause';$('pz').style.display='flex';$('upg').style.display='none'}const b=$('pauseSaveExit');b.disabled=true;b.textContent='GUARDANDO…';const ok=persist(true);b.disabled=false;b.textContent='GUARDAR Y SALIR';if(!ok){toast('NO SE PUDO VERIFICAR · SIGUES EN PAUSA');return}state='title';$('title').style.display='grid';$('over').style.display='none';$('pz').style.display='none';$('upg').style.display='none';refreshHome();toast('SUPERVIVENCIA GUARDADA')}
     function restart() { if (state === 'over' && performance.now() - overAt > 700) { $('over').querySelector('h1').textContent='FIN DE PARTIDA';newGame(false)} }
